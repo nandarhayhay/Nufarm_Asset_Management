@@ -1,0 +1,100 @@
+﻿<!--
+    idapp = models.IntegerField(db_column='IDApp',primary_key=True)  # Field name made lowercase.
+    itemcode = models.CharField(db_column='ItemCode', max_length=30)  # Field name made lowercase.
+    goodsname = models.CharField(db_column='GoodsName', max_length=100)  # Field name made lowercase.
+    brandname = models.CharField(db_column='BrandName', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    typeapp = models.CharField(db_column='TypeApp', max_length=32)  # Field name made lowercase.
+    priceperunit = models.DecimalField(db_column='PricePerUnit', max_digits=10,decimal_places=4)  # Field name made lowercase.
+    depreciationmethod = models.CharField(db_column='DepreciationMethod', max_length=2)  # Field name made lowercase.
+    unit = models.CharField(db_column='Unit', max_length=30)  # Field name madelowercase.
+    economiclife = models.DecimalField(db_column='EconomicLife', max_digits=10,decimal_places=2)  # Field name made lowercase.
+    placement = models.CharField(db_column='Placement', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    descriptions = models.CharField(db_column='Descriptions', max_length=150, blank=True, null=True)  # Field name made lowercase.
+    inactive = models.IntegerField(db_column='InActive', blank=True, null=True) # Field name made lowercase.
+    createddate = models.DateTimeField(db_column='CreatedDate')  # Field name made lowercase.
+    createdby = models.CharField(db_column='CreatedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)  # Field name made lowercase.
+    modifiedby = models.CharField(db_column='ModifiedBy', max_length=100, blank=True, null=True)
+-->
+<div class="row" style="overflow:auto;">
+    <!--
+//================load jquery-ui.min.js untuk ngaktifkan autocomplete ================
+
+    -->
+    
+    <!--Bagi dua Rownya-->
+    <div class="col-md-12">
+        <form action="." method="post" class="form-horizontal" enctype="multipart/form-data" style="background-color:transparent;font-size: 1em;" id="frm-NA-Entry-Goods" onsubmit="return false;">
+            {% csrf_token %}
+
+            <div class="NA-Entry-div-row">
+                <div class="NA-Entry-inlinve-div">
+                    <label for="itemcode" class="NA-Entry-label;">Item Code</label>
+                    {{ form.itemcode }}
+                </div>
+                <div class="NA-Entry-inlinve-div">
+                    <label for="goodsname" class="NA-Entry-label;">goods name</label>
+                    {{ form.goodsname }}
+                </div>
+                <div class="NA-Entry-inlinve-div">
+                    <label for="brandname" class="NA-Entry-label;">Brand Name</label>
+                    {{ form.brandname }}
+                </div>
+            </div>
+            <div class="NA-Entry-div-row">
+                <div class="NA-Entry-inlinve-div">
+                    <label for="typeapp" class="NA-Entry-label;">type of goods</label>
+                    {{ form.typeapp }}
+                </div>
+                <div class="NA-Entry-inlinve-div">
+                    <label for="priceperunit" class="NA-Entry-label;">Price/Unit</label>
+                    {{ form.priceperunit }}
+                </div>
+                <div class="NA-Entry-inlinve-div" style="vertical-align:bottom">
+                    <fieldset>
+                        <legend>Unit</legend>
+                        {{ form.unit }}
+                    </fieldset>
+                </div>
+                <div class="NA-Entry-inlinve-div" style="vertical-align:bottom">
+                    <fieldset>
+                        <legend>placement</legend>
+                        {{ form.placement }}
+                    </fieldset>
+                </div>
+            </div>
+            <div class="NA-Entry-div-row">
+                <div class="NA-Entry-inlinve-div" style="vertical-align: bottom;">
+                    <fieldset>
+                        <legend>economiclife</legend>
+                        {{ form.economiclife }}
+                    </fieldset>
+                </div>
+                <div class="NA-Entry-inlinve-div">
+                    <fieldset style="margin-left:auto;">
+                        <legend>Depreciation Method</legend>
+                        {{ form.depreciationmethod }}
+                    </fieldset>
+                </div>
+                <div class="NA-Entry-inlinve-div">
+                    <div class="checkbox">
+                        <label>  {{ form.inactive }} In Active </label>
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="NA-Entry-div-row">
+                 <div class="NA-Entry-inlinve-div">
+                    <label for="descriptions" class="NA-Entry-label;">Descriptions / Remark/Unit</label>
+                    {{ form.descriptions }}
+                </div>                
+            </div>
+             <input type="submit" style="display:none" id="inputButton">  
+            {{ form.status }}
+            {{ form.initializeForm }}
+            {{ form.idapp}}
+          
+        </form>
+    </div>
+
+</div>

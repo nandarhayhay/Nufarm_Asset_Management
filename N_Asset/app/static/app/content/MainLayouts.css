@@ -1,0 +1,402 @@
+﻿html {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font: Verdana, Arial, Helvetica, sans-serif;
+    /*background-color: #f1f1f1;*/
+    /*background:url('/Image/BackgroundImageLogo.jpg')no-repeat center top, linear-gradient(48deg,#E0E0E0,#FEFFFD,#8FBC8F) center top repeat-y;*/
+    margin: 0;
+    padding: 0;
+    color: #000;
+    background-image: linear-gradient(48deg,#E0E0E0,#FEFFFD,#8FBC8F);
+}
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* styles for validation helpers */
+.field-validation-error {
+    color: #b94a48;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-errors {
+    color: #b94a48;
+}
+
+.validation-summary-valid {
+    display: none;
+}
+
+/* ~~ Element/tag selectors ~~ */
+ul, ol, dl { /* Due to variations between browsers, it's best practices to zero padding and margin on lists. For consistency, you can either specify the amounts you want here, or on the list items (LI, DT, DD) they contain. Remember that what you do here will cascade to the .nav list unless you write a more specific selector. */
+    padding: 0;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin-top: 0; /* removing the top margin gets around an issue where margins can escape from their containing block. The remaining bottom margin will hold it away from any elements that follow. */
+    padding-right: 5px;
+    padding-left: 5px; /* adding the padding to the sides of the elements within the blocks, instead of the block elements themselves, gets rid of any box model math. A nested block with side padding can also be used as an alternate method. */
+}
+
+a img { /* this selector removes the default blue border displayed in some browsers around an image when it is surrounded by a link */
+    border: none;
+}
+/* ~~ Styling for your site's links must remain in this order - including the group of selectors that create the hover effect. ~~ */
+a:link {
+    color: #42413C;
+    text-decoration: underline; /* unless you style your links to look extremely unique, it's best to provide underlines for quick visual identification */
+}
+
+a:visited {
+    color: #6E6C64;
+    text-decoration: underline;
+}
+
+a:hover, a:active, a:focus { /* this group of selectors will give a keyboard navigator the same hover experience as the person using a mouse. */
+    text-decoration: none;
+}
+/* ~~ This fixed width container surrounds all other blocks ~~ */
+/* ~~ The header is not given a width. It will extend the full width of your layout. ~~ */
+header {
+    /*background-color: #ADB96E;*/
+    background-image: url('../images/bgLogo.jpg');
+    background-size: auto;
+    background-attachment: fixed;
+    background-repeat: repeat-x;
+    width: 100%;
+}
+label{
+    margin-bottom:2px;display:block;text-align:left;font-weight:normal
+}
+/*===========Main Wrapper middle===============*/
+body > div:nth-child(2) {
+    height: 85.5%;
+    position: relative;
+}
+
+div.fltlft {
+    width: 85.6%;
+    height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+}
+/*Aside kanan*/
+div > aside:nth-child(2) {
+    width: 14.4%;
+    height: 116%;
+    position: absolute;
+    right: 0;
+    border: 1px solid #4CAF50;
+    top: -16%;
+    background-color: transparent;
+    padding: 2px 2px 0;
+}
+
+.content {
+    /*width: 72.8%;
+    right: 14.4%;*/
+    height: 111%;
+    border: 1px solid #4CAF50;
+    border-right: 0;
+    border-bottom: 0;
+    top: -11%;
+    position: relative;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+    .content div.nfAction {
+        height: 5.48%;
+        top: 0;
+        background-color: transparent;
+        width: 100%;
+    }
+
+    .content div.nfsitemap {
+        height: 4.8%;
+        border-top: 1px solid #4CAF50;
+        /*top: 5.3%;*/
+    }
+
+    content div.nfAction, .content div.nfsitemap {
+        left: 0;
+        right: 0;
+    }
+
+    .content div.nfAction, .content div.nfsitemap {
+        position: relative;
+        display: block;
+    }
+
+div > aside:nth-child(2) > .AsideLoginArea {
+    height: 16%;
+    top: 0;
+}
+
+.login-picture {
+    width: 36px;
+    height: 36px;
+    position: relative;
+    border-radius: 50%;
+    display: block;
+    overflow: hidden;
+    cursor: pointer !important;
+}
+
+    .login-picture > img {
+        display: inline;
+        width: 100%;
+        height: auto;
+        text-align: center;
+        line-height: normal;
+        white-space: nowrap;
+        cursor: pointer !important;
+    }
+
+/*div > aside:nth-child(2) > .AsideLoginArea > ul {
+position:absolute;
+    top: 10%;
+    right:0;
+    
+    }*/
+
+div > aside:nth-child(2) > .AsideMainArea {
+    height: 100%;
+    top: 16.2%;
+    border-top: 1px solid #4CAF50;
+}
+
+div > aside:nth-child(2) > .AsideLoginArea, div > aside:nth-child(2) > .AsideMainArea {
+    /*border: 1px solid #4CAF50;*/
+    border-right: 0;
+    border-left: 0;
+}
+
+aside h2 {
+    font-size: 1.7rem;
+}
+
+.container, aside {
+    height: 90%;
+    /*overflow-y: auto;*/
+}
+
+/*=======================Navbar=====================*/
+nav.navbar.navbar-default {
+    margin: 0;
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 0;
+    min-height: 0;
+    max-height: 32.9660px;
+}
+
+.col-xs-12 {
+    padding-left: 0;
+}
+
+.nfAction > .row {
+    margin: 0;
+    max-width: 100% !important;
+}
+
+.navbar-collapse {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+nav ul {
+    list-style: none; /* this removes the list marker */
+    /* border-top: 1px solid #666;  this creates the top border for the links - all others are placed using a bottom border on the LI 
+    margin-bottom: 15px;  this creates the space between the navigation on the content below */
+    border-top: 0;
+}
+
+form.navbar-form {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.navbar-form {
+    padding: 0;
+}
+/*.form-control {
+    background-image: linear-gradient(48deg,#E0E0E0,#FEFFFD,#8FBC8F);
+}*/
+input[name='q'] {
+    /*.form-control*/
+    height: 30.22px;
+    border-radius: 0;
+}
+
+li.active > .btn-sm, li > .btn-sm {
+    background-color: #4CAF50;
+    border-color: transparent;
+    padding-bottom: 3px;
+}
+
+.input-group-btn {
+    padding-bottom: 2px;
+}
+
+    .input-group-btn > .btn {
+        padding: 4px 12px;
+    }
+
+.col-sm-5, .col-md-4 {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+nav a, nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
+    padding: 5px 5px 5px 15px;
+    display: block; /* this gives the link block properties causing it to fill the whole LI containing it. This causes the entire area to react to a mouse click. */
+    width: auto; /*this width makes the entire button clickable for IE6. If you don't need to support IE6, it can be removed. Calculate the proper width by subtracting the padding on this link from the width of your sidebar container. */
+    text-decoration: none;
+    background-color: #C6D580;
+}
+
+ul li a:hover, li.active > .btn-sm:hover {
+    background-color: green !important;
+    color: black;
+}
+
+ul.nav.navbar-nav > li > .btn-sm:hover, .btn-default:hover {
+    background-color: green !important;
+}
+
+ul.nav.navbar-nav > li > .btn-sm {
+    border-radius: 0;
+    border-color: transparent;
+}
+
+ul.nav.navbar-nav > li, ul.nav.navbar-nav > li > .btn-sm {
+    background-color: #4CAF50;
+    height: 30px;
+}
+
+ul.navbar-nav li a, ul.navbar-nav li a:active, ul nav a, ul nav a:active {
+    background-color: transparent;
+    color: black !important;
+}
+
+ul.nav.navbar-nav > li.dropdown {
+    background-color: transparent;
+    border-radius: 4px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-left: 5px;
+}
+
+    ul.nav.navbar-nav > li.dropdown > a.dropdown-toggle {
+        background-color: transparent;
+    }
+
+ul.nav.navbar-nav > li a.dropdown-toggle {
+    text-decoration: none;
+    text-align: right;
+}
+
+.nav > li > a {
+    padding-left: 3px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+div.col-sm-5.col-md-4 > ul > li.dropdown {
+    width: 50px;
+    display: inline-block;
+}
+/*.nav > li > a.dropdown-toggle,input.form-control,.btn-btn-default{
+
+}*/
+
+/*nav a:hover, nav a:active, nav a:focus { this changes the background and text color for both mouse and keyboard navigators 
+	background-color: #ADB96E;
+	color: #FFF;
+}*/
+/*======================CONTENT=====================*/
+#content-0 {
+    background-color: transparent;
+    display: block;
+    position: relative;
+    border: 1.5px solid #4CAF50;
+    overflow: auto;
+    height: auto;
+    margin: auto;
+}
+/* ~~ The footer ~~ */
+footer {
+    padding: 3px;
+    /*background-color: #CCC49F;*/
+    background-image: linear-gradient(48deg,#8FBC8F,#FEFFFD,#8FBC8F);
+    position: absolute; /* this gives IE6 hasLayout to properly clear */
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 10%;
+    left: 0;
+    right: 0%;
+    border-top: 1px solid #4CAF50;
+}
+/* ~~ Miscellaneous float/clear classes ~~ */
+.fltrt { /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
+    float: right;
+    margin-left: 8px;
+}
+
+.fltlft { /* this class can be used to float an element left in your page. The floated element must precede the element it should be next to on the page. */
+    float: left;
+    margin-right: auto;
+}
+
+.clearfloat { /* this class can be placed on a <br /> or empty block element as the final element following the last floated block (within the .container) if the footer is removed or taken out of the .container */
+    clear: both;
+    height: 0;
+    font-size: 1px;
+    line-height: 0px;
+}
+
+/*HTML 5 support - Sets new HTML 5 tags to display:block so browsers know how to render the tags properly. */
+header, section, footer, aside, article, figure {
+    display: block;
+}
+
+/*===========override google chrome style sheet=============*/
+ul, menu, dir {
+    display: block;
+    list-style-type: disc;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 0px;
+}
+

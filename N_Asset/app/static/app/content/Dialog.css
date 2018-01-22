@@ -1,0 +1,209 @@
+﻿#dropSheet {
+    background-color /**/: #000000;
+    background-image: url(../images/dots.gif);
+    background-image /**/: none;
+    opacity: 0.35;
+    filter: alpha(opacity=35);
+}
+/*Container dialog variable dialog*/
+div.containerDialog{
+    font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+    font-size: 1.1em;
+    text-align: center;
+    margin: auto;
+    padding: 0.2em;
+    outline: 0;
+    border-radius: 6px;
+    color: #0a0101;
+    background-image: linear-gradient(48deg,#E0E0E0,#FEFFFD,#8FBC8F);
+}
+/*header dialog*/
+
+div.headerDialog {
+    /*posisi sebagai parent */
+    content: "";
+    display: table;
+    border-collapse: collapse;
+    padding: .4em 1em;
+    background: #4CAF50 url(../images/JqueryImages/ui-bg_highlight-soft_60_4CAF50_1x100.png) repeat-x 50% 50%;
+    cursor: move;
+    font-weight: bold;
+}
+div.container, div.headerDialog {
+    border: 1px solid #0b9910;
+}
+span.uidialogtile {
+    /*posisi children langsung dari header */
+    margin: .1em 0;
+    white-space: nowrap;
+    width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: move;
+    /*color: #0a0101;
+    font-weight: bold;
+    font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+    font-size: 1.1em;*/
+}
+button.buttonClose {
+    border: 0;
+    padding: 0;
+    font-size: 1em;
+    position: absolute;
+    right: .3em;
+    top: 50%;
+    width: 20px;
+    margin: -10px 0 0 0;
+    padding: 1px;
+    height: 20px;
+    /*font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+color: #0a0101;*/
+    width: 2em;
+    box-sizing: border-box;
+    text-indent: -9999px;
+    white-space: nowrap;
+    line-height: normal;
+    cursor: pointer;
+    vertical-align: middle;
+    text-align: center;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: visible;
+    border: 1px solid #0b9910;
+    background: #4CAF50 url(../images/JqueryImages/ui-bg_inset-soft_10_4CAF50_1x100.png) repeat-x 50% 50%;
+    font-weight: normal;
+    color: #0a0101;
+}
+
+div.maindialogContent {
+    width: 100%;
+    min-height: 2px;
+    max-height: none;
+    height: auto;
+    position: relative;
+    border: 0;
+    padding: .5em 1em;
+    background: none;
+    overflow: auto;
+     display: table;
+}
+
+div.bottomDialogContent {
+    content: "";
+    /*display: table;*/
+    border-collapse: collapse;
+    text-align: left;
+    border-width: 1px 0 0 0;
+    background-image: none;
+    margin-top: .5em;
+    padding: .3em 1em .5em .4em;
+    border: none;
+    border-top: 1px solid #0b9910;
+    overflow:hidden;
+    width:100%;
+}
+div.bottomDialogContent > .dialogButtonEntry {
+text-align: left;
+    font-size: 1em;
+    font-weight:normal;
+    text-align:center;
+}
+div.bottomDialogContent > .dialogButtonOKCancel {
+    float: right;        
+}
+div.bottomDialogContent > .dialogButtonRightOther{
+    float:left;
+    margin-right:30px;
+}
+
+div.containerDialog, div.headerDialog, button.buttonClose {
+    border-radius: 6px;
+}
+
+div.bottomDialogContent, div.maindialogContent, div.headerDialog, div.containerDialog {
+    position: relative;
+    margin: auto;
+}
+
+span.uibuttonClose {
+    /*posisi children button.buttonClose*/
+    background-image: url(../images/JqueryImages/ui-icons_0a0101_256x240.png);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -8px;
+    margin-left: -8px;
+    background-position: -96px -128px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    text-indent: -99999px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    font-size: 1em;
+    /*font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+    color: #0a0101;*/
+    font-weight: normal;
+    line-height: normal;
+    cursor: pointer;
+    text-align: center;
+}
+span.uibuttonIconSpace {
+    /*posisi setelah span.uibuttonClose */
+    font-size: 1em;
+    /*font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+    color: #0a0101;*/
+    font-weight: normal text-indent: -9999px;
+    white-space: nowrap;
+    line-height: normal;
+    cursor: pointer;
+    text-align: center;
+}
+
+div.dialogButtonEntry>a {
+  -webkit-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+  -moz-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+  -ms-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+  -o-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+  transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+  display: inline-block;
+  margin-right:15px;
+  max-width: 180px;
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  background-color:transparent;
+padding-top:2px;
+}
+
+div.dialogButtonEntry>a.button {
+  color: inherit;
+  box-shadow: #4CAF50 0 0px 0px 2px inset;
+  height:27px;
+  cursor: default;
+}
+div.dialogButtonEntry>a.button:last-child{
+    margin-right:0;
+}
+div.dialogButtonEntry>a.button:hover {
+  color: rgba(255, 255, 255, 0.85);
+  box-shadow: #4CAF50 0 0px 0px 40px inset;
+  cursor: default;
+}
+div.dialogButtonEntry>a.button[disabled], div.dialogButtonEntry>a.button[disabled]:hover{
+  cursor: not-allowed;
+   pointer-events: none;
+   color: #e1e1e1;
+   box-shadow: none;
+    border: 1px solid #8FBC8F;
+     filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+div.dialogButtonEntry>a.btn-link{
+    cursor: not-allowed;
+   pointer-events: none;
+   color:#8FBC8F;
+}
