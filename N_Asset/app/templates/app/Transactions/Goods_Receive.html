@@ -1,0 +1,12 @@
+﻿<div class="row" style="overflow:auto;">
+	    <div class="col-md-12">
+			 <form action="." method="post" class="form-horizontal" enctype="multipart/form-data" style="background-color:transparent;font-size: 1em;" id="frm-NA-Entry-Goods" onsubmit="return false;">
+			{% csrf_token %}
+				  <div class="NA-Entry-div-row">
+					  <label for="datereceived" class="NA-Entry-label;" style="display:inline-block">date received</label>
+                    {{ form.daterecieved }}
+				 </div>
+
+			 </form>
+		</div>
+	</div>
