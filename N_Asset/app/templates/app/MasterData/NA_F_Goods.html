@@ -17,9 +17,10 @@
 		
 		if (!NA.common.getElementID('CustomSearch')){
 			var parentC = NA.common.doc.querySelector('ul.dropdown-menu.search');
-			var lastLi = NA.common.doc.createElement('li'),	
+			lastLi = NA.common.doc.createElement('li'),	
 			lastLi_a =  NA.common.doc.createElement('a');
-			LastLi_a.setAttribute('id','custSearch');
+			lastLi_a.setAttribute('id','custSearch');
+			lastLi_a.textContent = 'CustomSearch';
 			lastLi.appendChild(lastLi_a);
 			parentC.appendChild(lastLi);
 		}       
@@ -593,7 +594,7 @@
                 if (!csrfSafeMethod(settings.type)) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 }
-            }     
+            };     
         });
             // event handler btnSubmit form to raise validity event
         function submitForm(){         
@@ -627,13 +628,13 @@
                         //NA.NAEvent.preventDefault(event);                                          
                         var inputbtn = NA.common.getElementID('inputButton');
                         inputbtn.click();
-                        $('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]').each(function () {
-                            if(!this.validity.valid){                    
-                                $(this).focus();
-                                document.body.style.cursor = 'default';
-                                return false;
-                            }
-                        });  
+                        //$('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]').each(function () {
+                        //    if(!$(this).validity.valid){                    
+                        //        $(this).focus();
+                        //        document.body.style.cursor = 'default';
+                        //        return false;
+                        //    }
+                        //});  
                        document.body.style.cursor = 'default';
                         return false;
                     }

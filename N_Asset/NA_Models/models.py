@@ -1,6 +1,7 @@
 ﻿from django.db import models
 from datetime import datetime
 from NA_DataLayer.NA_Goods_BR import NA_BR_Goods
+from NA_DataLayer.NA_Goods_Receive_BR import NA_BR_Goods_Receive
 from django_mysql.models import JSONField
 
 #class NABRGoods(models.Manager):
@@ -198,6 +199,30 @@ class NAGoodsOutwards(models.Model):
         managed = True
         db_table = 'n_a_goods_outwards'
 
+class NASuplier(models.Model):
+    supliercode = models.CharField(db_column='SuplierCode', primary_key=True, max_length=30)  # Field name made lowercase.
+    supliername = models.CharField(db_column='SuplierName', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    address = models.CharField(db_column='Address', max_length=150, blank=True, null=True)  # Field name made lowercase.
+    telp = models.CharField(db_column='Telp', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    hp = models.CharField(db_column='HP', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    contactperson = models.CharField(db_column='ContactPerson', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    inactive = models.BooleanField(db_column='InActive', max_length=1)  # Field name made lowercase.
+    createddate = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)  # Field name made lowercase.
+    createdby = models.CharField(db_column='CreatedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)  # Field name made lowercase.
+    modifiedby = models.CharField(db_column='ModifiedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
+
+    def __str__(self):
+        return self.supliername
+
+    #from NA_DataLayer.NA_Suplier import NA_BR_Suplier
+
+    #NA = NA_BR_Suplier()
+    #objects = models.Manager() #default manager
+
+    class Meta:
+        managed = True
+        db_table = 'n_a_suplier'
 
 class NAGoodsReceive(models.Model):
 	idapp = models.AutoField(db_column='IDApp', primary_key=True)
@@ -218,26 +243,27 @@ class NAGoodsReceive(models.Model):
 		db_table = 'n_a_goods_receive'
 		app_label = ''
 
+	object = NA_BR_Goods_Receive()
 class NAGoodsReturn(models.Model):
-    idapp = models.AutoField(db_column='IDApp', primary_key=True)  # Field name made lowercase.
-    fk_goods = models.ForeignKey(goods, db_column='FK_Goods', max_length=30)  # Field name made lowercase.
-    datereturn = models.DateTimeField(db_column='DateReturn')  # Field name made lowercase.
-    condition = models.CharField(db_column='Condition', max_length=1)  # Field name made lowercase.
-    fk_fromemployee = models.CharField(db_column='FK_FromEmployee', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    fk_usedemployee = models.CharField(db_column='FK_UsedEmployee', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    iscompleted = models.IntegerField(db_column='IsCompleted')  # Field name made lowercase.
-    minus = models.CharField(db_column='Minus', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    fk_goods_lend = models.IntegerField(db_column='FK_Goods_Lend', blank=True, null=True)  # Field name made lowercase.
-    descriptions = models.CharField(db_column='Descriptions', max_length=200, blank=True, null=True)  # Field name made lowercase.
-    createddate = models.DateTimeField(db_column='CreatedDate')  # Field name made lowercase.
-    createdby = models.CharField(db_column='CreatedBy', max_length=100)  # Field name made lowercase.
-    modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)  # Field name made lowercase.
-    modifiedby = models.CharField(db_column='ModifiedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = True
-        db_table = 'n_a_goods_return'
-
+	idapp = models.AutoField(db_column='IDApp', primary_key=True)
+	fk_goods = models.ForeignKey(goods, db_column='FK_Goods')
+	datereturn = models.DateTimeField(db_column='DateReturn')
+	condition = models.CharField(db_column='Condition', max_length=1)
+	fk_fromemployee = models.CharField(db_column='FK_FromEmployee', max_length=50, blank=True, null=True)
+	fk_usedemployee = models.CharField(db_column='FK_UsedEmployee', max_length=50, blank=True, null=True)
+	iscompleted = models.IntegerField(db_column='IsCompleted')
+	minus = models.CharField(db_column='Minus', max_length=100, blank=True, null=True)
+	fk_goods_lend = models.IntegerField(db_column='FK_Goods_Lend', blank=True, null=True)
+	descriptions = models.CharField(db_column='Descriptions', max_length=200, blank=True, null=True)
+	createddate = models.DateTimeField(db_column='CreatedDate')
+	createdby = models.CharField(db_column='CreatedBy', max_length=100)
+	modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)
+	modifiedby = models.CharField(db_column='ModifiedBy', max_length=100, blank=True, null=True)
+	
+	class Meta:
+		managed = True
+		db_table = 'n_a_goods_return'
+		app_label = ''
 
 class NAMaintenance(models.Model):
     idapp = models.AutoField(db_column='IDApp', primary_key=True)  # Field name made lowercase.
@@ -282,27 +308,3 @@ class NAStock(models.Model):
         db_table = 'n_a_stock'
 
 
-class NASuplier(models.Model):
-    supliercode = models.CharField(db_column='SuplierCode', primary_key=True, max_length=30)  # Field name made lowercase.
-    supliername = models.CharField(db_column='SuplierName', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    address = models.CharField(db_column='Address', max_length=150, blank=True, null=True)  # Field name made lowercase.
-    telp = models.CharField(db_column='Telp', max_length=20, blank=True, null=True)  # Field name made lowercase.
-    hp = models.CharField(db_column='HP', max_length=20, blank=True, null=True)  # Field name made lowercase.
-    contactperson = models.CharField(db_column='ContactPerson', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    inactive = models.BooleanField(db_column='InActive', max_length=1)  # Field name made lowercase.
-    createddate = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)  # Field name made lowercase.
-    createdby = models.CharField(db_column='CreatedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)  # Field name made lowercase.
-    modifiedby = models.CharField(db_column='ModifiedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
-
-    def __str__(self):
-        return self.supliername
-
-    #from NA_DataLayer.NA_Suplier import NA_BR_Suplier
-
-    #NA = NA_BR_Suplier()
-    #objects = models.Manager() #default manager
-
-    class Meta:
-        managed = True
-        db_table = 'n_a_suplier'
