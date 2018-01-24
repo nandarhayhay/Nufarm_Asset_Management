@@ -122,7 +122,9 @@ class ResolveCriteria:
 				__query = ' <>{0} '.format(str(valueData))
 
 	def getDataType(strDataType):
-		if strDataType=='varchar':
+		if strDataType == 'int':
+			return DataType.Integer
+		elif strDataType=='varchar':
 			return DataType.VarChar
 		elif strDataType == 'bigint':
 			return DataType.BigInt

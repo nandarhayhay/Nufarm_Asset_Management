@@ -3,8 +3,6 @@
 {% for itemCombo in populateColumn %}
 <li><a href="#" data-tipe="{{itemCombo.dataType}}" data-column="{{itemCombo.columnName}}">{{itemCombo.label}}</a></li>
 {% endfor %}
-<li><a id="custSearch" href="#">CustomSearch</a></li>
-
 {% endblock %}
 
 {% block javascriptAndUI %}
@@ -15,17 +13,16 @@
 
 <script type="text/javascript">
     
-    (function(){   
-        var txtSearchMaster =  NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
-            btnSearchMaster = NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');
-        window.onunload = function(){
-            if (typeof txtSearchMaster.onclick == "function") {
-                NA.NAEvent.removeHandler(txtSearchMaster,'keydown',handlerSearchInput)               
-            }
-            if (typeof btnSearchMaster.onclick == "function") {
-                NA.NAEvent.removeHandler(btnSearchMaster,'click',handlerSearchInput);
-            }
-        };
+	(function(){ 
+		
+		if (!NA.common.getElementID('CustomSearch')){
+			var parentC = NA.common.doc.querySelector('ul.dropdown-menu.search');
+			var lastLi = NA.common.doc.createElement('li'),	
+			lastLi_a =  NA.common.doc.createElement('a');
+			LastLi_a.setAttribute('id','custSearch');
+			lastLi.appendChild(lastLi_a);
+			parentC.appendChild(lastLi);
+		}       
 //=================add Dynamic Styles=============================
         NA.common.loadStyles("../../../static/app/content/jquery-ui.min.css","jqueryUI");
         NA.common.loadStyles("../../../static/app/content/ui.jqgrid.css","UIJqueryGrid");   
@@ -67,12 +64,6 @@
 <table id="jqGrid_NA_F_Goods"></table>
 <div id="jqGrid_NA_F_Goods_Pager"></div>
 
-
-<script type="text/javascript">
-  
-</script>         
-
-
 {%endblock%}
 
 {% block DialogEntry %}
@@ -110,11 +101,22 @@
            
         //===============================END AJAX SetuP===========================-->  
 
+        //var txtSearchMaster =  NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+		//   btnSearchMaster = NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');       
+
         //========================Variable Object untuk memanggil search data secara default===============================
         var win = win||window;
         var  grid = $("#jqGrid_NA_F_Goods");
         var txtSearchMaster =  txtSearchMaster|| NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
         btnSearchMaster = btnSearchMaster||NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');
+		window.onunload = function(){
+        	if (typeof txtSearchMaster.onclick == "function") {
+        		NA.NAEvent.removeHandler(txtSearchMaster,'keydown',handlerSearchInput)               
+        	}
+        	if (typeof btnSearchMaster.onclick == "function") {
+        		NA.NAEvent.removeHandler(btnSearchMaster,'click',handlerSearchInput);
+        	}
+        };
         //settings btn sesuai user access
         //anggap saja sekarang admin
         var btnSave =  NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(4)'),

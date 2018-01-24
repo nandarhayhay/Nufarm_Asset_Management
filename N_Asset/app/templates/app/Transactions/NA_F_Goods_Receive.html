@@ -1,0 +1,79 @@
+﻿{% extends "../../app/layout.html" %}
+{% block SearchData %}
+{% for itemCombo in populateColumn %}
+<li><a href="#" data-tipe="{{itemCombo.dataType}}" data-column="{{itemCombo.columnName}}">{{itemCombo.label}}</a></li>
+{% endfor %}
+<script type="text/javascript">
+	if (!NA.common.getElementID('CustomSearch')){
+		var parentC = NA.common.doc.querySelector('ul.dropdown-menu.search');
+		var lastLi = NA.common.doc.createElement('li'),	
+		lastLi_a =  NA.common.doc.createElement('a');
+		LastLi_a.setAttribute('id','custSearch');
+		lastLi.appendChild(lastLi_a);
+		parentC.appendChild(lastLi);
+	}
+</script>
+
+{% endblock %}
+{% block javascriptAndUI %}
+<!--================================Load Script Modules NA ===========================================-->
+<script type="text/javascript" src="../../../static/app/scripts/NAJS.js"></script>
+<!--=======================================================================================================-->
+
+<script type="text/javascript">
+    
+	(function(){ 
+		
+		if (!NA.common.getElementID('CustomSearch')){
+			var parentC = NA.common.doc.querySelector('ul.dropdown-menu.search');
+			var lastLi = NA.common.doc.createElement('li'),	
+			lastLi_a =  NA.common.doc.createElement('a');
+			LastLi_a.setAttribute('id','custSearch');
+			lastLi.appendChild(lastLi_a);
+			parentC.appendChild(lastLi);
+		}       
+//=================add Dynamic Styles=============================
+        NA.common.loadStyles("../../../static/app/content/jquery-ui.min.css","jqueryUI");
+        NA.common.loadStyles("../../../static/app/content/ui.jqgrid.css","UIJqueryGrid");   
+        var doc = doc||window.document;
+        var DivSearch = doc.querySelector('ul.dropdown-menu.search');//return list Element
+        (function(elm){
+            var listElem = elm.children;
+            Array.prototype.forEach.call(listElem,function(item){//buat jadi foreach mesti convert dulu ke array
+                if(item.firstChild.nodeValue != 'CustomSearch'){
+                    NA.NAEvent.addHandler(item,'click',function(event){
+                        event.preventDefault();
+                        if(item.firstChild.id === 'custSearch'){
+                            //=========='show dialog search'==================
+                            NA.common.dialog.createSearchDialog(event)
+                        }
+                        NA.common.getElementID('bySearch').firstChild.nodeValue = item.textContent;
+                    });
+                }
+            });
+        })(DivSearch);
+    })();   
+</script>
+
+{% endblock %}
+
+
+<!--SETUP Jquery grid-->
+<!-- The jQuery library is a prerequisite for all jqSuite products -->
+<script>window.jQuery || NA.common.doc.write('\<script src="\.\.\/\.\.\/\.\.\/static\/app\/scripts\/jquery\-1\.11\.1\.js"\>\<\/script\>')</script>
+
+<!-- This is the Javascript file of jqGrid -->
+<script src="../../../static/app/scripts/jquery.jqGrid.js"></script>
+
+<!-- This is the localization file of the grid controlling messages, labels, etc. -->
+<!-- We support more than 40 localizations -->
+<script src="../../../app/scripts/jqGridJS/i18n/grid.locale-en.js"></script>
+<!----------------------------Load Jquery UI. JS file-------------------------------->
+<script src="../../../scripts/jquery-ui.js' %}"></script>
+{% endblock %}
+
+{%block content-0 %}
+<table id="jqGrid_NA_F_Goods_Receive"></table>
+<div id="jqGrid_NA_F_Goods_Receive_Pager"></div>
+
+{%endblock%}

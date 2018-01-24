@@ -25,11 +25,11 @@ def NA_Goods(request):
 	assert isinstance(request,HttpRequest)
 	#buat nama-name column, key sama 
 	populate_combo = []
-	populate_combo.append({'label':'','columnName':'goods','dataType':'varchar'})
-	populate_combo.append({'label':'date received','columnName':'datereceived','dataType':'datetime'})
-	populate_combo.append({'label':'BrandName','columnName':'brandname','dataType':'varchar'})
-	populate_combo.append({'label':'PricePerUnit','columnName':'priceperUnit','dataType':'decimal'})
-	populate_combo.append({'label':'Depreciation_Method','columnName':'depreciationmethod','dataType':'char'})
-	populate_combo.append({'label':'unit','columnName':'economiclife','dataType':'decimal'})
-	populate_combo.append({'label':'Placement','columnName':'placement','dataType':'varchar'})
+	populate_combo.append({'label':'Goods Name','columnName':'goods','dataType':'varchar'})
+	populate_combo.append({'label':'Date Received','columnName':'datereceived','dataType':'datetime'})
+	populate_combo.append({'label':'Suplier Name','columnName':'suplier','dataType':'varchar'})
+	populate_combo.append({'label':'Received By','columnName':'receivedby','dataType':'varchar'})
+	populate_combo.append({'label':'PR By','columnName':'prby','dataType':'varchar'})
+	populate_combo.append({'label':'Total Purchased','columnName':'totalpurchased','dataType':'int'})
+	populate_combo.append({'label':'Total Received','columnName':'totalreceived','dataType':'int'})
 	return render(request,'app/MasterData/NA_F_Goods.html',{'populateColumn':populate_combo})

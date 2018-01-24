@@ -31,17 +31,17 @@ class Employee(models.Model):
     status = models.CharField(db_column='Status', max_length=1, blank=True, null=True)  # Field name made lowercase.
     telphp = models.CharField(db_column='TelpHP', max_length=20, blank=True, null=True)  # Field name made lowercase.
     territory = models.CharField(db_column='Territory', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    descriptions = models.CharField(db_column='Descriptions', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    inactive = models.CharField(db_column='InActive', max_length=5)  # Field name made lowercase.
+    descriptions = models.CharField(db_column='Descriptions', max_length=200, blank=True, null=True)  # Field name made lowercase.
+    inactive = models.BooleanField(db_column='InActive', max_length=1)  # Field name made lowercase.
     createddate = models.DateTimeField(db_column='CreatedDate', auto_now_add=True)  # Field name made lowercase.
     createdby = models.CharField(db_column='CreatedBy', max_length=100)  # Field name made lowercase.
     modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True, auto_now=True)  # Field name made lowercase.
     modifiedby = models.CharField(db_column='ModifiedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
 
-    from NA_DataLayer.NA_Employee import NA_BR_Employee
+    #from NA_DataLayer.NA_Employee import NA_BR_Employee
 
-    NA = NA_BR_Employee()
-    objects = models.Manager() #default manager
+    #NA = NA_BR_Employee()
+    #objects = models.Manager() #default manager
     class Meta:
         managed = True
         db_table = 'employee'
@@ -206,7 +206,7 @@ class NAGoodsReceive(models.Model):
 	fk_suplier = models.ForeignKey(NASuplier,db_column='FK_Suplier')
 	totalpurchase = models.SmallIntegerField(db_column='TotalPurchase')
 	totalrecieved = models.SmallIntegerField(db_column='TotalRecieved')
-	fk_recievedby = models.ForeignKey(Employee, db_column='FK_RecievedBy', max_length=50)  # Field name made lowercase.
+	fk_receivedby = models.ForeignKey(Employee, db_column='FK_ReceivedBy', max_length=50)  # Field name made lowercase.
 	fk_p_r_by = models.ForeignKey(Employee,db_column='FK_P_R_By', max_length=50, blank=True, null=True)
 	createddate = models.DateTimeField(db_column='CreatedDate')
 	createdby = models.CharField(db_column='Createdby', max_length=50)
@@ -289,7 +289,7 @@ class NASuplier(models.Model):
     telp = models.CharField(db_column='Telp', max_length=20, blank=True, null=True)  # Field name made lowercase.
     hp = models.CharField(db_column='HP', max_length=20, blank=True, null=True)  # Field name made lowercase.
     contactperson = models.CharField(db_column='ContactPerson', max_length=100, blank=True, null=True)  # Field name made lowercase.
-    inactive = models.CharField(db_column='InActive', max_length=3)  # Field name made lowercase.
+    inactive = models.BooleanField(db_column='InActive', max_length=1)  # Field name made lowercase.
     createddate = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)  # Field name made lowercase.
     createdby = models.CharField(db_column='CreatedBy', max_length=100, blank=True, null=True)  # Field name made lowercase.
     modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)  # Field name made lowercase.
@@ -298,10 +298,10 @@ class NASuplier(models.Model):
     def __str__(self):
         return self.supliername
 
-    from NA_DataLayer.NA_Suplier import NA_BR_Suplier
+    #from NA_DataLayer.NA_Suplier import NA_BR_Suplier
 
-    NA = NA_BR_Suplier()
-    objects = models.Manager() #default manager
+    #NA = NA_BR_Suplier()
+    #objects = models.Manager() #default manager
 
     class Meta:
         managed = True

@@ -145,6 +145,7 @@
     <Content Include="app\templates\app\MasterData\NA_Entry.html" />
     <Content Include="app\templates\app\MasterData\NA_F_Goods.html" />
     <Content Include="app\templates\app\Transactions\Goods_Receive.html" />
+    <Content Include="app\templates\app\Transactions\NA_F_Goods_Receive.html" />
     <Content Include="app\templates\app\UserControl\customFilter.html" />
     <Content Include="NA_DataLayer\common.py" />
     <Content Include="requirements.txt" />
