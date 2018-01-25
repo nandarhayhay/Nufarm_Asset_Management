@@ -3,7 +3,7 @@ from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 from django.utils.dateformat import DateFormat
-from NA_Models.models import goods
+from NA_Models.models import NAGoodsReceive
 from django.core import serializers
 from NA_DataLayer.common import CriteriaSearch
 from NA_DataLayer.common import ResolveCriteria
@@ -47,6 +47,27 @@ def NA_Goods_Receive_Search(request):
 	criteria = ResolveCriteria.getCriteriaSearch(str(Icriteria))
 	dataType = ResolveCriteria.getDataType(str(IdataType))
 	if(Isord is not None and str(Isord) != ''):
-		NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by('-' + str(Isidx))
+		NAData = NAGoodsReceive.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType)
 	else:
-		NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType)	
+		NAData = NAGoodsReceive.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType)
+	
+	totalRecord = NAData.count()
+	paginator = Paginator(NAData, int(Ilimit)) 
+	try:
+		page = request.GET.get('page', '1')
+	except ValueError:
+		page = 1
+	try:
+		dataRows = paginator.page(page)
+	except (EmptyPage, InvalidPage):
+		dataRows = paginator.page(paginator.num_pages)
+		
+	rows = []
+	for row in dataRows.object_list:
+		datarow = {"id" :row['idapp'], "cell" :[row['idapp'],row['itemcode'],row['goodsname'],row['brandname'],row['unit'],row['priceperunit'], \
+			row['placement'],row['typeofdepreciation'],row['economiclife'],row['inactive'],datetime.date(row['createddate']),row['createdby']]}
+		#datarow = {"id" :row.idapp, "cell" :[row.idapp,row.itemcode,row.goodsname,row.brandname,row.unit,row.priceperunit, \
+		#	row.placement,row.depreciationmethod,row.economiclife,row.createddate,row.createdby]}
+		rows.append(datarow)
+	results = {"page": page,"total": paginator.num_pages ,"records": totalRecord,"rows": rows }
+	return HttpResponse(json.dumps(results, indent=4,cls=DjangoJSONEncoder),content_type='application/json')	

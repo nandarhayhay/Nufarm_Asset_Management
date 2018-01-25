@@ -1037,7 +1037,7 @@ NA.common.AJAX = function(){
     settings.dataType = settings.dataType || 'application/json';
     settings.url = settings.url || '';
     settings.MIMEType = settings.MIMEType || 'text/html';
-    settings.requestHeader = settings.requestHeader;
+    settings.requestHeader = settings.requestHeader || '';
     settings.timeOut = settings.timeOut || 2000000;
     return {
         NAXHR: function () { return XHR;},
@@ -1061,7 +1061,7 @@ NA.common.AJAX = function(){
             { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
             XHR.setRequestHeader(XdataType);
             if (OnBeforeSend) { OnBeforeSend.call(XHR); }
-            if (XData) { XHR.send(data); }
+            if (XData) { XHR.send(XData); }
         },
         GET: function (url, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
             var Xurl = url || settings.url;
@@ -1080,7 +1080,7 @@ NA.common.AJAX = function(){
             { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
              XHR.setRequestHeader(XdataType);
             if (OnBeforeSend) { OnBeforeSend.call(XHR); }
-            if (XData) { XHR.send(null); }
+            XHR.send(null);
         },
         SubmitForm: function (url, FormElement, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
             var Xurl = url || settings.url;
