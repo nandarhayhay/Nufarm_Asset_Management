@@ -32,16 +32,14 @@
         (function(elm){
             var listElem = elm.children;
             Array.prototype.forEach.call(listElem,function(item){//buat jadi foreach mesti convert dulu ke array
-                if(item.firstChild.nodeValue != 'CustomSearch'){
-                    NA.NAEvent.addHandler(item,'click',function(event){
-                        event.preventDefault();
-                        if(item.firstChild.id === 'custSearch'){
-                            //=========='show dialog search'==================
-                            NA.common.dialog.createSearchDialog(event)
-                        }
-                        NA.common.getElementID('bySearch').firstChild.nodeValue = item.textContent;
-                    });
-                }
+                NA.NAEvent.addHandler(item,'click',function(event){
+                    event.preventDefault();
+                    if(item.firstChild.id === 'custSearch'){
+                        //=========='show dialog search'==================
+                        NA.common.dialog.createSearchDialog(event)
+                    }
+                    NA.common.getElementID('bySearch').firstChild.nodeValue = item.textContent;
+                });
             });
         })(DivSearch);
     })();   
@@ -65,7 +63,7 @@
 <table id="jqGrid_NA_F_Goods"></table>
 <div id="jqGrid_NA_F_Goods_Pager"></div>
 
-{%endblock%}
+{% endblock %}
 
 {% block DialogEntry %}
 
@@ -397,7 +395,7 @@
 
 
                
-        status = status || win.status,  csrftoken = function(){return NA.CookieUtil.get('csrftoken');}, initializeForm = '';
+      var  status = status || win.status,  csrftoken = function(){return NA.CookieUtil.get('csrftoken');}, initializeForm = '';
         //load Dialog Style css    
         NA.common.loadStyles("../../../static/app/content/Dialog.css", "DialogEntryStyle");//Load Style buat dialog sebelum di pakai
         NA.common.loadStyles("../../../static/app/content/NA_commonEntry.css","CommonEntry");//Load Style buat form sebelum di pakai
@@ -625,13 +623,16 @@
                         //NA.NAEvent.preventDefault(event);                                          
                         var inputbtn = NA.common.getElementID('inputButton');
                         inputbtn.click();
-                        //$('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]').each(function () {
-                        //    if(!$(this).validity.valid){                    
-                        //        $(this).focus();
-                        //        document.body.style.cursor = 'default';
-                        //        return false;
-                        //    }
-                        //});  
+                        var elements = NA.common.doc.querySelectorAll('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]');
+                        Array.prototype.forEach.call(elements,function(item){
+                            if(!item.validity.valid){
+                                item.focus();                                      
+                                document.body.style.cursor = 'default';
+                                return false;
+                            }
+                            document.body.style.cursor = 'default';
+                            return false;
+                        });
                        document.body.style.cursor = 'default';
                         return false;
                     }
@@ -657,12 +658,6 @@
                                 var inputbtn = NA.common.getElementID('inputButton');
                                 inputbtn.click();
                                 var elements = NA.common.doc.querySelectorAll('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]');
-                                //$(').each(function () {
-                                //    if(!this.validity.valid){                    
-                                //        $(this).focus();
-                                //        window.document.body.style.cursor = 'default';return false;
-                                //    }
-                                //}); 
                                 Array.prototype.forEach.call(elements,function(item){
                                     if(!item.validity.valid){
                                         item.focus();                                      

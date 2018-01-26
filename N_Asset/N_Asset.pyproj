@@ -29,7 +29,7 @@
   <ItemGroup>
     <Compile Include="app\forms.py" />
     <Compile Include="app\models.py" />
-    <Compile Include="app\NA_Views\NA.Goods_Receive_View.py">
+    <Compile Include="app\NA_Views\NA_Goods_Receive_View.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\NA_Views\NA_Goods_View.py">

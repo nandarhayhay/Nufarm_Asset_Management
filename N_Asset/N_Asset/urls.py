@@ -5,7 +5,7 @@ Definition of urls for N_Asset.
 from datetime import datetime
 from django.conf.urls import url
 import django.contrib.auth.views
-from app.NA_Views import NA_Goods_View
+from app.NA_Views import NA_Goods_View,NA_Goods_Receive_View
 import app.forms
 import app.views
 
@@ -45,7 +45,10 @@ urlpatterns = [
     url(r'^NA_Goods/ShowEntry',NA_Goods_View.ShowEntry,name='ShowEntry'),
 	url(r'^NA_Goods/customFilter',NA_Goods_View.ShowCustomFilter,name='ShowCustomFilter'),
 	url(r'^NA_Goods/Delete/$',NA_Goods_View.deleteItem,name='DeleteGoods'),
-	url(r'^NA_Goods/setInActive/$',NA_Goods_View.setInActive,name='SetInActive')
+	url(r'^NA_Goods/setInActive/$',NA_Goods_View.setInActive,name='SetInActive'),
+
+	#view the goods_receive
+		url(r'^NA_Goods_Receive/$',NA_Goods_Receive_View.NA_Goods_Receive,name='GoodsReceive'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

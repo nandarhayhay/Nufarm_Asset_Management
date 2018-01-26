@@ -25,14 +25,14 @@ def NA_Goods_Receive(request):
 	assert isinstance(request,HttpRequest)
 	#buat nama-name column, key sama 
 	populate_combo = []
-	populate_combo.append({'label':'Goods Name','columnName':'goods','dataType':'varchar'})
+	populate_combo.append({'label':'Goods Descriptions','columnName':'goods','dataType':'varchar'})
 	populate_combo.append({'label':'Date Received','columnName':'datereceived','dataType':'datetime'})
 	populate_combo.append({'label':'Suplier Name','columnName':'suplier','dataType':'varchar'})
 	populate_combo.append({'label':'Received By','columnName':'received_by','dataType':'varchar'})
 	populate_combo.append({'label':'PR By','columnName':'pr_by','dataType':'varchar'})
 	populate_combo.append({'label':'Total Purchased','columnName':'totalpurchased','dataType':'int'})
 	populate_combo.append({'label':'Total Received','columnName':'totalreceived','dataType':'int'})
-	return render(request,'app/MasterData/NA_F_Goods.html',{'populateColumn':populate_combo})
+	return render(request,'app/Transactions/NA_F_Goods_Receive.html',{'populateColumn':populate_combo})
 def NA_Goods_Receive_Search(request):
 	IcolumnName = request.GET.get('columnName');
 	IvalueKey =  request.GET.get('valueKey')

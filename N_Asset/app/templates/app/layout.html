@@ -62,7 +62,11 @@
                                            <li>
                                                <a href="#" data-toggle="collapse" data-target="#products" class="active collapsed" aria-expanded="false"> <span class="nav-label">Transactions</span> <span class="fa fa-angle-down pull-right"></span> </a>
                                                <ul class="sub-menu collapse" id="products" aria-expanded="false" style="">
-                                                   <li class="active"><a href="#">Goods Receiving</a></li>
+                                                    {% if "/NA_Goods_Receive/" == request.path %} 
+                                                         <li class="active"><a href="{{ request.path }}">Goods Receiving</a></li>
+                                                   {% else %}
+                                                        <li class="active"><a href="/NA_Goods_Receive/">Goods Receiving</a></li>
+                                                   {% endif %}
                                                    <li><a href="#">Goods Outwords</a></li>
                                                    <li><a href="#">Goods Lent</a></li>
                                                    <li><a href="#">Goods Returned</a></li>
