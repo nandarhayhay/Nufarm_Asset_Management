@@ -79,5 +79,189 @@
 {%endblock%}
 
 {% block DialogEntry %}
+<script type="text/javascript">
+	//=================================AJAX Setup===========================-->
 
+	(function () {
+		$.ajaxSetup({
+			cache: false,
+			error: function (xhr, status, error) {
+				try {
+					var messageErr = xhr.responseText;
+					var contentype = xhr.getResponseHeader('Content-Type')
+					if (contentype === 'application/json') {
+						messageErr = $.parseJSON(xhr.responseText);
+					}
+					var message = xhr.responseText;
+					if (messageErr) {
+						message = messageErr.message;
+					}
+					if (message) {
+						alert('An error occurred: ' + error + '\n' + xhr.status + ": " + message);
+					}
+
+				} catch (e) {
+					alert('An error occurred: ' + error + '\n' + xhr.status + ": " + e.message);
+				}
+				window.document.body.style.cursor = 'defautl'; return false;
+			},
+			timeout: 2000000, // Timeout// nanti kalau sudah selesai system timeout ini harus di rubah, jadi maximal 20 detik
+			type: 'GET',
+			crossDomain: false, // obviates need for sameOrigin test                              
+		});
+	})();
+	//===============================END AJAX SetuP===========================--> 
+
+	//========================Variable Object untuk memanggil search data secara default===============================
+	var win = win || window;
+	var grid = $("#jqGrid_NA_F_Goods");
+	var txtSearchMaster = txtSearchMaster || NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+	btnSearchMaster = btnSearchMaster || NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');
+	window.onunload = function () {
+		if (typeof txtSearchMaster.onclick == "function") {
+			NA.NAEvent.removeHandler(txtSearchMaster, 'keydown', handlerSearchInput)
+		}
+		if (typeof btnSearchMaster.onclick == "function") {
+			NA.NAEvent.removeHandler(btnSearchMaster, 'click', handlerSearchInput);
+		}
+	};
+	//settings btn sesuai user access
+	//anggap saja sekarang admin
+	var btnSave = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(4)'),
+		btnDelete = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(5)'),
+		btnExport = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(6)'),
+		btnPrint = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(7)'),
+		btnHelp = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(8)'),
+		containerMenu = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav');//inistialisasi menu   
+	function LoadData(page) {
+		var url = 'NA_Goods_Receive_Search/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
+				  '&' + win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
+				  '&' + win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) +
+				  '&' + win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria());
+		if (arguments.length > 0) {			
+			grid.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
+		}
+		else {
+			try {
+				grid.jqGrid({
+					url: url,
+					mtype: "GET",
+					datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	Received_By FK_P_R_By pr_by totalpurchased totalreceived 
+					colNames: ['IDapp','NO', 'goods Description', 'Date Received', 'Suplier Name', 'Received By', 'Purchase Request By', 'Total Purchased', 'Total Received','Created Date', 'Created By'],
+					colModel: [						
+						{ name: 'idapp', key: true, hidden: true,align: 'left' },
+						{ name: 'NO', width: 50, align: 'right', sortable: false, editable: false, },
+						{ name: 'goods', index: 'itemcode', width: 140, sortable: true, editable: false, align: 'left', },
+						{ name: 'datereceived', index: 'datereceived', sortable: true, width: 120, formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' } },
+						{ name: 'supliername', index: 'supliername', width: 150, sortable: true, editable: false, align: 'left', },
+						//formatter : 'date', formatoptions: { srcformat : 'Y-m-d H:i:s', newformat :'ShortDate'}},
+						{ name: 'FK_ReceivedBy', index: 'FK_ReceivedBy', hidden: true, },
+						{ name: 'Received_By', index: 'Received_By', width: 120, sortable: true, editable: false, align: 'left', },
+						{ name: 'FK_P_R_By', index: 'FK_ReceivedBy', hidden: true, },
+						{ name: 'pr_by', index: 'pr_by', width: 120, sortable: true, editable: false, align: 'left', },
+						{name: 'totalpurchased', index: 'totalpurchased', width: 100, sortable: true, align: 'right', formatter: 'currency', formatoptions: {
+								decimalSeparator: ",", thousandsSeparator: ".",decimalPlaces: 2, prefix: "Rp "}, },
+						{
+							name: 'totalreceived', index: 'totalreceived', width: 100, sortable: true, align: 'right', formatter: 'currency', formatoptions: {
+								decimalSeparator: ",", thousandsSeparator: ".", decimalPlaces: 2, prefix: "Rp "	},
+						},
+						{ name: 'createddate', index: 'CreatedDate', sortable: true, width: 120, formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' } },
+						{ name: 'reatedby', index: 'CreatedBy', sortable: true, width: 110, editable: false,},
+					],
+					ondblClickRow: function (rowId) {
+						var btnOpen = NA.common.doc.querySelector('ul.nav.navbar-nav>li:nth-child(2)>button');
+						if (btnOpen) {
+							btnOpen.click();
+						}
+					},
+					gridComplete: function () {
+						document.body.style.cursor = 'default';
+					},					
+					cellEdit: false,
+					viewrecords: true,
+					height: $('div.fltlft').height() - ($('div.fltlft').height() * 0.173),
+					rowNum: 300,
+					rowList: [20, 50, 100, 200, 300, 500],
+					sortname: "idapp",
+					sortorder: "desc",
+					multiSort: true,
+					shrinkToFit: false,
+					iconSet: "fontAwesome",
+					forceFit: true,
+					toolbar: true,
+					scrollrows: true,
+					hidegrid: true,
+					caption: "Transactions ---Goods Received",
+					pager: "#jqGrid_NA_F_Goods_Receive_Pager"
+				});
+				grid.navGrid("#jqGrid_NA_F_Goods_Receive_Pager", {
+					search: false, // show search button on the toolbar
+					add: false,
+					edit: false,
+					del: false,
+					refresh: true
+				});
+
+			} catch (e) {
+				alert(e.message);
+				console.log(e);
+				document.body.style.cursor = 'default';
+			}
+		};
+	};
+
+	var SearchData = NA.common.SearchData;
+	SearchData.setDefaultSearchData('goods', 'Varchar', 'like');
+	LoadData();
+
+	//====================GROUP FUNCTION DECLARATION===============================
+	function printToPDF(event) {
+		if (event) {
+			NA.NAEvent.preventDefault(event);
+			var target = NA.NAEvent.getTarget(event);
+			grid.jqGrid("exportToPdf", {
+				title: 'Transactions -- goods Received',
+				orientation: 'portrait',
+				pageSize: 'A4',
+				description: 'description of the exported document',
+				customSettings: null,
+				download: 'download',
+				includeLabels: true,
+				includeGroupHeader: true,
+				includeFooter: true,
+				fileName: "goods_Received.pdf"
+				//langsung print by pdf file
+			})
+		}
+	};
+
+	function ExporttoExcel(event) {
+		if (event) {
+			NA.NAEvent.preventDefault(event);
+			grid.jqGrid("exportToExcel", {
+				includeLabels: true,
+				includeGroupHeader: true,
+				includeFooter: true,
+				fileName: "goods_Received.xlsx",
+				maxlength: 40 // maxlength for visible string data 
+			})
+
+			NA.NAEvent.stopPropagation(event);
+		}
+	};
+
+	function getGridCellValue() {
+		var reccount = grid.jqGrid('getGridParam', 'reccount');
+		var rowId, rowData, colData;
+		if (reccount > 0) {
+			rowId = grid.jqGrid('getGridParam', 'selrow');
+			if (rowId) {
+				rowData = grid.getRowData(rowId);
+				colData = rowData['IDApp'];
+			}
+		}
+		return colData
+	};
+
+</script>
 {% endblock %}

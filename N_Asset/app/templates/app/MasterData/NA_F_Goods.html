@@ -126,110 +126,107 @@
             btnPrint =  NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(7)'),
             btnHelp =  NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(8)'),
             containerMenu = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav');//inistialisasi menu   
-        function LoadData(page){          
-            if(arguments.length > 0){
-                var url = 'NA_Goods_Search/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
-                      '&' +  win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
-                      '&' +  win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) + 
-                      '&' +  win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria());
-                grid.setGridParam({url:url}).trigger("reloadGrid",[{page:page,}]);
-            }
-            else{
-                try {           
-                    grid.jqGrid({
-                        url: 'NA_Goods_Search/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
-                            '&' +  win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
-                            '&' +  win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) + 
-                            '&' +  win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria()),
-                        mtype: "GET",
-                        datatype: "json",
-                        colNames: ['IDapp','Item Code','Goods Name','Brand Name','Unit','Price/PerUnit','Placement','Depreciation Method','Economic Life','inactive','Created Date','Created By'],
-                        colModel: [
+        function LoadData(page){
+        	var url = 'NA_Goods_Search/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
+			  '&' + win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
+			  '&' + win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) +
+			  '&' + win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria());
+        	if(arguments.length > 0){
+        		grid.setGridParam({url:url}).trigger("reloadGrid",[{page:page,}]);
+        	}
+        	else{
+        		try {           
+        			grid.jqGrid({
+        				url:url,
+        				mtype: "GET",
+        				datatype: "json",
+        				colNames: ['IDapp','Item Code','Goods Name','Brand Name','Unit','Price/PerUnit','Placement','Depreciation Method','Economic Life','inactive','Created Date','Created By'],
+        				colModel: [
                             {name: 'idapp', key: true, hidden: true, width:70,align:'left'},
                             {name: 'itemcode', index:'itemcode', width: 80,sortable:true,editable:false,align:'left', filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
-                            {name: 'brandname', index:'brandcame',width: 150,sortable:true,editable:false, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
+                            {name: 'brandname', index:'brandname',width: 150,sortable:true,editable:false, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             //formatter : 'date', formatoptions: { srcformat : 'Y-m-d H:i:s', newformat :'ShortDate'}},
                             {name: 'goodsname',index:'goodsname', width: 150,sortable:true,editable:false, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] } },
                             {name:'unit',index:'unit',width:70,sortable:true,editable:false,align:'left', filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name: 'priceperunit',index:'priceperunit', width: 150,sortable:true,align:'right',formatter:'currency', formatoptions:{decimalSeparator:",", thousandsSeparator: ".",
-                                decimalPlaces: 2, prefix: "Rp "},filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] } },
+                            	decimalPlaces: 2, prefix: "Rp "},filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] } },
                             {name:'placement',index:'placement',width:110,sortable:true,editable:false,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name:'typeofdepreciation',index:'typeofdepreciation',width:120,sortable:true,editable:false,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name:'economiclife',index:'economiclife',sortable:true,width:100,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name:'inactive',index:'inactive',sortable:true,width:50,align:'center', editable:true,edittype:'checkbox',editoptions:{value: "true:false", defaultValue: "false"},formatter:'checkbox', formatoptions: {disabled : false}},
                             {name:'createddate',index:'createddate',sortable:true,width:120,formatter:'date',formatoptions:{srcformat: 'Y-m-d',newformat: 'd F Y'}},
                             {name:'createdby',index:'createdby',sortable:true,width:110,editable:false,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
-                        ],
-                        ondblClickRow: function(rowId) {
-                            var btnOpen = NA.common.doc.querySelector('ul.nav.navbar-nav>li:nth-child(2)>button');
-                            if(btnOpen){
-                                btnOpen.click();
-                            }                   
-                        },
-                        gridComplete: function(){
-                            document.body.style.cursor = 'default';
-                        },
-                        beforeSelectRow: function (rowid, e) {
-                            var $self = $(this),
+        				],
+        				ondblClickRow: function(rowId) {
+        					var btnOpen = NA.common.doc.querySelector('ul.nav.navbar-nav>li:nth-child(2)>button');
+        					if(btnOpen){
+        						btnOpen.click();
+        					}                   
+        				},
+        				gridComplete: function(){
+        					document.body.style.cursor = 'default';
+        				},
+        				beforeSelectRow: function (rowid, e) {
+        					var $self = $(this),
                                 iCol = $.jgrid.getCellIndex($(e.target).closest("td")[0]),
                             cm = $self.jqGrid("getGridParam", "colModel");
-                            //localData = $self.jqGrid("getLocalRow", rowid);
-                            if (cm[iCol].name === "inactive") {
-                                var checked = $(e.target).is(":checked");
-                                oriChecked = !checked;
-                                var tr = $(e.target).closest('tr');
-                                idapp = tr[0].id;
-                                if(parseInt(idapp) != -1){
-                                    //post update data by idapp
-                                    var url = 'setInActive/';
-                                    url = NA.common.addURLParam(url,'idapp',idapp);
-                                    url = NA.common.addURLParam(url,'inactive',checked);
-                                    $.post(url, function(data, status,xhr){
-                                        if(parseInt(status) != 200){
-                                            if(parseInt(status) >= 500){
-                                                $(this).attr('checked',oriChecked);
-                                                throw new Error(data);
-                                            }
-                                            else {
-                                                $(this).attr('checked',oriChecked);
-                                                throw new Error((typeof data != 'undefined' && data != null)?data:'unknown error');
-                                            }
-                                        }
-                                    },'json');
-                                }                           
-                            }                        
-                            return true; // allow selection
-                        },
-                        cellEdit:false,
-                        viewrecords: true,
-                        height: $('div.fltlft').height() - ($('div.fltlft').height() * 0.173),
-                        rowNum: 300,
-                        rowList: [20,50,100,200,300,500],
-                        sortname: "idapp",
-                        sortorder: "desc",
-                        multiSort: true,
-                        shrinkToFit:false,
-                        iconSet: "fontAwesome",
-                        forceFit:true,
-                        toolbar:true,
-                        scrollrows:true,
-                        hidegrid:true,             
-                        caption:"Master data -- Goods",
-                        pager: "#jqGrid_NA_F_Goods_Pager"
-                    });
-                    grid.navGrid("#jqGrid_NA_F_Goods_Pager", {                
-                        search: true, // show search button on the toolbar
-                        add: false,
-                        edit: false,
-                        del: false,
-                        refresh: true
-                    });
+        					//localData = $self.jqGrid("getLocalRow", rowid);
+        					if (cm[iCol].name === "inactive") {
+        						var checked = $(e.target).is(":checked");
+        						oriChecked = !checked;
+        						var tr = $(e.target).closest('tr');
+        						idapp = tr[0].id;
+        						if(parseInt(idapp) != -1){
+        							//post update data by idapp
+        							var url = 'setInActive/';
+        							url = NA.common.addURLParam(url,'idapp',idapp);
+        							url = NA.common.addURLParam(url,'inactive',checked);
+        							$.post(url, function(data, status,xhr){
+        								if(parseInt(status) != 200){
+        									if(parseInt(status) >= 500){
+        										$(this).attr('checked',oriChecked);
+        										throw new Error(data);
+        									}
+        									else {
+        										$(this).attr('checked',oriChecked);
+        										throw new Error((typeof data != 'undefined' && data != null)?data:'unknown error');
+        									}
+        								}
+        							},'json');
+        						}                           
+        					}                        
+        					return true; // allow selection
+        				},
+        				cellEdit:false,
+        				viewrecords: true,
+        				height: $('div.fltlft').height() - ($('div.fltlft').height() * 0.173),
+        				rowNum: 300,
+        				rowList: [20,50,100,200,300,500],
+        				sortname: "idapp",
+        				sortorder: "desc",
+        				multiSort: true,
+        				shrinkToFit:false,
+        				iconSet: "fontAwesome",
+        				forceFit:true,
+        				toolbar:true,
+        				scrollrows:true,
+        				hidegrid:true,             
+        				caption:"Master data -- Goods",
+        				pager: "#jqGrid_NA_F_Goods_Pager"
+        			});
+        			grid.navGrid("#jqGrid_NA_F_Goods_Pager", {                
+        				search: false, // show search button on the toolbar
+        				add: false,
+        				edit: false,
+        				del: false,
+        				refresh: true
+        			});
                
-                } catch (e) {
-                    console.log(e);
-                    document.body.style.cursor = 'default';
-                }
-            };           
+        		} catch (e) {
+        			console.log(e);
+        			document.body.style.cursor = 'default';
+        		}
+        	};           
         };
 
         var SearchData =  NA.common.SearchData;

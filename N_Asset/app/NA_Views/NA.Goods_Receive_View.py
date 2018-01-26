@@ -63,9 +63,11 @@ def NA_Goods_Receive_Search(request):
 		dataRows = paginator.page(paginator.num_pages)
 		
 	rows = []
+	#column IDapp 	goods 	datereceived supliername FK_ReceivedBy 	Received_By FK_P_R_By pr_by totalpurchased totalreceived 
+	i = 0;
 	for row in dataRows.object_list:
-		datarow = {"id" :row['idapp'], "cell" :[row['idapp'],row['itemcode'],row['goodsname'],row['brandname'],row['unit'],row['priceperunit'], \
-			row['placement'],row['typeofdepreciation'],row['economiclife'],row['inactive'],datetime.date(row['createddate']),row['createdby']]}
+		datarow = {"id" :row['idapp'], "cell" :[i+1,row['goods'],row['datereceived'],row['supliername'],row['FK_ReceivedBy'],row['Received_By'],row['FK_P_R_By'], \
+			row['pr_by'],row['totalpurchased'],row['totalreceived'],row['inactive'],datetime.date(row['CreatedDate']),row['CreatedBy']]}
 		#datarow = {"id" :row.idapp, "cell" :[row.idapp,row.itemcode,row.goodsname,row.brandname,row.unit,row.priceperunit, \
 		#	row.placement,row.depreciationmethod,row.economiclife,row.createddate,row.createdby]}
 		rows.append(datarow)
