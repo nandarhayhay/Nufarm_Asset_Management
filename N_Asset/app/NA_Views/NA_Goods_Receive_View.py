@@ -72,4 +72,17 @@ def NA_Goods_Receive_Search(request):
 		#	row.placement,row.depreciationmethod,row.economiclife,row.createddate,row.createdby]}
 		rows.append(datarow)
 	results = {"page": page,"total": paginator.num_pages ,"records": totalRecord,"rows": rows }
-	return HttpResponse(json.dumps(results, indent=4,cls=DjangoJSONEncoder),content_type='application/json')	
+	return HttpResponse(json.dumps(results, indent=4,cls=DjangoJSONEncoder),content_type='application/json')
+@ensure_csrf_cookie
+def ShowEntry_Receive(request):
+	authentication_classes = []
+	status = 'Add'
+	IDApp = 1
+	initializationForm={}
+	statuscode = 200
+	if request.POST:
+		status = request.POST.get('status')
+	else:
+		status = 'Add' if request.GET.get('status') == None else request.GET.get('status')
+		IDApp = request.GET.get('IDApp')
+		#set initilization

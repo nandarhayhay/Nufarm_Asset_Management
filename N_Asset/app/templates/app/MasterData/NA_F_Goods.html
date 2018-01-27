@@ -725,7 +725,7 @@
                 if(target.innerText === ' Add' || target.innerText === ' Edit' || target.innerText === ' Open'){
                     if(target.innerText.trim() !== 'Add'){
                         var itemCode = getGridCellValue();
-                        if(typeof(itemCode) == 'undefined' || itemCode === ''){
+                        if(typeof itemCode == 'undefined' || itemCode === ''){
                             alert('Please select data to edit');
                             var dialog = dialog || NA.common.dialog.doc.querySelector("div.containerDialog");
                             if(dialog){

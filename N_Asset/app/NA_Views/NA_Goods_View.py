@@ -147,7 +147,7 @@ def ShowEntry(request):
 					#newItem = goods(**data)
 					
 					#newItem = 
-	#					IcolumnName = request.GET.get('columnName');
+	#IcolumnName = request.GET.get('columnName');
 	#IvalueKey =  request.GET.get('valueKey')
 	#IdataType =  request.GET.get('dataType')
 	#Icriteria =  request.GET.get('criteria')
@@ -161,7 +161,6 @@ def ShowEntry(request):
 			else:				
 				form = NA_Goods_Form(initial=initializationForm)
 				form.fields['status'].widget.attrs = {'value':status};	
-				#form.fields['initializeForm'].widget.attrs = {'value':json.dumps(initializationForm)}
 				return render(request, 'app/MasterData/NA_Entry.html', {'form' : form})
 		elif status == 'Edit' or status == "Open":		
 			hasRefData = goods.objects.hasreferenced(itemcode)
