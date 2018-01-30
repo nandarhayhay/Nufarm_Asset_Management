@@ -111,6 +111,7 @@
     <Content Include="app\static\app\images\NufarmLogo.jpg" />
     <Content Include="app\static\app\images\bgLogo.jpg" />
     <Content Include="app\static\app\images\Examplemyself.jpg" />
+    <Content Include="app\static\app\scripts\bootstrap-dialog.js" />
     <Content Include="app\static\app\scripts\JqGridJS\grid.base.js" />
     <Content Include="app\static\app\scripts\JqGridJS\grid.celledit.js" />
     <Content Include="app\static\app\scripts\JqGridJS\grid.common.js" />

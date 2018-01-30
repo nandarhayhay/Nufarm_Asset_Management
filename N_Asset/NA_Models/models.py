@@ -2,25 +2,25 @@
 from datetime import datetime
 from NA_DataLayer.NA_Goods_BR import NA_BR_Goods
 from NA_DataLayer.NA_Goods_Receive_BR import NA_BR_Goods_Receive
-from django_mysql.models import JSONField
+#from django_mysql.models import JSONField
 
 #class NABRGoods(models.Manager):
 #	def serchData(columKey='',valueKey=''):
 #		return super.get_queryset(NABRGoods,self).filter(columKey=valueKey)
 
-class LogEvent(models.Model):
-    idapp = models.AutoField(db_column='IDApp', primary_key=True)
-    nameapp = models.CharField(db_column='NameApp', max_length=30)
-    typeapp = models.CharField(db_column='TypeApp', max_length=10)
-    descriptionsapp = JSONField()
-    createddate = models.DateTimeField(db_column='CreatedDate', auto_now_add=True)
-    createdby = models.CharField(db_column='CreatedBy', max_length=30)
+#class LogEvent(models.Model):
+#    idapp = models.AutoField(db_column='IDApp', primary_key=True)
+#    nameapp = models.CharField(db_column='NameApp', max_length=30)
+#    typeapp = models.CharField(db_column='TypeApp', max_length=10)
+#    descriptionsapp = JSONField()
+#    createddate = models.DateTimeField(db_column='CreatedDate', auto_now_add=True)
+#    createdby = models.CharField(db_column='CreatedBy', max_length=30)
 
-    def __str__(self):
-        return '{}'.format(self.nameapp)
+#    def __str__(self):
+#        return '{}'.format(self.nameapp)
 
-    class Meta:
-        db_table = 'LogEvent'
+#    class Meta:
+#        db_table = 'LogEvent'
 
 class Employee(models.Model):
     idapp = models.AutoField(db_column='IDApp', primary_key=True)  # Field name made lowercase.
@@ -237,7 +237,7 @@ class NAGoodsReceive(models.Model):
 	createdby = models.CharField(db_column='Createdby', max_length=50)
 	modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)
 	modifiedby = models.CharField(db_column='ModifiedBy', max_length=50, blank=True, null=True)
-	
+	descriptions =  models.CharField(db_column='Descriptions', max_length=150, blank=True, null=True)  # Field name made lowercase.
 	class Meta:
 		managed = False
 		db_table = 'n_a_goods_receive'

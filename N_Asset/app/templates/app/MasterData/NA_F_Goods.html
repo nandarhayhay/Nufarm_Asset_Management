@@ -738,8 +738,7 @@
                     $('div.maindialogContent').load("ShowEntry?" + win.encodeURIComponent('itemcode') + '=' +  win.encodeURIComponent(itemCode) +
                         '&' + win.encodeURIComponent('status') + '=' +  win.encodeURIComponent(target.innerText.trim()),function(responseTxt,statusTxt,xhr){//load /tampilkan form entry data                    
                        
-                            if(statusTxt == "success"){ //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpang semua ke dalam variable jika perlua
-                            
+                            if(statusTxt == "success"){ //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpan semua ke dalam variable jika perluas                            
                                 $(this).html(responseTxt);
                                 //remove attribute disable untuk button OK dan cancel bila statusnya Add
                                 status = status||win.status||target.innerText.trim();

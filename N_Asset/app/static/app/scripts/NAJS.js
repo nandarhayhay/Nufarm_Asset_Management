@@ -661,6 +661,64 @@ NA.common.dialog = {
         }
         return position;
     },
+    createFormContainer: function(IDForControl,placeHolderForSearch,handlerForBlurSearch,HandlerForFocusSearch,HandlerForKeyDown){
+       var containerForm = this.doc.createElement("div");
+       containerForm.className = 'containerForm';
+       containerForm.classList.add(IDForControl);
+        //create Header for Searching
+        var HeaderSearching = this.doc.createElement('div');
+        HeaderSearching.className = 'input-group';
+
+   //     <div class="input-group">
+   //  <input type="text" class="form-control" placeholder="Search" name="search">
+   //  <div class="input-group-btn">
+   //    <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+   //  </div>
+   //</div>
+
+        //create TextBox Searching with placeholder
+        var searchText = this.doc.createElement('input');
+        searchText.type = 'text';
+        searchText.className = 'form-control';
+        searchText.classList.add(IDForControl);
+
+        searchText.id = 'txtsearch_' + IDForControl;
+        searchText.setAttribute('placeholder', placeHolderForSearch);
+
+        if (handlerForBlurSearch) {
+            NA.NAEvent.addHandler(searchText, 'blur', handlerForBlurSearch);
+        }
+        if (HandlerForFocusSearch) {
+            NA.NAEvent.addHandler(searchText, 'focus', HandlerForFocusSearch);
+        }
+        if (HandlerForKeyDown) {
+            NA.NAEvent.addHandler(searchText, 'keydown', HandlerForKeyDown);
+        }
+
+        var inputGrButton = this.doc.createElement('div');
+        inputGrButton.className = 'input-group-btn';
+
+        var btnSearch = this.doc.createElement('button');
+        btnSearch.className = 'btn';
+        btnSearch.classList.add('btn-success');
+        btnSearch.type = 'button';
+
+        var Iicon = this.doc.createElement('i');
+        Iicon.className = 'glyphicon';
+        Iicon.classList.add('glyphicon-search');
+        btnSearch.appendChild(Iicon);
+        inputGrButton.appendChild(btnSearch);
+
+        HeaderSearching.appendChild(searchText);
+        HeaderSearching.appendChild(inputGrButton);
+
+        var mainContainer = this.doc.createElement('div');
+        mainContainer.className = 'maincontainerForm';
+        mainContainer.classList.add(IDForControl);
+        containerForm.appendChild(HeaderSearching);
+        containerForm.appendChild(mainContainer);
+        return containerForm;
+    },
     createSearchDialog: function (event, args) {
         var body = this.doc.body;
         var pageDimensions = this.getPageDimensions();
@@ -1034,9 +1092,9 @@ NA.common.AJAX = function(){
     var XHR = XHR || createXHR();
     var settings = settings || {};
     settings.data = settings.data || {};
-    settings.dataType = settings.dataType || 'application/json';
+    settings.dataType = settings.dataType || 'application/json';//content yang di kirim ke server jika post default nya application/json
     settings.url = settings.url || '';
-    settings.MIMEType = settings.MIMEType || 'text/html';
+    settings.MIMEType = settings.MIMEType || 'text/html';//method overrides the MIME type returned by the server,default 'text/html',override responsetype
     settings.requestHeader = settings.requestHeader || '';
     settings.timeOut = settings.timeOut || 2000000;
     return {
@@ -1059,7 +1117,8 @@ NA.common.AJAX = function(){
             XHR.open('POST', Xurl, true);
             if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
             { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-            XHR.setRequestHeader(XdataType);
+            XHR.setRequestHeader('Content-Type :' + XdataType);
+            //XHR.setRequestHeader('Accept :' + XdataType);
             if (OnBeforeSend) { OnBeforeSend.call(XHR); }
             if (XData) { XHR.send(XData); }
         },

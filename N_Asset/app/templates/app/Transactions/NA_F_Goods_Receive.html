@@ -60,6 +60,7 @@ t>
 <script src="../../../static/app/scripts/jqGridJS/i18n/grid.locale-en.js"></script>
 <!----------------------------Load Jquery UI. JS file-------------------------------->
 <scriptS src="../../../static/app/scripts/jquery-ui.js"></scriptS>
+<script src="../../../static/app/scripts/bootstrap-dialog.js"></script>
 {% endblock %}
 
 {%block content-0 %}
@@ -220,13 +221,13 @@ t>
 		//====================GROUP FUNCTION DECLARATION===============================
 
 
-		function getGridCellValue(CeltoGet) {
-			var reccount = grid.jqGrid('getGridParam', 'reccount');
+		function getGridCellValue(thegrid,CeltoGet) {
+			var reccount = thegrid.jqGrid('getGridParam', 'reccount');
 			var rowId, rowData, colData;
 			if (reccount > 0) {
-				rowId = grid.jqGrid('getGridParam', 'selrow');
+				rowId = thegrid.jqGrid('getGridParam', 'selrow');
 				if (rowId) {
-					rowData = grid.getRowData(rowId);
+					rowData = thegrid.getRowData(rowId);
 					colData = rowData[CeltoGet];
 				}
 			}
@@ -406,8 +407,8 @@ t>
 		//=========================================================================================     
 
 		NA.NAEvent.addHandler(btnDelete, 'click', function (event) {
-			var itemCode = getGridCellValue();
-			if (itemCode) {
+			var IDApp = getGridCellValue(grid,'IDApp');
+			if (IDApp) {
 				NA.NAEvent.preventDefault(event);
 				if (!confirm('are you sure you want to delete data\nOperation can not be undone ?')) {
 					return false;
@@ -502,7 +503,7 @@ t>
 				var target = NA.NAEvent.getTarget(event);
 				if (target.innerText === ' Add' || target.innerText === ' Edit' || target.innerText === ' Open') {
 					if (target.innerText.trim() !== 'Add') {
-						var IDApp = getGridCellValue('IDApp');
+						var IDApp = getGridCellValue(grid,'IDApp');
 						if (typeof IDApp == 'undefined' || IDApp === '') {
 							alert('Please select data to edit');
 							var dialog = dialog || NA.common.dialog.doc.querySelector("div.containerDialog");
@@ -513,13 +514,14 @@ t>
 							return false;
 						}
 					}
-					$('div.maindialogContent').load("ShowEntry?" + win.encodeURIComponent('itemcode') + '=' + win.encodeURIComponent(itemCode) +
+					$('div.maindialogContent').load("ShowEntry_Receive?" + win.encodeURIComponent('IDApp') + '=' + win.encodeURIComponent(IDApp) +
                         '&' + win.encodeURIComponent('status') + '=' + win.encodeURIComponent(target.innerText.trim()), function (responseTxt, statusTxt, xhr) {//load /tampilkan form entry data                    
 
                         	if (statusTxt == "success") { //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpang semua ke dalam variable jika perlua
 
                         		$(this).html(responseTxt);
                         		//remove attribute disable untuk button OK dan cancel bila statusnya Add
+								//fk_goods daterecieved fk_suplier totalpurchase totalrecieved  fk_receivedby fk_p_r_by
                         		status = status || win.status || target.innerText.trim();
                         		switch (status) {
                         			case 'Add': {
@@ -539,6 +541,8 @@ t>
                         						item.setAttribute('disabled', true);
                         					}
                         				});
+                        				//matikan FK_goods,fk_suplier,fk_received_by,fk_p_r_by
+
                         				break;
                         			}
                         		};
@@ -551,26 +555,59 @@ t>
                         			//========set autocomplete buat brand============
                         			$("#id_brandname").autocomplete({ source: "SearchBrand/", minLength: 1, });
                         			//tambahkan css untuk autocomplete file agar munculnya dengan backgorund bisa menutupi layer 1
-                        			NA.common.doc.querySelector('ul[id*="ui-id-"]').style.backgroundColor = 'white';
-                        			//setting focus dan blur
-                        			$('input[type="text"]').focus(function () {
-                        				var $valPlaceHolder = $(this).data('value');
-                        				if ($(this).val() === '') {
-                        					if ($(this).attr('placeholder') === $valPlaceHolder) {
-                        						$(this).attr('placeholder', '');
+                        			NA.common.doc.querySelector('ul[id*="ui-id-"]').style.backgroundColor = 'white';                        			//setting focus dan blur
+
+                        			Array.prototype.forEach.call(NA.common.doc.querySelectorAll('input[type="text"]'),function (item) {
+                        				var valPlaceHolder = item.dataset.value;
+                        				NA.NAEvent.addHandler(item, 'focus', function (event) {
+                        					if (this.value === '') {
+                        						if (this.getAttribute('placeholder') === valPlaceHolder) {
+                        							this.setAttribute('placeholder', '');
+                        						}
                         					}
-                        				}
-                        			});
-                        			$('input[type="text"]').blur(function () {
-                        				if ($(this).val() === '') {
-                        					var $valPlaceHolder = $(this).data('value');
-                        					if ($(this).attr('placeholder') === '') {
-                        						$(this).attr('placeholder', $valPlaceHolder)
+                        				});
+										//============blur event================================
+                        				NA.NAEvent.addHandler(item, 'blur', function (event) {
+                        					if (this.value === '') {
+                        						if (this.getAttribute('placeholder') === '') {
+                        							this.setAttribute('placeholder', valPlaceHolder);
+                        						}
                         					}
-                        				}
+                        				});
+                        				NA.NAEvent.addHandler(item, 'keydown', function (event) {
+                        					if (event.keyCode === 13) {//kalau menekan tombol enter
+                        						switch (this.id) {
+                        							case 'id_fk_goods': {
+                        								//prevent default
+                        								NA.NAEvent.preventDefault(event);//prevent from submit
+														//get data ke database by itemCode
+                        								//jika ada tampilkan data di form goods_desc
+                        								break;
+                        							}
+                        							case 'id_fk_suplier': {
+
+                        								//jika ada tampilkan data di form supliername
+                        								break;
+                        							}
+                        							case 'id_fk_receivedby': {
+
+                        								//jika ada tampilkan data di form employee_Received
+                        								break;
+                        							}
+                        							case 'id_fk_p_r_by': {
+
+                        								//jika ada tampilkan data di form employee_pr
+                        								break;
+                        							}
+                        						}
+                        					}
+                        				});
                         			});
+                        			//====================id_daterecieved===========================
+                        			//set JQueryDatePicker
+                        			$('#id_daterecieved').datepicker({ dateFormat: 'dd/mm/yyyy' });
                         			//setting Custom Validity
-                        			var elm = NA.common.doc.querySelector('#id_priceperunit');
+                        			var elm = NA.common.doc.querySelector('#id_daterecieved');
                         			NA.NAEvent.addHandler(elm, 'input', function (event) {
                         				var elpat = this.getAttribute('patern');
                         				var patern = new RegExp(elpat, 'i');
@@ -579,12 +616,331 @@ t>
                         					valuePat = this.textcontent;
                         				}
                         				if (!patern.test(valuePat)) {
-                        					this.setCustomValidity('Value must be decimal or number');
+                        					this.setCustomValidity('Invalid date value');
                         					this.validity.valid = false;
                         				}
                         				else {
                         					this.setCustomValidity(''); //clearkan error custom validity
                         				}
+                        			});
+                        			//=====================end id_daterecieved==========================================
+
+                        			//fk_goods daterecieved fk_suplier totalpurchase totalrecieved  fk_receivedby fk_p_r_by
+									//======================BUTTONS Search================================================
+                        			//add event to btn Find goods
+                        			var btnFindGoods = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_goods'),
+										btnFindSuplier = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_suplier'),
+										btnFindPRBy = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_pr_by'),
+										btnFindReceivedBy = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_receivedby');
+                        			NA.NAEvent.addHandler(btnFindGoods, 'click', function (event) {
+										//create bootstrapDialog
+                        				BootstrapDialog.show({
+
+                        					//message: (function () {
+                        					//	//==============create formSearching===============
+                        					//	//create div for container
+                        					//	//create header div for searching
+                        					//	//create div for main container
+                        					
+
+                        					//	//if success , set event on double click, set event to button OK
+                        					//})(this),
+                        					message: function (dialogRef) {
+                        						var placeHolder = 'Enter goods desc to search for';
+                        						var gridTbl = null, gridPager = null;                        						
+												var containerMessage = NA.common.dialog.createFormContainer('fk_goods', placeHolder,
+												function (e) {//event for blur
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === '') {
+															this.setAttribute('placeholder', placeHolder);
+														}
+													}
+												},
+												function (e) {//event for focus
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === 'Enter goods desc to search for') {
+															this.setAttribute('placeholder', '');
+														}
+													}
+												},
+												function (e) {//even for keydown txtSearch
+													if (e.keyCode === 13) {
+														win.document.body.style.cursor = 'wait';
+														//cari data ke database
+														var url = '/SearchGoodsbyForm?' + win.encodeURIComponent('goods_desc') + '=' + win.encodeURIComponent(e.target.value.trim());
+														//var ajax = NA.common.AJAX();
+														//ajax.GET(url, 'application/json', null, function () {
+														//	window.document.body.style.cursor = 'wait';
+														//}, function (xhr) {
+														//	if (xhr.status == 200 && xhr.status < 300) {
+														//		var json = JSON.parse(xhr.responseText);
+														//		//reloadJquery
+														//	}
+														//}, null, function (xhr) {
+
+														//}, OnLoadEnd, customRequestHeader);
+														if (gridTbl) {
+															gridTbl.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
+														}
+														win.document.body.style.cursor = 'default';
+													}
+												});
+												var children = containerMessage.childNodes;
+												var mainContainer = null, txtSearch = null;
+												for (var i = 0, len = children.length; i < len; i++) {
+													if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm') {
+														mainContainer = children[i];
+													}
+													//else if (children[i].nodeType == 1 && children[i].className === 'NA-Entry-div-row') {
+													//	txtSearch = children[i].childNodes[0];
+													//}
+													break;
+												}
+												var txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+												if (mainContainer && txtSearch) {
+													//loads Data into JqueryGrid
+													var gridTbl = NA.common.doc.createElement('table');
+													gridTbl.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods';
+													var gridPager = NA.common.doc.createElement('div');
+													gridPager.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods_Pager';
+
+													var urlFKGoods = 'NA_F_Goods_Receive_FK_Goods/?' + win.encodeURIComponent('searchText') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
+													gridTbl.jqGrid({
+														url: urlFKGoods,
+														mtype: "GET",
+														datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	Received_By FK_P_R_By pr_by totalpurchased totalreceived 
+														colNames: ['IDapp', 'NO', 'itemcode', 'goods Description', ],
+														colModel: [
+															{ name: 'idapp', key: true, hidden: true, align: 'left' },
+															{ name: 'NO', width: 50, align: 'right', sortable: false, editable: false, },
+															{ name: 'itemcode', width: 80, align: 'left', sortable: true, editable: false, },
+															{ name: 'goods', index: 'goods', width: 150, sortable: true, editable: false, align: 'left', },
+														],
+														ondblClickRow: function (rowId) {
+															//fire button OK
+															var btnOK = dialogRef.getButton('btnOKFindGoods');
+															btnOK.click();
+														},
+														gridComplete: function () {
+															document.body.style.cursor = 'default';
+														},
+														cellEdit: false,
+														viewrecords: true,
+														height: '500px',
+														rowNum: 500,
+														rowList: [20, 50, 100, 200, 300, 500],
+														sortname: "itemcode",
+														sortorder: "asc",
+														multiSort: true,
+														shrinkToFit: false,
+														iconSet: "fontAwesome",
+														forceFit: true,
+														toolbar: true,
+														scrollrows: true,
+														hidegrid: true,
+														caption: "Transactions ---Find goods",
+														pager: "#jqGrid_NA_F_Goods_Receive_FK_Goods_Pager"
+													});
+													gridTbl.navGrid(gridPager, {
+														search: false, // show search button on the toolbar
+														add: false,
+														edit: false,
+														del: false,
+														refresh: false
+													});
+													containerMessage.childNodes[mainContainer].appendChild(gridTbl);
+													containerMessage.childNodes[mainContainer].appendChild(gridPager);
+												}												
+												return containerMessage;
+                        					},
+                        					closable: true,
+                        					closeByBackdrop: false,
+                        					closeByKeyboard: false,
+                        					buttons: [{
+                        						label: 'Cancel',
+                        						icon: 'glyphicon glyphicon-remove',
+                        						cssClass : 'btn-success',
+                        						action: function (dialogRef) {
+                        							dialogRef.close();
+                        						},
+                        					}, {
+                        						label: 'OK',
+												id:'btnOKFindGoods',
+                        						icon: 'glyphicon glyphicon-ok',
+                        						cssClass: 'btn-success',
+                        						action: function (dialogRef) {
+                        							var IDApp = getGridCellValue(gridTbl, 'IDApp');
+                        							if (IDApp) {//cell di select sama user
+                        								//tempelkan data row di fk_goods, dan valuenya di goods_desc;
+                        							var rowId = gridTbl.jqGrid('getGridParam', 'selrow');
+                        							var rowData = gridTbl.getRowData(rowId);
+                        							var fk_Goods = rowData['itemcode'], goods_Desc = rowData['goods'];
+                        							var txtid_fk_goods = NA.common.getElementID('id_fk_goods');
+                        							txtid_fk_goods.textContent = fk_Goods;
+                        							var txtgoodsDesc = NA.common.getElementID('id_goods_desc');
+                        							txtgoodsDesc.textContent = goods_Desc;
+                        							}
+                        						}
+                        					}]
+                        				});                        				
+                        			});
+                        			NA.NAEvent.addHandler(btnFindSuplier, 'click', function (event) {
+                        				//create bootstrapDialog
+                        				BootstrapDialog.show({
+
+                        					//message: (function () {
+                        					//	//==============create formSearching===============
+                        					//	//create div for container
+                        					//	//create header div for searching
+                        					//	//create div for main container
+
+
+                        					//	//if success , set event on double click, set event to button OK
+                        					//})(this),
+                        					message: function (dialogRef) {
+                        						var placeHolder = 'Enter Suplier name to search for';
+                        						var gridTbl = null, gridPager = null;
+                        						var containerMessage = NA.common.dialog.createFormContainer('fk_suplier', placeHolder,
+												function (e) {//event for blur
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === '') {
+															this.setAttribute('placeholder', placeHolder);
+														}
+													}
+												},
+												function (e) {//event for focus
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === 'Enter suplier name to search for') {
+															this.setAttribute('placeholder', '');
+														}
+													}
+												},
+												function (e) {//even for keydown txtSearch
+													if (e.keyCode === 13) {
+														win.document.body.style.cursor = 'wait';
+														//cari data ke database
+														var url = '/SearchSuplierbyForm?' + win.encodeURIComponent('supliername') + '=' + win.encodeURIComponent(e.target.value.trim());
+														//var ajax = NA.common.AJAX();
+														//ajax.GET(url, 'application/json', null, function () {
+														//	window.document.body.style.cursor = 'wait';
+														//}, function (xhr) {
+														//	if (xhr.status == 200 && xhr.status < 300) {
+														//		var json = JSON.parse(xhr.responseText);
+														//		//reloadJquery
+														//	}
+														//}, null, function (xhr) {
+
+														//}, OnLoadEnd, customRequestHeader);
+														if (gridTbl) {
+															gridTbl.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
+														}
+														win.document.body.style.cursor = 'default';
+													}
+												});
+                        						var children = containerMessage.childNodes;
+                        						var mainContainer = null, txtSearch = null;
+                        						for (var i = 0, len = children.length; i < len; i++) {
+                        							if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm') {
+                        								mainContainer = children[i];
+                        							}
+                        							//else if (children[i].nodeType == 1 && children[i].className === 'NA-Entry-div-row') {
+                        							//	txtSearch = children[i].childNodes[0];
+                        							//}
+                        							break;
+                        						}
+                        						var txtSearch = NA.common.getElementID('txtsearch_fk_suplier');
+                        						if (mainContainer && txtSearch) {
+                        							//loads Data into JqueryGrid
+                        							var gridTbl = NA.common.doc.createElement('table');
+                        							gridTbl.id = 'jqGrid_NA_F_Goods_Receive_fk_suplier';
+                        							var gridPager = NA.common.doc.createElement('div');
+                        							gridPager.id = 'jqGrid_NA_F_Goods_Receive_fk_suplier_Pager';
+
+                        							var urlFKGoods = 'NA_F_Goods_Receive_fk_suplier/?' + win.encodeURIComponent('searchText') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
+                        							gridTbl.jqGrid({
+                        								url: urlFKGoods,
+                        								mtype: "GET",
+                        								datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	Received_By FK_P_R_By pr_by totalpurchased totalreceived 
+                        								colNames: ['IDapp', 'NO', 'supliercode', 'suplier name', ],
+                        								colModel: [
+															{ name: 'idapp', key: true, hidden: true, align: 'left' },
+															{ name: 'NO', width: 50, align: 'right', sortable: false, editable: false, },
+															{ name: 'supliercode', width: 90, align: 'left', sortable: true, editable: false, },
+															{ name: 'supliername', index: 'supliername', width: 150, sortable: true, editable: false, align: 'left', },
+                        								],
+                        								ondblClickRow: function (rowId) {
+                        									//fire button OK
+                        									var btnOK = dialogRef.getButton('btnOKFindsuplier');
+                        									btnOK.click();
+                        								},
+                        								gridComplete: function () {
+                        									document.body.style.cursor = 'default';
+                        								},
+                        								cellEdit: false,
+                        								viewrecords: true,
+                        								height: '500px',
+                        								rowNum: 500,
+                        								rowList: [20, 50, 100, 200, 300, 500],
+                        								sortname: "supliername",
+                        								sortorder: "asc",
+                        								multiSort: true,
+                        								shrinkToFit: false,
+                        								iconSet: "fontAwesome",
+                        								forceFit: true,
+                        								toolbar: true,
+                        								scrollrows: true,
+                        								hidegrid: true,
+                        								caption: "Transactions ---Find suplier",
+                        								pager: "#jqGrid_NA_F_Goods_Receive_fk_suplier_Pager"
+                        							});
+                        							gridTbl.navGrid(gridPager, {
+                        								search: false, // show search button on the toolbar
+                        								add: false,
+                        								edit: false,
+                        								del: false,
+                        								refresh: false
+                        							});
+                        							containerMessage.childNodes[mainContainer].appendChild(gridTbl);
+                        							containerMessage.childNodes[mainContainer].appendChild(gridPager);
+                        						}
+                        						return containerMessage;
+                        					},
+                        					closable: true,
+                        					closeByBackdrop: false,
+                        					closeByKeyboard: false,
+                        					buttons: [{
+                        						label: 'Cancel',
+                        						icon: 'glyphicon glyphicon-remove',
+                        						cssClass: 'btn-success',
+                        						action: function (dialogRef) {
+                        							dialogRef.close();
+                        						},
+                        					}, {
+                        						label: 'OK',
+                        						id: 'btnOKFindsuplier',
+                        						icon: 'glyphicon glyphicon-ok',
+                        						cssClass: 'btn-success',
+                        						action: function (dialogRef) {
+                        							var supliercode = getGridCellValue(gridTbl, 'supliercode');
+                        							if (supliercode) {//cell di select sama user
+                        								//tempelkan data row di fk_goods, dan valuenya di goods_desc;
+                        								var rowId = gridTbl.jqGrid('getGridParam', 'selrow');
+                        								var rowData = gridTbl.getRowData(rowId);
+                        								var fk_suplier = rowData['supliercode'], supliername = rowData['supliername'];
+                        								var txtid_fk_suplier = NA.common.getElementID('id_fk_suplier');
+                        								txtid_fk_suplier.textContent = supliercode;
+                        								var txtsupliername = NA.common.getElementID('id_supliername');
+                        								txtsupliername.textContent = supliername;
+                        							}
+                        						}
+                        					}]
+                        				});
+                        			});
+                        			NA.NAEvent.addHandler(btnFindPRBy, 'click', function (event) {
+
+                        			});
+                        			NA.NAEvent.addHandler(btnFindReceivedBy, 'click', function (event) {
+
                         			});
                         		}
                         	}

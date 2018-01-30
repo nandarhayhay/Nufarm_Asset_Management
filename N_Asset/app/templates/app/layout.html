@@ -48,8 +48,8 @@
                                                    {% if "/NA_Goods/" == request.path %}
                                                    <li class="active"><a href="{{ request.path }}"><i class="fa fa-dropbox" aria-hidden="true"></i>Goods</a></li>
                                                    {% else %}
-                                                    <li class="active"><a href="NA_Goods/"><i class="fa fa-dropbox" aria-hidden="true"></i>Goods</a></li>
-                                                    {% endif %}
+                                                   <li class="active"><a href="NA_Goods/"><i class="fa fa-dropbox" aria-hidden="true"></i>Goods</a></li>
+                                                   {% endif %}
                                                    <li><a href="#">Others Menu</a></li>
                                                    <li><a href="#">Others Menu</a></li>
                                                    <li><a href="#">Others Menu</a></li>
@@ -62,10 +62,10 @@
                                            <li>
                                                <a href="#" data-toggle="collapse" data-target="#products" class="active collapsed" aria-expanded="false"> <span class="nav-label">Transactions</span> <span class="fa fa-angle-down pull-right"></span> </a>
                                                <ul class="sub-menu collapse" id="products" aria-expanded="false" style="">
-                                                    {% if "/NA_Goods_Receive/" == request.path %} 
-                                                         <li class="active"><a href="{{ request.path }}">Goods Receiving</a></li>
+                                                   {% if "/NA_Goods_Receive/" == request.path %}
+                                                   <li class="active"><a href="{{ request.path }}">Goods Receiving</a></li>
                                                    {% else %}
-                                                        <li class="active"><a href="/NA_Goods_Receive/">Goods Receiving</a></li>
+                                                   <li class="active"><a href="/NA_Goods_Receive/">Goods Receiving</a></li>
                                                    {% endif %}
                                                    <li><a href="#">Goods Outwords</a></li>
                                                    <li><a href="#">Goods Lent</a></li>
@@ -224,97 +224,92 @@
 
                            </div>
 
-                           <!-- =================jQuery CDN  ========================================-->
-                           <!--================= jQuery local fallback https://code.jquery.com/jquery-1.11.1.min.js========================= -->
-                           
-                           {#<script>window.jQuery || document.write('<script src="/local/jquery.min.js"><\/script>')</script>#}
-                           <script>window.jQuery || document.write('\<script src="{% static 'app/scripts/jquery-1.11.1.js' %}"\>\<\/script\>')</script>
+                           <!-- =================jQuery CDN  ttps://code.jquery.com/jquery-1.11.1.min.js========================================-->
+                           <!--================= jQuery local fallback h========================= -->
+                           <script>window.jQuery || document.write('\<script src\="{% static 'app/scripts/jquery-1.11.1.js' %}"\>\<\/script\>')</script>
 
-                           <!-- ===============Bootstrap JS CDN=============================== -->
-                           <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+                           <!-- ===============Bootstrap JS CDN  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>  =============================== -->
                            <!-- ===============Bootstrap JS local fallback============== -->
-                           <script type="text/javascript">if(typeof($.fn.modal) === 'undefined') {document.write('<script src="{% static 'app/scripts/bootstrap.js' %}"><\/script>')}</script>
+                           <script type="text/javascript">if(typeof($.fn.modal) == 'undefined') {document.write('<script src="{% static 'app/scripts/bootstrap.js' %}"><\/script>')}</script>
 
-                           <!-- ==================== Matikan dulu bootstrap na ======================================
-    <script type="text/javascript">
+                           
+                           <!--==================== Matikan dulu bootstrap na ======================================
+    $(function(){
+           //=============Bootstrap CSS local fallback==========
+            var btndefaultbgcolor = $('div.input-group-button>.btn-btn-default').css('background-color');
+                if(btndefaultbgcolor != '#ffffff') {
+                $("head>title").prepend('<link rel="stylesheet" type="text/css" href="{ % static 'app/content/bootstrap.css' %}">');}
+           });
+                              </script>
+			=======================================================================================================================-->
 
-        $(function(){
-        //=============Bootstrap CSS local fallback==========
-         var btndefaultbgcolor = $('div.input-group-button>.btn-btn-default').css('background-color');
-             if(btndefaultbgcolor != '#ffffff') {
-             $("head>title").prepend('<link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.css' %}">');}
-        });
-       </script>
+						<!--====================Jquery untuk menu============================ -->
+                           <script type="text/javascript">
+							                    
+                          
+                         	$(function () {
 
-        -->
-                           <!--====================Jquery
-    untuk menu============================ -->
-                           <
-                           script>
-                           <script>
-                             
-                               $(function () {                           
+                         		//================Tambahkan method Form Serialize json pada jquery ======================
+                         		//===============di NA.js serilize hanya berguna untuk query string=====================
+                         		// sending the form with JSON
+                         		// sample pemakaian
+                         		//var frm = $(document.myform);
+                         		//var data = JSON.stringify(frm.serializeObject());
+                         		//$.fn.serializeObject = function() {
+                         		//    var o = {};
+                         		//    //    var a = this.serializeArray();
+                         		//    $(this).find('input[type="hidden"], input[type="text"], input[type="password"], input[type="checkbox"]:checked, input[type="radio"]:checked, select').each(function() {
+                         		//        if ($(this).attr('type') == 'hidden') { //if checkbox is checked do not take the hidden field
+                         		//            var $parent = $(this).parent();
+                         		//            var $chb = $parent.find('input[type="checkbox"][name="' + this.name.replace(/\[/g, '\[').replace(/\]/g, '\]') + '"]');
+                         		//            if ($chb != null) {
+                         		//                if ($chb.prop('checked')) return;
+                         		//            }
+                         		//        }
+                         		//        if (this.name === null || this.name === undefined || this.name === '')
+                         		//            return;
+                         		//        var elemValue = null;
+                         		//        if ($(this).is('select'))
+                         		//            elemValue = $(this).find('option:selected').val();
+                         		//        else elemValue = this.value;
+                         		//        if (o[this.name] !== undefined) {
+                         		//            if (!o[this.name].push) {
+                         		//                o[this.name] = [o[this.name]];
+                         		//            }
+                         		//            o[this.name].push(elemValue || '');
+                         		//        } else {
+                         		//            o[this.name] = elemValue || '';
+                         		//        }
+                         		//    });
+                         		//    return o;
+                         		//}
 
-                                   //================Tambahkan method Form Serialize json pada jquery ======================
-                                   //===============di NA.js serilize hanya berguna untuk query string=====================
-                                   // sending the form with JSON 
-                                   // sample pemakaian 
-                                   //var frm = $(document.myform);
-                                   //var data = JSON.stringify(frm.serializeObject());
-                               //$.fn.serializeObject = function() {
-                               //    var o = {};
-                               //    //    var a = this.serializeArray();
-                               //    $(this).find('input[type="hidden"], input[type="text"], input[type="password"], input[type="checkbox"]:checked, input[type="radio"]:checked, select').each(function() {
-                               //        if ($(this).attr('type') == 'hidden') { //if checkbox is checked do not take the hidden field
-                               //            var $parent = $(this).parent();
-                               //            var $chb = $parent.find('input[type="checkbox"][name="' + this.name.replace(/\[/g, '\[').replace(/\]/g, '\]') + '"]');
-                               //            if ($chb != null) {
-                               //                if ($chb.prop('checked')) return;
-                               //            }
-                               //        }
-                               //        if (this.name === null || this.name === undefined || this.name === '')
-                               //            return;
-                               //        var elemValue = null;
-                               //        if ($(this).is('select'))
-                               //            elemValue = $(this).find('option:selected').val();
-                               //        else elemValue = this.value;
-                               //        if (o[this.name] !== undefined) {
-                               //            if (!o[this.name].push) {
-                               //                o[this.name] = [o[this.name]];
-                               //            }
-                               //            o[this.name].push(elemValue || '');
-                               //        } else {
-                               //            o[this.name] = elemValue || '';
-                               //        }
-                               //    });
-                               //    return o;
-                               //}
-
-                                //============click menu event=======================
-                                   $("div.sidebar ul li a").click(function (event) {
-                                       if ($(this).find($(".fa")).hasClass('fa-angle-down')) {
-                                           $(this).find($(".fa")).removeClass('fa-angle-down');
-                                           $(this).find($(".pull-right")).addClass('fa-angle-up');
-                                       }
-                                       else if ($(this).find($(".fa")).hasClass('fa-angle-up')) {
-                                           $(this).find($(".fa")).removeClass('fa-angle-up');
-                                           $(this).find($(".pull-right")).addClass('fa-angle-down');
-                                       }
-                                       else if ($(this).find($(".fa")).hasClass('fa-angle-left')) {
-                                           $(this).find($(".fa")).removeClass('fa-angle-left');
-                                           $(this).find($(".pull-right")).addClass('fa-angle-right');
-                                           $('div.sidebar').css('flex', '0 1 auto');
-                                           $('div.sidebar').toggleClass('fliph');
-                                       }
-                                       else if ($(this).find($(".fa")).hasClass('fa-angle-right')) {
-                                           $(this).find($(".fa")).removeClass('fa-angle-right');
-                                           $(this).find($(".pull-right")).addClass('fa-angle-left');
-                                           $('.sidebar').css('flex', '0 0 173px');
-                                           $('.sidebar').toggleClass('fliph');
-                                       }
-                                   });
-                               });
+                         		//============click menu event=======================
+                         		$("div.sidebar ul li a").click(function (event) {
+                         			if ($(this).find($(".fa")).hasClass('fa-angle-down')) {
+                         				$(this).find($(".fa")).removeClass('fa-angle-down');
+                         				$(this).find($(".pull-right")).addClass('fa-angle-up');
+                         			}
+                         			else if ($(this).find($(".fa")).hasClass('fa-angle-up')) {
+                         				$(this).find($(".fa")).removeClass('fa-angle-up');
+                         				$(this).find($(".pull-right")).addClass('fa-angle-down');
+                         			}
+                         			else if ($(this).find($(".fa")).hasClass('fa-angle-left')) {
+                         				$(this).find($(".fa")).removeClass('fa-angle-left');
+                         				$(this).find($(".pull-right")).addClass('fa-angle-right');
+                         				$('div.sidebar').css('flex', '0 1 auto');
+                         				$('div.sidebar').toggleClass('fliph');
+                         			}
+                         			else if ($(this).find($(".fa")).hasClass('fa-angle-right')) {
+                         				$(this).find($(".fa")).removeClass('fa-angle-right');
+                         				$(this).find($(".pull-right")).addClass('fa-angle-left');
+                         				$('.sidebar').css('flex', '0 0 173px');
+                         				$('.sidebar').toggleClass('fliph');
+                         			}
+                         		});
+                         	});
 
                            </script>
                        </body>
+
 </html>

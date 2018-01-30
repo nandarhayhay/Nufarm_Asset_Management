@@ -49,7 +49,7 @@ urlpatterns = [
 
 	#view the goods_receive
 		url(r'^NA_Goods_Receive/$',NA_Goods_Receive_View.NA_Goods_Receive,name='GoodsReceive'),
-		url(r'^NA_Goods/ShowEntry_Receive',NA_Goods_View.ShowEntry,name='ShowEntry'),
+		url(r'^NA_Goods/ShowEntry_Receive',NA_Goods_Receive_View.ShowEntry_Receive,name='ShowEntryReceivey'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
