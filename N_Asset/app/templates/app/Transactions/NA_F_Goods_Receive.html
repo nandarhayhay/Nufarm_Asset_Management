@@ -50,7 +50,7 @@ t>
 
 <!--SETUP Jquery grid-->
 <!-- The jQuery library is a prerequisite for all jqSuite products -->
-<script>window.jQuery || NA.common.doc.write('\<script src="\.\.\/\.\.\/\.\.\/static\/app\/scripts\/jquery\-1\.11\.1\.js"\>\<\/script\>')</script>
+<script>window.jQuery || NA.common.doc.write('\<script src\=\"\.\.\/\.\.\/\.\.\/static\/app\/scripts\/jquery\-1\.11\.1\.js\"\>\<\/script\>');</script>
 
 <!-- This is the Javascript file of jqGrid -->
 <script src="../../../static/app/scripts/jquery.jqGrid.js"></script>
@@ -59,7 +59,8 @@ t>
 <!-- We support more than 40 localizations -->
 <script src="../../../static/app/scripts/jqGridJS/i18n/grid.locale-en.js"></script>
 <!----------------------------Load Jquery UI. JS file-------------------------------->
-<scriptS src="../../../static/app/scripts/jquery-ui.js"></scriptS>
+<script src="../../../static/app/scripts/jquery-ui.js"></script>
+<script type="text/javascript">if (typeof $.fn.modal == 'undefined') { NA.common.doc.write('\<script src\=\"\.\.\/\.\.\/\.\.\/static\/app\/scripts\/bootstrap\.js\"\>\<\/script\>'); }</script>
 <script src="../../../static/app/scripts/bootstrap-dialog.js"></script>
 {% endblock %}
 
@@ -139,8 +140,8 @@ t>
 					grid.jqGrid({
 						url: url,
 						mtype: "GET",
-						datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	Received_By FK_P_R_By pr_by totalpurchased totalreceived 
-						colNames: ['IDapp', 'NO', 'goods Description', 'Date Received', 'Suplier Name', 'FK_ReceivedBy', 'Received By', 'FK_P_R_By ', 'Purchase Request By', 'Total Purchased', 'Total Received', 'Created Date', 'Created By'],
+						datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+						colNames: ['idapp', 'NO', 'goods Description', 'Date Received', 'Suplier Name', 'FK_ReceivedBy', 'Received By', 'FK_P_R_By ', 'Purchase Request By', 'Total Purchased', 'Total Received', 'Created Date', 'Created By'],
 						colModel: [
                             { name: 'idapp', key: true, hidden: true, align: 'left' },
                             { name: 'NO', width: 50, align: 'right', sortable: false, editable: false, },
@@ -149,7 +150,7 @@ t>
                             { name: 'supliername', index: 'supliername', width: 150, sortable: true, editable: false, align: 'left', },
                             //formatter : 'date', formatoptions: { srcformat : 'Y-m-d H:i:s', newformat :'ShortDate'}},
                             { name: 'FK_ReceivedBy', index: 'FK_ReceivedBy', hidden: true, },
-                            { name: 'Received_By', index: 'Received_By', width: 120, sortable: true, editable: false, align: 'left', },
+                            { name: 'receivedby', index: 'receivedby', width: 120, sortable: true, editable: false, align: 'left', },
                             { name: 'FK_P_R_By', index: 'FK_ReceivedBy', hidden: true, },
                             { name: 'pr_by', index: 'pr_by', width: 120, sortable: true, editable: false, align: 'left', },
                             {
@@ -203,7 +204,7 @@ t>
 					alert(e.message);
 					console.log(e);
 					document.body.style.cursor = 'default';
-				}
+				};
 			};
 		};
 
@@ -215,12 +216,65 @@ t>
 		//disablekan save dan help karena saat ini tidak di pakai
 		btnSave.setAttribute('disable', true);
 		btnHelp.setAttribute('disable', true);
-
-		NA.common.dialog.initDialog(containerMenu, 'Nufarm Entry Goods - Master Data');//inistialisasi menu     
+		NA.common.loadStyles("../../../static/app/content/Dialog.css", "DialogEntryStyle");//Load Style buat dialog sebelum di pakai
+		NA.common.loadStyles("../../../static/app/content/NA_commonEntry.css", "CommonEntry");//Load Style buat form sebelum di pakai
+		NA.common.dialog.initDialog(containerMenu, 'Nufarm Entry Goods Receive - Transactions');//inistialisasi menu     
 
 		//====================GROUP FUNCTION DECLARATION===============================
 
-
+		function getValuesForm() {
+			//idapp,fk_goods, idapp_fk_goods,goods_desc,datereceived, fk_suplier,supliername, totalpurchase, totalreceived, idapp_fk_received, fk_receivedby,employee_received,idapp_fk_p_r_by, fk_p_r_by,employee_pr, descriptions	
+			var elidapp = NA.common.getElementID('id_idapp'),
+				idapp = elidapp.value;
+			var elidapp_fk_goods = NA.common.getElementID('id_idapp_fk_goods'),
+				idapp_fk_goods = elidapp_fk_goods.value;
+			var elfk_goods = NA.common.getElementID('id_fk_goods'),
+				fk_goods = elfk_goods.value;
+			var elgoods_desc = NA.common.getElementID('id_goods_desc'),
+				goods_desc = elgoods_desc.value;
+			var eldatereceived = NA.common.getElementID('id_datereceived'),
+				datereceived = eldatereceived.value.toString().trim();
+			var elfk_suplier = NA.common.getElementID('id_fk_suplier'),
+				fk_suplier = elfk_suplier.value;
+			var elsupliername = NA.common.getElementID('id_supliername'),
+				supliername = elsupliername.value;
+			var eltotalpurchase = NA.common.getElementID('id_totalpurchase'),
+				totalpurchase = eltotalpurchase.value;
+			var eltotalreceived = NA.common.getElementID('id_totalreceived'),
+				totalreceived = eltotalreceived.value;
+			var elidapp_fk_p_r_by = NA.common.getElementID('id_idapp_fk_p_r_by'),
+				idapp_fk_p_r_by = elidapp_fk_p_r_by.value;
+			var elfk_p_r_by = NA.common.getElementID('id_fk_p_r_by'),
+				fk_p_r_by = elfk_p_r_by.value;
+			var elemployee_pr = NA.common.getElementID('id_employee_pr'),
+				employee_pr = elemployee_pr.value;
+			var elidapp_fk_receivedby = NA.common.getElementID('id_idapp_fk_receivedby'),
+				idapp_fk_receivedby = elidapp_fk_receivedby.value;
+			var elfk_receivedby =  NA.common.getElementID('id_fk_receivedby'),
+				fk_receivedby = elfk_receivedby.value;
+			var elemployee_received = NA.common.getElementID('id_employee_received'),
+				employee_received = elemployee_received.value;
+			var eldescriptions = NA.common.getElementID('id_descriptions'),
+				descriptions = eldescriptions.value;
+			return {
+				idapp:idapp,
+				idapp_fk_goods: idapp_fk_goods,
+				fk_goods: fk_goods,
+				goods_desc:goods_desc,
+				datereceived: datereceived,
+				fk_suplier: fk_suplier,
+				supliername:supliername,
+				totalpurchase: totalpurchase,
+				totalreceived: totalreceived,
+				idapp_fk_p_r_by: idapp_fk_p_r_by,
+				fk_p_r_by: fk_p_r_by,
+				employee_pr:employee_pr,
+				idapp_fk_receivedby: idapp_fk_receivedby,
+				fk_receivedby: fk_receivedby,
+				employee_received:employee_received,
+				descriptions: descriptions				
+			};
+		};
 		function getGridCellValue(thegrid,CeltoGet) {
 			var reccount = thegrid.jqGrid('getGridParam', 'reccount');
 			var rowId, rowData, colData;
@@ -237,6 +291,171 @@ t>
 		function csrfSafeMethod(method) {
 			// these HTTP methods do not require CSRF protection
 			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+		};
+		function XhrError(xhr) {
+			try {
+				var messageErr = this.responseText;
+				var contentype = this.getResponseHeader('Content-Type')
+				if (contentype === 'application/json') {
+					messageErr = JSON.parse(this.responseText);
+				}
+				var message = this.responseText;
+				if (messageErr) {
+					message = messageErr.message;
+				}
+				if (message) {
+					alert('An error occurred: ' + error + '\n' + this.status + ": " + message);
+				}
+				document.body.style.cursor = 'default';
+			} catch (e) {
+				alert('An error occurred: ' + error + '\n' + this.status + ": " + e.message);
+				document.body.style.cursor = 'default';
+			}
+			return false;
+		};
+		function ExecuteHandler(TextElement) {
+			try {
+
+				if (window.document.body.style.cursor != 'wait') { window.document.body.style.cursor = 'wait'; }
+				var dialog = NA.common.dialog.doc.querySelector("div.containerDialog");
+				var frmEntry = NA.common.getElementID('frm-NA-Entry-Goods_Receive');
+				switch (TextElement) {
+					case 'OK': {
+						if (!frmEntry.checkValidity()) {
+							//NA.NAEvent.preventDefault(event);                                          
+							var inputbtn = NA.common.getElementID('inputButton');
+							inputbtn.click();
+							//var elements = NA.common.doc.querySelectorAll('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]');
+							//Array.prototype.forEach.call(elements, function (item) {
+							//	if (!item.validity.valid) {
+							//		item.focus();
+							//		document.body.style.cursor = 'default';
+							//		return false;
+							//	}
+							//	document.body.style.cursor = 'default';
+							//	return false;
+							//});
+							//document.body.style.cursor = 'default';
+							//return false;
+						}
+						else {
+							//check existing
+							var elfk_goods = NA.common.getElementID('id_fk_goods'),
+								fk_goods = elfk_goods.value;
+							var eldatereceived = NA.common.getElementID('id_datereceived'),
+								datereceived = eldatereceived.value.toString().trim();
+							var eltotalpurchase = NA.common.getElementID('id_totalpurchase'),
+								totalPurchase = eltotalpurchase.value;
+							var NAAjax = NA.common.AJAX;
+							NAAjax.settings.
+							//POST: function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+							NAAjax.POST('HasExists/',
+								{ 'fk_goods': fk_goods, 'datereceived': datereceived, 'totalpurchase': totalPurchase },
+								'application/json',
+								'application/json',
+								function () {
+									window.document.body.style.cursor = 'wait';
+								}, null,
+								function () {
+									if (this.status === '200') {
+										var confirmText = JSON.parse(this.responseText);
+										if (confirm(confirmText)) {
+											return submitForm();
+										}
+										else {
+											throw new Error('');
+										}
+									}
+								}, null,function(){ XhrError(this);throw new Error('')},
+								function () { document.body.style.cursor = 'default'; }, null
+							);
+						}
+						//jangan di close 
+						//clear kan textbox dan set initilize data, focus ke itemCode
+						break;
+					}
+					case 'Cancel':
+					case 'Close': {
+						//check if data has changed with javascrispt
+						initializeForm = NA.common.getElementID('id_initializeForm');
+						if (status === 'Open' || initializeForm.Value == '') { NA.common.dialog.closeDialog(dialog); return false; }
+						var originalData = JSON.parse(initializeForm.Value);
+						var valuesForm = getValuesForm();
+						if (NA.common.detectInputChanges(originalData, valuesForm)) {
+							if (confirm('Data has changed, \nSave data before closing form ?')) {
+								if (!frmEntry.checkValidity()) {
+									//NA.NAEvent.preventDefault(event);   
+									var inputbtn = NA.common.getElementID('inputButton');
+									inputbtn.click();
+									//var elements = NA.common.doc.querySelectorAll('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]');
+									//Array.prototype.forEach.call(elements, function (item) {
+									//	if (!item.validity.valid) {
+									//		item.focus();
+									//		document.body.style.cursor = 'default';
+									//		return false;
+									//	}
+									//	document.body.style.cursor = 'default';
+									//	return false;
+									//});
+								}
+								else {
+									submitForm();
+								}
+							}
+						}
+						NA.common.dialog.closeDialog(dialog);
+						//EraseElHidden();
+						document.body.style.cursor = 'default';
+						break;
+					}
+				};
+			} catch (e) {
+				return false;
+			}
+			document.body.style.cursor = 'default';
+			return true;
+		};
+		function submitForm() {
+			//var valuesForm = JSON.stringify(getValuesForm());
+			var valuesForm = getValuesForm();
+			//valuesForm['status'] = status || $('input[name="status"]').val();
+			valuesForm['csrfmiddlewaretoken'] = (function () {
+				var el = document.getElementsByName("csrfmiddlewaretoken");
+				return el[0].getAttribute("value");
+			})();
+			var NAAjax = NA.common.AJAX;
+			//POST: function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+			NAAjax.POST('ShowEntry_Receive', valuesForm, 'application/json', 'application/json',
+				function () {
+					window.document.body.style.cursor = 'wait';
+				},
+				null,
+				function () {
+					if (this.statusTxt == "OK") {
+						if (grid) {
+							grid.trigger("reloadGrid", [{ page: 1 }])
+						}
+						//reloadJquery$("#jqGrid_NA_F_Goods").trigger("reloadGrid", [{ page: 1 }]);
+					}
+					document.body.style.cursor = 'default';
+				}, null,
+				function(){XhrError(this);throw new Error('')},
+				function () {
+					window.document.body.style.cursor = 'default';
+				});
+			//$.post("ShowEntry_Receive", valuesForm, function (data, status) {
+			//	//reload jqueryGrid
+			//	if (data.message === 'success') {
+			//		var dialog = NA.common.dialog.doc.querySelector("div.containerDialog");
+			//		NA.common.dialog.closeDialog(dialog);
+			//		EraseElHidden();
+			//		//reload jqueryGrid                        
+			//		$("#jqGrid_NA_F_Goods").trigger("reloadGrid", [{ page: 1 }]);
+			//		document.body.style.cursor = 'default';
+			//		return false;
+			//	}
+			//});
+			return true;
 		};
 		//========================END GROUP FUNCTION DECLARATION===================================
 
@@ -283,7 +502,7 @@ t>
 				var elSearch = NA.common.doc.querySelector('li.dropdown>a#bySearch'),
                 SearchBy = NA.common.doc.querySelector('li.dropdown>a#bySearch').textContent.trim();
 				if (SearchBy.trim() == 'By') {
-					NA.common.SearchData.setDefaultSearchData('goodsname', 'Varchar', 'like');
+					SearchData.setDefaultSearchData('goods', 'varchar', 'like');
 					var curPage = parseInt(grid.getGridParam('page'));
 					window.document.body.style.cursor = 'wait';
 					if (event.target.value !== '') {
@@ -367,10 +586,10 @@ t>
 				}
 			};
 
-			NA.common.SearchData.setValue(valueKey);
-			NA.common.SearchData.setColumnName(columnKey);
-			NA.common.SearchData.setDataType(elDataType)
-			NA.common.SearchData.setCriteria(valCriteria);
+			SearchData.setValue(valueKey);
+			SearchData.setColumnName(columnKey);
+			SearchData.setDataType(elDataType)
+			SearchData.setCriteria(valCriteria);
 			window.document.body.style.cursor = 'wait';
 			LoadData(1);
 			document.body.style.cursor = 'default';
@@ -380,8 +599,8 @@ t>
 		//function untuk Reset
 		function submitReset(event) {
 			window.document.body.style.cursor = 'wait';
-			NA.common.SearchData.setDefaultSearchData('goods', 'varchar', 'like');
-			NA.common.SearchData.setValue('');
+			SearchData.setDefaultSearchData('goods', 'varchar', 'like');
+			SearchData.setValue('');
 			LoadData(1);
 			window.document.body.style.cursor = 'default';
 		};
@@ -407,8 +626,8 @@ t>
 		//=========================================================================================     
 
 		NA.NAEvent.addHandler(btnDelete, 'click', function (event) {
-			var IDApp = getGridCellValue(grid,'IDApp');
-			if (IDApp) {
+			var idapp = getGridCellValue(grid,'idapp');
+			if (idapp) {
 				NA.NAEvent.preventDefault(event);
 				if (!confirm('are you sure you want to delete data\nOperation can not be undone ?')) {
 					return false;
@@ -417,39 +636,53 @@ t>
 				try {
 					//delete data di server                  
 					//$(selector).post(URL,data,function(data,status,xhr),dataType)-->return data type
-					var url = NA.common.addURLParam('Delete/', 'itemCode', itemCode);
-					$.post(url, {}, function (data, textStatus, jqXHR) {
-						if (textStatus === 'success') {
-							var rowNum = grid.getGridParam('rowNum'),
-                         allRecords = grid.getGridParam('records'),
-                         totalPages = parseInt((allRecords / rowNum) + 1),
-                         curPage = grid.getGridParam('page'),
-                         rowId = grid.jqGrid('getGridParam', 'selrow'),
-                            curRecount = grid.jqGrid('getGridParam', 'reccount');
-							mustReload = true;
-							if (parseInt(curRecount) === 1) {
-								if (totalPages > 1) {
-									curPage--;
+
+					var url = NA.common.addURLParam('Delete/', 'idapp', idapp);
+					var NAAjax = NA.common.AJAX;
+					NAAjax.POST(url,
+						{ 'idapp': idapp },
+						'application/json',
+						'application/json',
+						null, null,
+						function () {
+							var textStatus = JSON.parse(this.responseText);
+							if (textStatus === 'success') {
+							 var rowNum = grid.getGridParam('rowNum'),
+							 allRecords = grid.getGridParam('records'),
+							 totalPages = parseInt((allRecords / rowNum) + 1),
+							 curPage = grid.getGridParam('page'),
+							 rowId = grid.jqGrid('getGridParam', 'selrow'),
+								curRecount = grid.jqGrid('getGridParam', 'reccount');
+								mustReload = true;
+								if (parseInt(curRecount) === 1) {
+									if (totalPages > 1) {
+										curPage--;
+									}
+									else {
+										mustReload = false;
+										grid.delRowData(rowId);
+									}
 								}
-								else {
+								else if (parseInt(totalPages) === 1) {
 									mustReload = false;
 									grid.delRowData(rowId);
 								}
+								else if (parseInt(curRecount) > 1) {
+									mustReload = false;
+									grid.delRowData(rowId);
+								}
+								if (mustReload) {
+									window.document.body.style.cursor = 'wait';
+									grid.trigger("reloadGrid", [{ page: curPage }]);
+								}
 							}
-							else if (parseInt(totalPages) === 1) {
-								mustReload = false;
-								grid.delRowData(rowId);
-							}
-							else if (parseInt(curRecount) > 1) {
-								mustReload = false;
-								grid.delRowData(rowId);
-							}
-							if (mustReload) {
-								window.document.body.style.cursor = 'wait';
-								grid.trigger("reloadGrid", [{ page: curPage }]);
-							}
-						}
-					});
+						}, null,
+						function () { throw new error(this.responseText + '\nStatus code :' + this.statusText); },
+						function () { window.document.body.style.cursor = 'default'; },
+						null);
+					//$.post(url, {}, function (data, textStatus, jqXHR) {
+					NA.NAEvent.stopPropagation(event);
+					//});
 				} catch (e) {
 					console.log(e);
 					window.document.body.style.cursor = 'default';
@@ -480,9 +713,11 @@ t>
 			Array.prototype.forEach.call(btnOKCancel, function (item) {//buat jadi foreach mesti convert dulu ke array
 				NA.NAEvent.addHandler(item, 'click', function (event) {
 					NA.NAEvent.preventDefault(event);
-					ExecuteHandler(event.target.value);
-					var curPage = grid.getGridParam('page')
-					grid.trigger("reloadGrid", [{ page: 1 }]);
+					if (window.status !== 'open') {
+						ExecuteHandler(event.target.value);
+					}
+					//var curPage = grid.getGridParam('page')
+					//grid.trigger("reloadGrid", [{ page: 1 }]);
 					if (event) {
 						NA.NAEvent.stopPropagation(event);
 					} document.body.style.cursor = 'default';
@@ -503,8 +738,8 @@ t>
 				var target = NA.NAEvent.getTarget(event);
 				if (target.innerText === ' Add' || target.innerText === ' Edit' || target.innerText === ' Open') {
 					if (target.innerText.trim() !== 'Add') {
-						var IDApp = getGridCellValue(grid,'IDApp');
-						if (typeof IDApp == 'undefined' || IDApp === '') {
+						var idapp = getGridCellValue(grid,'idapp');
+						if (typeof idapp == 'undefined' || IDApp === '') {
 							alert('Please select data to edit');
 							var dialog = dialog || NA.common.dialog.doc.querySelector("div.containerDialog");
 							if (dialog) {
@@ -514,35 +749,45 @@ t>
 							return false;
 						}
 					}
-					$('div.maindialogContent').load("ShowEntry_Receive?" + win.encodeURIComponent('IDApp') + '=' + win.encodeURIComponent(IDApp) +
+					$('div.maindialogContent').load("ShowEntry_Receive?" + win.encodeURIComponent('idapp') + '=' + win.encodeURIComponent(idapp) +
                         '&' + win.encodeURIComponent('status') + '=' + win.encodeURIComponent(target.innerText.trim()), function (responseTxt, statusTxt, xhr) {//load /tampilkan form entry data                    
 
                         	if (statusTxt == "success") { //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpang semua ke dalam variable jika perlua
 
                         		$(this).html(responseTxt);
-                        		//remove attribute disable untuk button OK dan cancel bila statusnya Add
-								//fk_goods daterecieved fk_suplier totalpurchase totalrecieved  fk_receivedby fk_p_r_by
+                        		
+                        		//======================BUTTONS Search================================================
+
+                        		var btnFindGoods = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_goods'),
+									btnFindSuplier = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_suplier'),
+									btnFindPRBy = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_pr_by'),
+									btnFindReceivedBy = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_receivedby');
+                        		//======================end BUTTONS Search================================================
+
                         		status = status || win.status || target.innerText.trim();
                         		switch (status) {
                         			case 'Add': {
-                        				//if(hasAttribute("value
-                        				if (target.hasAttribute('disabled')) {
-                        					target.removeAttribute('disabled');
-                        				}
+                        				Array.prototype.forEach.call(NA.common.doc.querySelectorAll('div.dialogButtonEntry>a.button'), function (item) {
+                        					if (item.hasAttribute('disabled')) {
+                        						item.removeAttribute('disabled');
+                        					}//remove attribute disable untuk button OK dan cancel bila statusnya Add
+                        				});
                         				break;
                         			}
-                        			case 'Edit': {
-                        				NA.common.getElementID('id_itemcode').disabled = true;
-                        				break;
-                        			}
+                        			//case 'Edit': {
+                        			//	NA.common.getElementID('id_').disabled = true;
+                        			//	break;
+                        			//}
                         			case 'Open': {
                         				Array.prototype.forEach.call(NA.common.doc.querySelectorAll('div.dialogButtonEntry>a.button'), function (item) {
                         					if (!item.hasAttribute('disabled')) {
                         						item.setAttribute('disabled', true);
-                        					}
+                        					}//remove attribute disable untuk button OK dan cancel bila statusnya Add
                         				});
-                        				//matikan FK_goods,fk_suplier,fk_received_by,fk_p_r_by
-
+                        				btnFindGoods.setAttribute('disabled', true)
+                        				btnFindSuplier.setAttribute('disabled', true)
+                        				btnFindPRBy.setAttribute('disabled', true)
+                        				btnFindReceivedBy.setAttribute('disabled', true)
                         				break;
                         			}
                         		};
@@ -551,12 +796,7 @@ t>
                         			var originalData = JSON.stringify(getValuesForm());
                         			//$('#id_initializeForm').val(originalData);
                         			initializeForm = NA.common.getElementID('id_initializeForm');
-                        			initializeForm.Value = originalData;
-                        			//========set autocomplete buat brand============
-                        			$("#id_brandname").autocomplete({ source: "SearchBrand/", minLength: 1, });
-                        			//tambahkan css untuk autocomplete file agar munculnya dengan backgorund bisa menutupi layer 1
-                        			NA.common.doc.querySelector('ul[id*="ui-id-"]').style.backgroundColor = 'white';                        			//setting focus dan blur
-
+                        			initializeForm.Value = originalData;                        		
                         			Array.prototype.forEach.call(NA.common.doc.querySelectorAll('input[type="text"]'),function (item) {
                         				var valPlaceHolder = item.dataset.value;
                         				NA.NAEvent.addHandler(item, 'focus', function (event) {
@@ -574,7 +814,8 @@ t>
                         						}
                         					}
                         				});
-                        				NA.NAEvent.addHandler(item, 'keydown', function (event) {
+                        				var NAAjax = NA.common.AJAX;
+										NA.NAEvent.addHandler(item, 'keydown', function (event) {
                         					if (event.keyCode === 13) {//kalau menekan tombol enter
                         						switch (this.id) {
                         							case 'id_fk_goods': {
@@ -582,32 +823,106 @@ t>
                         								NA.NAEvent.preventDefault(event);//prevent from submit
 														//get data ke database by itemCode
                         								//jika ada tampilkan data di form goods_desc
+                        								NAAjax.GET('getGoods/?' + win.encodeURIComponent('itemcode') + '=' + win.encodeURIComponent(event.target.value),
+															'application/json',//overrideMimeType returned by the server
+															function () { window.document.body.style.cursor = 'wait'; },
+															null,//nggak usah di isi bila tidak perlu
+															function () {//function executed after data has been returned by server(XHR.onload)
+																var data = JSON.parse(this.responseText);
+																if (data) {
+																	var txtGoods = NA.common.getElementID('id_goods_desc');
+																		txtGoods.textContent = data['goods'];
+																}
+															}, null, function () {//function untuk ajax error
+															 throw new error(this.responseText + '\nStatus code :' + this.statusText);
+															}, function () {window.document.body.style.cursor = 'default';},//function ajax complete
+															null//(parameter tambahan)nggak usah di isi bila tidak perlu(bila mau di isi isi dengan object javascript {key:value}
+															);
+                        								NA.NAEvent.stopPropagation(event);//prevent event buble'
                         								break;
                         							}
                         							case 'id_fk_suplier': {
 
                         								//jika ada tampilkan data di form supliername
+                        								NA.NAEvent.preventDefault(event);//prevent from submit
+                        								NAAjax.GET('getSuplier/?' + win.encodeURIComponent('supliercode') + '=' + win.encodeURIComponent(event.target.value),
+															'application/json',//overrideMimeType returned by the server
+															function () { window.document.body.style.cursor = 'wait'; },
+															null,//nggak usah di isi bila tidak perlu
+															function () {//function executed after data has been returned by server(XHR.onload)
+																var data = JSON.parse(this.responseText);
+																if (data) {
+																	var txtsuplier = NA.common.getElementID('id_supliername');
+																	txtsuplier.value = data['supliername'];
+																	txtsuplier.textContent = data['supliername'];
+																}
+															}, null, function () {//function untuk ajax error
+																throw new error(this.responseText + '\nStatus code :' + this.statusText);
+															}, function () { window.document.body.style.cursor = 'default'; },//function ajax complete
+															null//(parameter tambahan)nggak usah di isi bila tidak perlu(bila mau di isi isi dengan object javascript {key:value}
+															);
+                        								NA.NAEvent.stopPropagation(event);//prevent event buble'
+
                         								break;
                         							}
                         							case 'id_fk_receivedby': {
 
-                        								//jika ada tampilkan data di form employee_Received
+                        								//jika ada tampilkan data di form employee_Received	NA.NAEvent.preventDefault(event);//prevent from submit
+                        								NAAjax.GET('getEmployee/?' + win.encodeURIComponent('nik') + '=' + win.encodeURIComponent(event.target.value),
+															'application/json',//overrideMimeType returned by the server
+															function () { window.document.body.style.cursor = 'wait'; },
+															null,//nggak usah di isi bila tidak perlu
+															function () {//function executed after data has been returned by server(XHR.onload)
+																var data = JSON.parse(this.responseText);
+																if (data) {
+																	var txreceivedby = NA.common.getElementID('id_employee_received');
+																	txtreceivedby.value = data['employee_name'];
+																	txtreceivedby.textContent = data['employee_name'];
+																}
+															}, null, function () {//function untuk ajax error
+																throw new error(this.responseText + '\nStatus code :' + this.statusText);
+															}, function () {
+																if (this.status == 404)
+																	throw new (this.responseText, 'replied 404')
+																window.document.body.style.cursor = 'default';
+															},//function ajax complete
+															null//(parameter tambahan)nggak usah di isi bila tidak perlu(bila mau di isi isi dengan object javascript {key:value}
+															);
+                        								NA.NAEvent.stopPropagation(event);//prevent event buble'
                         								break;
                         							}
                         							case 'id_fk_p_r_by': {
 
-                        								//jika ada tampilkan data di form employee_pr
+                        								//jika ada tampilkan data di form employee_Received	NA.NAEvent.preventDefault(event);//prevent from submit
+                        								NAAjax.GET('getEmployee/?' + win.encodeURIComponent('nik') + '=' + win.encodeURIComponent(event.target.value),
+															'application/json',//overrideMimeType returned by the server
+															function () { window.document.body.style.cursor = 'wait'; },
+															null,//nggak usah di isi bila tidak perlu
+															function () {//function executed after data has been returned by server(XHR.onload)
+																var data = JSON.parse(this.responseText);
+																if (data) {
+																	var txtp_r_by = NA.common.getElementID('id_employee_received');
+																	txtp_r_by.value = data['employee_name'];
+																	txtp_r_by.textContent = data['employee_name'];
+																}
+															}, null, function () {//function untuk ajax error
+																throw new error(this.responseText + '\nStatus code :' + this.statusText);
+															}, function () { window.document.body.style.cursor = 'default'; },//function ajax complete
+															null//(parameter tambahan)nggak usah di isi bila tidak perlu(bila mau di isi isi dengan object javascript {key:value}
+															);
+                        								NA.NAEvent.stopPropagation(event);//prevent event buble'
                         								break;
                         							}
                         						}
                         					}
+                        					return false;
                         				});
                         			});
-                        			//====================id_daterecieved===========================
+                        			//====================id_datereceived===========================
                         			//set JQueryDatePicker
-                        			$('#id_daterecieved').datepicker({ dateFormat: 'dd/mm/yyyy' });
+                        			$('#id_datereceived').datepicker({ dateFormat: 'dd/mm/yyyy' });
                         			//setting Custom Validity
-                        			var elm = NA.common.doc.querySelector('#id_daterecieved');
+                        			var elm = NA.common.doc.querySelector('#id_datereceived');
                         			NA.NAEvent.addHandler(elm, 'input', function (event) {
                         				var elpat = this.getAttribute('patern');
                         				var patern = new RegExp(elpat, 'i');
@@ -623,15 +938,9 @@ t>
                         					this.setCustomValidity(''); //clearkan error custom validity
                         				}
                         			});
-                        			//=====================end id_daterecieved==========================================
-
-                        			//fk_goods daterecieved fk_suplier totalpurchase totalrecieved  fk_receivedby fk_p_r_by
-									//======================BUTTONS Search================================================
-                        			//add event to btn Find goods
-                        			var btnFindGoods = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_goods'),
-										btnFindSuplier = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_suplier'),
-										btnFindPRBy = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_pr_by'),
-										btnFindReceivedBy = NA.common.doc.querySelector('div.NA-Entry-div-row button#FE_fk_receivedby');
+                        			//=====================end id_datereceived==========================================
+								
+                        			//======================event handler BUTTONS Search================================================
                         			NA.NAEvent.addHandler(btnFindGoods, 'click', function (event) {
 										//create bootstrapDialog
                         				BootstrapDialog.show({
@@ -640,8 +949,7 @@ t>
                         					//	//==============create formSearching===============
                         					//	//create div for container
                         					//	//create header div for searching
-                        					//	//create div for main container
-                        					
+                        					//	//create div for main container                        					
 
                         					//	//if success , set event on double click, set event to button OK
                         					//})(this),
@@ -658,7 +966,7 @@ t>
 												},
 												function (e) {//event for focus
 													if (this.value === '') {
-														if (this.getAttribute('placeholder') === 'Enter goods desc to search for') {
+														if (this.getAttribute('placeholder') === placeHolder) {
 															this.setAttribute('placeholder', '');
 														}
 													}
@@ -667,18 +975,7 @@ t>
 													if (e.keyCode === 13) {
 														win.document.body.style.cursor = 'wait';
 														//cari data ke database
-														var url = '/SearchGoodsbyForm?' + win.encodeURIComponent('goods_desc') + '=' + win.encodeURIComponent(e.target.value.trim());
-														//var ajax = NA.common.AJAX();
-														//ajax.GET(url, 'application/json', null, function () {
-														//	window.document.body.style.cursor = 'wait';
-														//}, function (xhr) {
-														//	if (xhr.status == 200 && xhr.status < 300) {
-														//		var json = JSON.parse(xhr.responseText);
-														//		//reloadJquery
-														//	}
-														//}, null, function (xhr) {
-
-														//}, OnLoadEnd, customRequestHeader);
+														var url = 'SearchGoodsbyForm/?' + win.encodeURIComponent('goods_desc') + '=' + win.encodeURIComponent(e.target.value.trim());
 														if (gridTbl) {
 															gridTbl.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
 														}
@@ -688,69 +985,67 @@ t>
 												var children = containerMessage.childNodes;
 												var mainContainer = null, txtSearch = null;
 												for (var i = 0, len = children.length; i < len; i++) {
-													if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm') {
-														mainContainer = children[i];
-													}
-													//else if (children[i].nodeType == 1 && children[i].className === 'NA-Entry-div-row') {
-													//	txtSearch = children[i].childNodes[0];
-													//}
-													break;
+													if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm fk_goods') {
+														mainContainer = children[i];break;
+													}											
+													
 												}
-												var txtSearch = NA.common.getElementID('txtsearch_fk_goods');
-												if (mainContainer && txtSearch) {
-													//loads Data into JqueryGrid
-													var gridTbl = NA.common.doc.createElement('table');
-													gridTbl.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods';
-													var gridPager = NA.common.doc.createElement('div');
-													gridPager.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods_Pager';
+												//var txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+												//if (mainContainer && txtSearch) {
+													
+                        						//}
+                        						//loads Data into JqueryGrid
+												var gridTbl = NA.common.doc.createElement('table');
+												gridTbl.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods';
+												var gridPager = NA.common.doc.createElement('div');
+												gridPager.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods_Pager';
 
-													var urlFKGoods = 'NA_F_Goods_Receive_FK_Goods/?' + win.encodeURIComponent('searchText') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
-													gridTbl.jqGrid({
-														url: urlFKGoods,
-														mtype: "GET",
-														datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	Received_By FK_P_R_By pr_by totalpurchased totalreceived 
-														colNames: ['IDapp', 'NO', 'itemcode', 'goods Description', ],
-														colModel: [
-															{ name: 'idapp', key: true, hidden: true, align: 'left' },
-															{ name: 'NO', width: 50, align: 'right', sortable: false, editable: false, },
-															{ name: 'itemcode', width: 80, align: 'left', sortable: true, editable: false, },
-															{ name: 'goods', index: 'goods', width: 150, sortable: true, editable: false, align: 'left', },
-														],
-														ondblClickRow: function (rowId) {
-															//fire button OK
-															var btnOK = dialogRef.getButton('btnOKFindGoods');
-															btnOK.click();
-														},
-														gridComplete: function () {
-															document.body.style.cursor = 'default';
-														},
-														cellEdit: false,
-														viewrecords: true,
-														height: '500px',
-														rowNum: 500,
-														rowList: [20, 50, 100, 200, 300, 500],
-														sortname: "itemcode",
-														sortorder: "asc",
-														multiSort: true,
-														shrinkToFit: false,
-														iconSet: "fontAwesome",
-														forceFit: true,
-														toolbar: true,
-														scrollrows: true,
-														hidegrid: true,
-														caption: "Transactions ---Find goods",
-														pager: "#jqGrid_NA_F_Goods_Receive_FK_Goods_Pager"
-													});
-													gridTbl.navGrid(gridPager, {
-														search: false, // show search button on the toolbar
-														add: false,
-														edit: false,
-														del: false,
-														refresh: false
-													});
-													containerMessage.childNodes[mainContainer].appendChild(gridTbl);
-													containerMessage.childNodes[mainContainer].appendChild(gridPager);
-												}												
+												var urlFKGoods = 'SearchGoodsbyForm/?' + win.encodeURIComponent('goods_desc') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
+												gridTbl.jqGrid({
+													url: urlFKGoods,
+													mtype: "GET",
+													datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+													colNames: ['idapp', 'NO', 'itemcode', 'goods Description', ],
+													colModel: [
+														{ name: 'idapp', key: true, hidden: true, align: 'left' },
+														{ name: 'no', width: 50, align: 'right', sortable: false, editable: false, },
+														{ name: 'itemcode', width: 80, align: 'left', sortable: true, editable: false, },
+														{ name: 'goods', index: 'goods', width: 150, sortable: true, editable: false, align: 'left', },
+													],
+													ondblClickRow: function (rowId) {
+														//fire button OK
+														var btnOK = dialogRef.getButton('btnOKFindGoods');
+														btnOK.click();
+													},
+													gridComplete: function () {
+														document.body.style.cursor = 'default';
+													},
+													cellEdit: false,
+													viewrecords: true,
+													height: '500px',
+													rowNum: 500,
+													rowList: [20, 50, 100, 200, 300, 500],
+													sortname: "itemcode",
+													sortorder: "asc",
+													multiSort: true,
+													shrinkToFit: false,
+													iconSet: "fontAwesome",
+													forceFit: true,
+													toolbar: true,
+													scrollrows: true,
+													hidegrid: true,
+													caption: "Transactions ---Find goods",
+													pager: "#jqGrid_NA_F_Goods_Receive_FK_Goods_Pager"
+												});
+												gridTbl.navGrid(gridPager, {
+													search: false, // show search button on the toolbar
+													add: false,
+													edit: false,
+													del: false,
+													refresh: false
+												});
+												containerMessage.childNodes[mainContainer].appendChild(gridTbl);
+												containerMessage.childNodes[mainContainer].appendChild(gridPager);
 												return containerMessage;
                         					},
                         					closable: true,
@@ -769,16 +1064,19 @@ t>
                         						icon: 'glyphicon glyphicon-ok',
                         						cssClass: 'btn-success',
                         						action: function (dialogRef) {
-                        							var IDApp = getGridCellValue(gridTbl, 'IDApp');
-                        							if (IDApp) {//cell di select sama user
+                        							var idapp = getGridCellValue(gridTbl, 'idapp');
+                        							if (idapp) {//cell di select sama user
                         								//tempelkan data row di fk_goods, dan valuenya di goods_desc;
                         							var rowId = gridTbl.jqGrid('getGridParam', 'selrow');
-                        							var rowData = gridTbl.getRowData(rowId);
-                        							var fk_Goods = rowData['itemcode'], goods_Desc = rowData['goods'];
+                        							var rowData = gridTbl.getRowData(rowId);                        						
+                        							var itemCode = rowData['itemcode'], goods_Desc = rowData['goods'];
                         							var txtid_fk_goods = NA.common.getElementID('id_fk_goods');
-                        							txtid_fk_goods.textContent = fk_Goods;
+                        							txtid_fk_goods.textContent = itemCode;
                         							var txtgoodsDesc = NA.common.getElementID('id_goods_desc');
                         							txtgoodsDesc.textContent = goods_Desc;
+														//simpan IDAppFKGoods di elementHidden
+                        							var elemIDApp = NA.common.getElementID('id_idapp_fk_goods');
+                        							elemIDApp.value = idapp;
                         							}
                         						}
                         					}]
@@ -786,17 +1084,7 @@ t>
                         			});
                         			NA.NAEvent.addHandler(btnFindSuplier, 'click', function (event) {
                         				//create bootstrapDialog
-                        				BootstrapDialog.show({
-
-                        					//message: (function () {
-                        					//	//==============create formSearching===============
-                        					//	//create div for container
-                        					//	//create header div for searching
-                        					//	//create div for main container
-
-
-                        					//	//if success , set event on double click, set event to button OK
-                        					//})(this),
+                        				BootstrapDialog.show({                        					
                         					message: function (dialogRef) {
                         						var placeHolder = 'Enter Suplier name to search for';
                         						var gridTbl = null, gridPager = null;
@@ -810,7 +1098,7 @@ t>
 												},
 												function (e) {//event for focus
 													if (this.value === '') {
-														if (this.getAttribute('placeholder') === 'Enter suplier name to search for') {
+														if (this.getAttribute('placeholder') === placeHolder) {
 															this.setAttribute('placeholder', '');
 														}
 													}
@@ -819,18 +1107,8 @@ t>
 													if (e.keyCode === 13) {
 														win.document.body.style.cursor = 'wait';
 														//cari data ke database
-														var url = '/SearchSuplierbyForm?' + win.encodeURIComponent('supliername') + '=' + win.encodeURIComponent(e.target.value.trim());
-														//var ajax = NA.common.AJAX();
-														//ajax.GET(url, 'application/json', null, function () {
-														//	window.document.body.style.cursor = 'wait';
-														//}, function (xhr) {
-														//	if (xhr.status == 200 && xhr.status < 300) {
-														//		var json = JSON.parse(xhr.responseText);
-														//		//reloadJquery
-														//	}
-														//}, null, function (xhr) {
-
-														//}, OnLoadEnd, customRequestHeader);
+														var url = 'SearchSuplierbyForm/?' + win.encodeURIComponent('supliername') + '=' + win.encodeURIComponent(e.target.value.trim());
+														
 														if (gridTbl) {
 															gridTbl.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
 														}
@@ -843,9 +1121,7 @@ t>
                         							if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm') {
                         								mainContainer = children[i];
                         							}
-                        							//else if (children[i].nodeType == 1 && children[i].className === 'NA-Entry-div-row') {
-                        							//	txtSearch = children[i].childNodes[0];
-                        							//}
+                        						
                         							break;
                         						}
                         						var txtSearch = NA.common.getElementID('txtsearch_fk_suplier');
@@ -856,15 +1132,14 @@ t>
                         							var gridPager = NA.common.doc.createElement('div');
                         							gridPager.id = 'jqGrid_NA_F_Goods_Receive_fk_suplier_Pager';
 
-                        							var urlFKGoods = 'NA_F_Goods_Receive_fk_suplier/?' + win.encodeURIComponent('searchText') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
+                        							var urlFKSuplier = 'SearchSuplierbyForm/?' + win.encodeURIComponent('supliername') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
                         							gridTbl.jqGrid({
-                        								url: urlFKGoods,
+                        								url: urlFKSuplier,
                         								mtype: "GET",
-                        								datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	Received_By FK_P_R_By pr_by totalpurchased totalreceived 
-                        								colNames: ['IDapp', 'NO', 'supliercode', 'suplier name', ],
+                        								datatype: "json",//column idapp, no,supliercode,supliername
+                        								colNames: ['NO', 'suplier code', 'suplier name', ],
                         								colModel: [
-															{ name: 'idapp', key: true, hidden: true, align: 'left' },
-															{ name: 'NO', width: 50, align: 'right', sortable: false, editable: false, },
+															{ name: 'no', width: 50, align: 'right', sortable: false, editable: false, },
 															{ name: 'supliercode', width: 90, align: 'left', sortable: true, editable: false, },
 															{ name: 'supliername', index: 'supliername', width: 150, sortable: true, editable: false, align: 'left', },
                         								],
@@ -926,7 +1201,7 @@ t>
                         								//tempelkan data row di fk_goods, dan valuenya di goods_desc;
                         								var rowId = gridTbl.jqGrid('getGridParam', 'selrow');
                         								var rowData = gridTbl.getRowData(rowId);
-                        								var fk_suplier = rowData['supliercode'], supliername = rowData['supliername'];
+                        								var  supliername = rowData['supliername'];
                         								var txtid_fk_suplier = NA.common.getElementID('id_fk_suplier');
                         								txtid_fk_suplier.textContent = supliercode;
                         								var txtsupliername = NA.common.getElementID('id_supliername');
@@ -937,11 +1212,272 @@ t>
                         				});
                         			});
                         			NA.NAEvent.addHandler(btnFindPRBy, 'click', function (event) {
+                        				//create bootstrapDialog
+                        				BootstrapDialog.show({
+                        					message: function (dialogRef) {
+                        						var placeHolder = 'Enter Employee who PRs to search for';
+                        						var gridTbl = null, gridPager = null;
+                        						var containerMessage = NA.common.dialog.createFormContainer('fk_p_r_by', placeHolder,
+												function (e) {//event for blur
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === '') {
+															this.setAttribute('placeholder', placeHolder);
+														}
+													}
+												},
+												function (e) {//event for focus
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === placeHolder) {
+															this.setAttribute('placeholder', '');
+														}
+													}
+												},
+												function (e) {//even for keydown txtSearch
+													if (e.keyCode === 13) {
+														win.document.body.style.cursor = 'wait';
+														//cari data ke database
+														var url = 'Searchbyform/?' + win.encodeURIComponent('employeeName') + '=' + win.encodeURIComponent(e.target.value.trim());
 
+														if (gridTbl) {
+															gridTbl.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
+														}
+														win.document.body.style.cursor = 'default';
+													}
+												});
+                        						var children = containerMessage.childNodes;
+                        						var mainContainer = null, txtSearch = null;
+                        						for (var i = 0, len = children.length; i < len; i++) {
+                        							if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm') {
+                        								mainContainer = children[i];
+                        							}
+                        							break;
+                        						}
+                        						var txtSearch = NA.common.getElementID('txtsearch_fk_p_r_by');
+                        						if (mainContainer && txtSearch) {
+                        							//loads Data into JqueryGrid
+                        							var gridTbl = NA.common.doc.createElement('table');
+                        							gridTbl.id = 'jqGrid_NA_F_Goods_Receive_fk_p_r_by';
+                        							var gridPager = NA.common.doc.createElement('div');
+                        							gridPager.id = 'jqGrid_NA_F_Goods_Receive_fk_p_r_by_Pager';
+
+                        							var urlPR = 'Searchbyform/?' + win.encodeURIComponent('employeeName') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
+                        							gridTbl.jqGrid({
+                        								url: urlPR,
+                        								mtype: "GET",
+                        								datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+                        								colNames: ['idapp','NO', 'NIK', 'Employee Name', ],
+                        								colModel: [
+															{ name: 'idapp', key: true, hidden: true, align: 'left' },
+															{ name: 'no', width: 50, align: 'right', sortable: false, editable: false, },
+															{ name: 'nik', width: 90, align: 'left', sortable: true, editable: false, },
+															{ name: 'employee_name', index: 'employee_name', width: 150, sortable: true, editable: false, align: 'left', },
+                        								],
+                        								ondblClickRow: function (rowId) {
+                        									//fire button OK
+                        									var btnOK = dialogRef.getButton('btnOKFind_p_r_by');
+                        									btnOK.click();
+                        								},
+                        								gridComplete: function () {
+                        									document.body.style.cursor = 'default';
+                        								},
+                        								cellEdit: false,
+                        								viewrecords: true,
+                        								height: '500px',
+                        								rowNum: 500,
+                        								rowList: [20, 50, 100, 200, 300, 500],
+                        								sortname: "employee_name",
+                        								sortorder: "asc",
+                        								multiSort: true,
+                        								shrinkToFit: false,
+                        								iconSet: "fontAwesome",
+                        								forceFit: true,
+                        								toolbar: true,
+                        								scrollrows: true,
+                        								hidegrid: true,
+                        								caption: "Transactions ---Find employee",
+                        								pager: "#jqGrid_NA_F_Goods_Receive_fk_p_r_by_Pager"
+                        							});
+                        							gridTbl.navGrid(gridPager, {
+                        								search: false, // show search button on the toolbar
+                        								add: false,
+                        								edit: false,
+                        								del: false,
+                        								refresh: false
+                        							});
+                        							containerMessage.childNodes[mainContainer].appendChild(gridTbl);
+                        							containerMessage.childNodes[mainContainer].appendChild(gridPager);
+                        						}
+                        						return containerMessage;
+                        					},
+                        					closable: true,
+                        					closeByBackdrop: false,
+                        					closeByKeyboard: false,
+                        					buttons: [{
+                        						label: 'Cancel',
+                        						icon: 'glyphicon glyphicon-remove',
+                        						cssClass: 'btn-success',
+                        						action: function (dialogRef) {
+                        							dialogRef.close();
+                        						},
+                        					}, {
+                        						label: 'OK',
+                        						id: 'btnOKFind_p_r_by',
+                        						icon: 'glyphicon glyphicon-ok',
+                        						cssClass: 'btn-success',
+                        						action: function (dialogRef) {
+                        							var fk_p_r_by = getGridCellValue(gridTbl, 'nik');
+                        							if (fk_p_r_by) {//cell di select sama user
+                        								//tempelkan data row di fk_goods, dan valuenya di goods_desc;
+                        								var rowId = gridTbl.jqGrid('getGridParam', 'selrow');
+                        								var rowData = gridTbl.getRowData(rowId);
+                        								var employeeName = rowData['employee_name'];
+                        								var idapp = rowData['idapp'];
+                        								var txt_fk_p_r_by = NA.common.getElementID('id_fk_p_r_by');
+                        								txt_fk_p_r_by.textContent = fk_p_r_by;
+                        								var p_r_by = NA.common.getElementID('id_employee_pr');
+                        								txtp_r_by.textContent = p_r_by;
+                        								//simpan IDAppFKGoods di elementHidden
+                        								var elemIDApp = NA.common.getElementID('id_idapp_fk_p_r_by');
+                        								elemIDApp.textContent = idapp;
+                        							}
+                        						}
+                        					}]
+                        				});
                         			});
                         			NA.NAEvent.addHandler(btnFindReceivedBy, 'click', function (event) {
+                        				//create bootstrapDialog
+                        				BootstrapDialog.show({
+                        					message: function (dialogRef) {
+                        						var placeHolder = 'Enter Employee who Received goods to search for';
+                        						var gridTbl = null, gridPager = null;
+                        						var containerMessage = NA.common.dialog.createFormContainer('fk_receivedby', placeHolder,
+												function (e) {//event for blur
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === '') {
+															this.setAttribute('placeholder', placeHolder);
+														}
+													}
+												},
+												function (e) {//event for focus
+													if (this.value === '') {
+														if (this.getAttribute('placeholder') === placeHolder) {
+															this.setAttribute('placeholder', '');
+														}
+													}
+												},
+												function (e) {//even for keydown txtSearch
+													if (e.keyCode === 13) {
+														win.document.body.style.cursor = 'wait';
+														//cari data ke database
+														var url = 'SearchEmployeebyform/?' + win.encodeURIComponent('employeeName') + '=' + win.encodeURIComponent(e.target.value.trim());
 
+														if (gridTbl) {
+															gridTbl.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
+														}
+														win.document.body.style.cursor = 'default';
+													}
+												});
+                        						var children = containerMessage.childNodes;
+                        						var mainContainer = null, txtSearch = null;
+                        						for (var i = 0, len = children.length; i < len; i++) {
+                        							if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm') {
+                        								mainContainer = children[i];
+                        							}
+                        							break;
+                        						}
+                        						var txtSearch = NA.common.getElementID('txtsearch_fk_receivedby');
+                        						if (mainContainer && txtSearch) {
+                        							//loads Data into JqueryGrid
+                        							var gridTbl = NA.common.doc.createElement('table');
+                        							gridTbl.id = 'jqGrid_NA_F_Goods_Receive_fk_receivedby';
+                        							var gridPager = NA.common.doc.createElement('div');
+                        							gridPager.id = 'jqGrid_NA_F_Goods_Receive_fk_receivedby_Pager';
+
+                        							var urlPR = 'SearchEmployeebyform/?' + win.encodeURIComponent('employeeName') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
+                        							gridTbl.jqGrid({
+                        								url: urlPR,
+                        								mtype: "GET",
+                        								datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+                        								colNames: ['idapp','NO', 'NIK', 'Employee Name', ],
+                        								colModel: [
+															{ name: 'idapp', key: true, hidden: true, align: 'left' },
+															{ name: 'no', width: 50, align: 'right', sortable: false, editable: false, },
+															{ name: 'nik', width: 90, align: 'left', sortable: true, editable: false, },
+															{ name: 'employee_name', index: 'employee_name', width: 150, sortable: true, editable: false, align: 'left', },
+                        								],
+                        								ondblClickRow: function (rowId) {
+                        									//fire button OK
+                        									var btnOK = dialogRef.getButton('btnOKFind_receivedby');
+                        									btnOK.click();
+                        								},
+                        								gridComplete: function () {
+                        									document.body.style.cursor = 'default';
+                        								},
+                        								cellEdit: false,
+                        								viewrecords: true,
+                        								height: '500px',
+                        								rowNum: 500,
+                        								rowList: [20, 50, 100, 200, 300, 500],
+                        								sortname: "employee_name",
+                        								sortorder: "asc",
+                        								multiSort: true,
+                        								shrinkToFit: false,
+                        								iconSet: "fontAwesome",
+                        								forceFit: true,
+                        								toolbar: true,
+                        								scrollrows: true,
+                        								hidegrid: true,
+                        								caption: "Transactions ---Find Employee",
+                        								pager: "#jqGrid_NA_F_Goods_Receive_fk_receivedby_Pager"
+                        							});
+                        							gridTbl.navGrid(gridPager, {
+                        								search: false, // show search button on the toolbar
+                        								add: false,
+                        								edit: false,
+                        								del: false,
+                        								refresh: false
+                        							});
+                        							containerMessage.childNodes[mainContainer].appendChild(gridTbl);
+                        							containerMessage.childNodes[mainContainer].appendChild(gridPager);
+                        						}
+                        						return containerMessage;
+                        					},
+                        					closable: true,
+                        					closeByBackdrop: false,
+                        					closeByKeyboard: false,
+                        					buttons: [{
+                        						label: 'Cancel',
+                        						icon: 'glyphicon glyphicon-remove',
+                        						cssClass: 'btn-success',
+                        						action: function (dialogRef) {
+                        							dialogRef.close();
+                        						},
+                        					}, {
+                        						label: 'OK',
+                        						id: 'btnOKFind_receivedby',
+                        						icon: 'glyphicon glyphicon-ok',
+                        						cssClass: 'btn-success',
+                        						action: function (dialogRef) {
+                        							var fk_receivedby = getGridCellValue(gridTbl, 'nik');
+                        							if (fk_receivedby) {//cell di select sama user
+                        								//tempelkan data row di fk_goods, dan valuenya di goods_desc;
+                        								var rowId = gridTbl.jqGrid('getGridParam', 'selrow');
+                        								var rowData = gridTbl.getRowData(rowId);
+                        								var employeeName = rowData['employee_name'];
+                        								var idapp = rowData['idapp'];
+                        								var txt_fk_receivedby = NA.common.getElementID('id_fk_receivedby');
+                        								txt_fk_receivedby.textContent = fk_receivedby;
+                        								var txt_employee_received = NA.common.getElementID('id_employee_received');
+                        								txt_employee_Received.textContent = employeeName;
+                        								//simpan IDAppFKGoods di elementHidden
+                        								var elemIDApp = NA.common.getElementID('id_idapp_fk_receivedby');
+                        								elemIDApp.value = idapp;
+                        							}
+                        						}
+                        					}]
+                        				});
                         			});
+                        			//======================end event handler BUTTONS Search================================================
                         		}
                         	}
                         	NA.NAEvent.preventDefault(event);

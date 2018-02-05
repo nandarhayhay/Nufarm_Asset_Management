@@ -1065,100 +1065,251 @@ NA.common.dialog = {
     }(),
 };
 //=========================AJAX NAJS,(belum di test) =============================================
-NA.common.AJAX = function(){
-    function createXHR(){
-        if (typeof XMLHttpRequest != "undefined"){
-            return new XMLHttpRequest();
-        } else if (typeof ActiveXObject != "undefined"){
-            if (typeof arguments.callee.activeXString != "string"){
-                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
-                                "MSXML2.XMLHttp"],
-                    i, len;            
-                for (i=0,len=versions.length; i < len; i++){
-                    try {
-                        var xhr = new ActiveXObject(versions[i]);
-                        arguments.callee.activeXString = versions[i];
-                        return xhr;
-                    } catch (ex){
-                        //skip
-                    }
+NA.common.AJAX = {
+    XHR:{},
+    Xsettings: {
+        data: {},
+        dataType: 'application/json',//content yang di kirim ke server jika post default nya application/json
+        url: '',
+        MIMEType: 'text/html',//method overrides the MIME type returned by the server,default 'text/html',override responsetype
+        timeOut: 2000000
+    },
+};
+NA.common.AJAX.createXHR = function () {
+    if (typeof XMLHttpRequest != "undefined") {
+        this.XHR = new XMLHttpRequest();
+    } else if (typeof ActiveXObject != "undefined") {
+        if (typeof arguments.callee.activeXString != "string") {
+            var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
+                            "MSXML2.XMLHttp"],
+                i, len;
+            for (i = 0, len = versions.length; i < len; i++) {
+                try {
+                    var xhr = new ActiveXObject(versions[i]);
+                    arguments.callee.activeXString = versions[i];
+                    return xhr;
+                } catch (ex) {
+                    //skip
                 }
-            }            
-            return new ActiveXObject(arguments.callee.activeXString);
-        } else {
-            throw new Error("No XHR object available.");
+            }
         }
-    };
-    var XHR = XHR || createXHR();
-    var settings = settings || {};
-    settings.data = settings.data || {};
-    settings.dataType = settings.dataType || 'application/json';//content yang di kirim ke server jika post default nya application/json
-    settings.url = settings.url || '';
-    settings.MIMEType = settings.MIMEType || 'text/html';//method overrides the MIME type returned by the server,default 'text/html',override responsetype
-    settings.requestHeader = settings.requestHeader || '';
-    settings.timeOut = settings.timeOut || 2000000;
-    return {
-        NAXHR: function () { return XHR;},
-        XHRSettings: function(){return settings;},
-        POST: function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-            
-            var Xurl = url || settings.url ;
-            if (!Xurl || Xurl ==='') {
-                throw new Error("Please define URL");
-            }
-            var XData = data || settings.data, XdataType = dataType || settings.dataType;
-            if (OnAJAXStart) { OnAJAXStart.call(XHR); }
-            XHR.overrideMimeType(MIMEType || settings.MIMEType);
-            
-            if (onload) { XHR.onload = OnLoad(); }
-            if (OnProgress) { XHR.onprogress = OnProgress(); }
-            if (OnError) { XHR.onerror = OnError; }
-            if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }          
-            XHR.open('POST', Xurl, true);
-            if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
-            { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-            XHR.setRequestHeader('Content-Type :' + XdataType);
-            //XHR.setRequestHeader('Accept :' + XdataType);
-            if (OnBeforeSend) { OnBeforeSend.call(XHR); }
-            if (XData) { XHR.send(XData); }
-        },
-        GET: function (url, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-            var Xurl = url || settings.url;
-            if (!Xurl || Xurl === '') {
-                throw new Error("Please define URL");
-            }          
-            if (OnAJAXStart) { OnAJAXStart.call(XHR); }
-            XHR.overrideMimeType(MIMEType || settings.MIMEType);
-
-            if (onload) { XHR.onload = OnLoad(); }
-            if (OnProgress) { XHR.onprogress = OnProgress(); }
-            if (OnError) { XHR.onerror = OnError; }
-            if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }        
-             XHR.open('GET', Xurl, true);
-            if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
-            { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-             XHR.setRequestHeader(XdataType);
-            if (OnBeforeSend) { OnBeforeSend.call(XHR); }
-            XHR.send(null);
-        },
-        SubmitForm: function (url, FormElement, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-            var Xurl = url || settings.url;
-            if (!Xurl || Xurl === '') {
-                throw new Error("Please define URL");
-            }
-            if (OnAJAXStart) { OnAJAXStart.call(XHR); }
-            XHR.overrideMimeType(MIMEType || settings.MIMEType);
-            if (onload) { XHR.onload = OnLoad(); }
-            if (OnProgress) { XHR.onprogress = OnProgress(); }
-            if (OnError) { XHR.onerror = OnError; }
-            if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }
-            XHR.open('POST', Xurl, true);
-            if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
-            { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-            XHR.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            XHR.send(NA.common.serializeForm(FormElement));
-        },
+        this.XHR = new ActiveXObject(arguments.callee.activeXString);
+    } else {
+        throw new Error("No XHR object available.");
     }
-}
+    return this.XHR;
+};
+Object.defineProperty(NA.common.AJAX, 'settings', {
+    get: function () {
+        return this.Xsettings || {}
+    },
+    set: function (newSettings) {
+        //var Xsettings = this.Xsettings || {};
+        //Xsettings.data = data || {};
+        //Xsettings.dataType = dataType || 'application/json';//content yang di kirim ke server jika post default nya application/json
+        //Xsettings.url = url || '';
+        //Xsettings.MIMEType = MType || 'text/html';//method overrides the MIME type returned by the server,default 'text/html',override responsetype
+        //Xsettings.requestHeader = requestHeader || {};
+        //Xsettings.timeOut = timeOut || 2000000;
+        this.Xsettings = newSettings;
+    }
+});
+NA.common.AJAX.POST = function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+    if (!this.XHR) { this.createXHR(); }
+    var Xurl = url || this.settings.url;
+    if (!Xurl || Xurl === '') {
+        throw new Error("Please define URL");
+    }
+    var XData = data || this.settings.data, XdataType = dataType || this.settings.dataType;
+    if (OnAJAXStart) { OnAJAXStart.call(this.XHR); }
+    this.XHR.overrideMimeType(MIMEType || this.settings.MIMEType);
+    if (onload) { this.XHR.onload = OnLoad; }
+    if (OnProgress) { this.XHR.onprogress = OnProgress; }
+    if (OnError) { this.XHR.onerror = OnError; }
+    if (OnLoadEnd) { this.XHR.onloadend = OnLoadEnd; }
+    this.XHR.open('POST', Xurl, true);
+    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    { this.XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
+    this.XHR.setRequestHeader('Content-Type', XdataType);
+    //==========prevent browser catching============================
+    this.XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+    this.XHR.setRequestHeader('Pragma', 'no - cache');
+    this.XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
+    //==============================================================
+    //XHR.setRequestHeader('Accept :' + XdataType);
+    if (OnBeforeSend) { OnBeforeSend.call(this.XHR); }
+    if (XData) { this.XHR.send(XData); }
+    return true;
+};
+NA.common.AJAX.GET = function (url, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+    if (!this.XHR) { this.createXHR(); }
+    var Xurl = url || this.settings.url;
+    if (!Xurl || Xurl === '') {
+        throw new Error("Please define URL");
+    }
+    var XData = data || this.settings.data, XdataType = dataType || this.settings.dataType;
+    if (OnAJAXStart) { OnAJAXStart.call(this.XHR); }
+    this.XHR.overrideMimeType(MIMEType || this.settings.MIMEType);
+    if (onload) { this.XHR.onload = OnLoad; }
+    this.XHR.open('GET', Xurl, true);
+    if (OnProgress) { this.XHR.onprogress = OnProgress; }
+    if (OnError) { this.XHR.onerror = OnError; }
+    if (OnLoadEnd) { this.XHR.onloadend = OnLoadEnd; }
+    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    { this.XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
+    this.XHR.setRequestHeader('Content-Type', XdataType);
+    //==========prevent browser catching============================
+    this.XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+    this.XHR.setRequestHeader('Pragma', 'no - cache');
+    this.XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
+    //==============================================================
+    if (OnBeforeSend) { OnBeforeSend.call(this.XHR); }
+    this.XHR.send(null);
+    return true;
+};
+NA.common.AJAX.SubmitForm = function (url, FormElement, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+    if (!this.XHR) { this.createXHR(); }
+    var Xurl = url || this.settings.url;
+    if (!Xurl || Xurl === '') {
+        throw new Error("Please define URL");
+    }
+    var XData = data || this.settings.data, XdataType = dataType || this.settings.dataType;
+    if (OnAJAXStart) { OnAJAXStart.call(this.XHR); }
+    this.XHR.overrideMimeType(MIMEType || this.settings.MIMEType);
+    if (onload) { this.XHR.onload = OnLoad; }
+    this.XHR.open('POST', Xurl, true);
+    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    { this.XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
+    this.XHR.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    //==========prevent browser catching============================
+    this.XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+    this.XHR.setRequestHeader('Pragma', 'no - cache');
+    this.XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
+    //==============================================================
+    this.XHR.send(NA.common.serializeForm(FormElement));
+    return true;
+};
+//NA.common.AJAX = function(){
+//    function createXHR(){
+//        if (typeof XMLHttpRequest != "undefined"){
+//            return new XMLHttpRequest();
+//        } else if (typeof ActiveXObject != "undefined"){
+//            if (typeof arguments.callee.activeXString != "string"){
+//                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
+//                                "MSXML2.XMLHttp"],
+//                    i, len;            
+//                for (i=0,len=versions.length; i < len; i++){
+//                    try {
+//                        var xhr = new ActiveXObject(versions[i]);
+//                        arguments.callee.activeXString = versions[i];
+//                        return xhr;
+//                    } catch (ex){
+//                        //skip
+//                    }
+//                }
+//            }            
+//            return new ActiveXObject(arguments.callee.activeXString);
+//        } else {
+//            throw new Error("No XHR object available.");
+//        }
+//    };
+//    var XHR = null;
+//    var settings = settings || {};
+//    settings.data = settings.data || {};
+//    settings.dataType = settings.dataType || 'application/json';//content yang di kirim ke server jika post default nya application/json
+//    settings.url = settings.url || '';
+//    settings.MIMEType = settings.MIMEType || 'text/html';//method overrides the MIME type returned by the server,default 'text/html',override responsetype
+//    settings.requestHeader = settings.requestHeader || '';
+//    settings.timeOut = settings.timeOut || 2000000;
+//    function create(){
+//        if (XHR == null || typeof XHR == 'undefined') {
+//            XHR = createXHR();
+//        }
+//        return XHR;
+//    };
+//    function XHRSetting(){
+//        return settings;
+//    }
+//    return XHR;
+ 
+    //return {
+    //    NAXHR: function () { return XHR; },//get XHR reference
+    //    create: function () { }},
+    //    XHRSettings: function(){},
+    //    POST: function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+            
+    //        var Xurl = url || settings.url ;
+    //        if (!Xurl || Xurl ==='') {
+    //            throw new Error("Please define URL");
+    //        }
+    //        var XData = data || settings.data, XdataType = dataType || settings.dataType;
+    //        if (OnAJAXStart) { OnAJAXStart.call(XHR); }
+    //        XHR.overrideMimeType(MIMEType || settings.MIMEType);
+            
+    //        if (onload) { XHR.onload = OnLoad; }
+    //        if (OnProgress) { XHR.onprogress = OnProgress; }
+    //        if (OnError) { XHR.onerror = OnError; }
+    //        if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }          
+    //        XHR.open('POST', Xurl, true);
+    //        if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    //        { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
+    //        XHR.setRequestHeader('Content-Type', XdataType);
+    //        //==========prevent browser catching============================
+    //        XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+    //        XHR.setRequestHeader('Pragma', 'no - cache');
+    //        XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
+    //        //==============================================================
+    //        //XHR.setRequestHeader('Accept :' + XdataType);
+    //        if (OnBeforeSend) { OnBeforeSend.call(XHR); }
+    //        if (XData) { XHR.send(XData); }
+    //    },
+    //    GET: function (url, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+    //        var Xurl = url || settings.url;
+    //        if (!Xurl || Xurl === '') {
+    //            throw new Error("Please define URL");
+    //        }          
+    //        if (OnAJAXStart) { OnAJAXStart.call(XHR); }
+    //        XHR.overrideMimeType(MIMEType || settings.MIMEType);
+
+    //        if (onload) { XHR.onload = OnLoad; }
+    //        if (OnProgress) { XHR.onprogress = OnProgress; }
+    //        if (OnError) { XHR.onerror = OnError; }
+    //        if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }        
+    //         XHR.open('GET', Xurl, true);
+    //        if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    //        { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
+    //        XHR.setRequestHeader('Content-Type', XdataType);
+    //        //==========prevent browser catching============================
+    //        XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+    //        XHR.setRequestHeader('Pragma', 'no - cache');
+    //        XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
+    //        //==============================================================
+    //        if (OnBeforeSend) { OnBeforeSend.call(XHR); }
+    //        XHR.send(null);
+    //    },
+    //    SubmitForm: function (url, FormElement, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
+    //        var Xurl = url || settings.url;
+    //        if (!Xurl || Xurl === '') {
+    //            throw new Error("Please define URL");
+    //        }
+    //        if (OnAJAXStart) { OnAJAXStart.call(XHR); }
+    //        XHR.overrideMimeType(MIMEType || settings.MIMEType);
+    //        if (onload) { XHR.onload = OnLoad; }
+    //        if (OnProgress) { XHR.onprogress = OnProgress; }
+    //        if (OnError) { XHR.onerror = OnError; }
+    //        if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }
+    //        XHR.open('POST', Xurl, true);
+    //        if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    //        { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
+    //        XHR.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    //        //==========prevent browser catching============================
+    //        XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+    //        XHR.setRequestHeader('Pragma', 'no - cache');
+    //        XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
+    //        //==============================================================
+    //        XHR.send(NA.common.serializeForm(FormElement));
+    //    },
+    //};
+//}
 //=================================================================
    

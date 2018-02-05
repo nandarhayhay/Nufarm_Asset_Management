@@ -49,7 +49,15 @@ urlpatterns = [
 
 	#view the goods_receive
 		url(r'^NA_Goods_Receive/$',NA_Goods_Receive_View.NA_Goods_Receive,name='GoodsReceive'),
-		url(r'^NA_Goods/ShowEntry_Receive',NA_Goods_Receive_View.ShowEntry_Receive,name='ShowEntryReceivey'),
+		url(r'^NA_Goods_Receive/ShowEntry_Receive',NA_Goods_Receive_View.ShowEntry_Receive,name='ShowEntryReceivey'),
+		url(r'^NA_Goods_Receive/getGoods/$',NA_Goods_Receive_View.getGoods,name='getGoods'),
+		url(r'^NA_Goods_Receive/Delete/$',NA_Goods_Receive_View.Delete,'delete'),
+		url(r'^NA_Goods_Receive/HasExists/$',NA_Goods_Receive_View.HasExists,'HasExists'),
+		url(r'^NA_Goods_Receive/getSuplier/$',NA_Goods_Receive_View.getSuplier,'getSuplier'),
+		url(r'^NA_Goods_Receive/getEmployee/$',NA_Goods_Receive_View.getEmployee,'getEmployee'),
+		url(r'^NA_Goods_Receive/SearchGoodsbyForm/$',NA_Goods_Receive_View.SearchGoodsbyForm,'SearchGoodsbyForm'),
+		url(r'^NA_goods_Receive/SearchSuplierbyForm/$',NA_Goods_Receive_View.SearchSuplierbyForm,'SearchSuplierbyForm'),
+
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

@@ -193,3 +193,6 @@ class query:
 			dict(zip(columns, row))
 			for row in cursor.fetchall()
 		]
+class commonFunct:
+	def str2bool(v):
+		return v.lower() in ("yes", "true", "t", "1")

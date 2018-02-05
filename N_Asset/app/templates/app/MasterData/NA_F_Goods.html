@@ -735,6 +735,7 @@
                             return false;
                         }
                     }
+
                     $('div.maindialogContent').load("ShowEntry?" + win.encodeURIComponent('itemcode') + '=' +  win.encodeURIComponent(itemCode) +
                         '&' + win.encodeURIComponent('status') + '=' +  win.encodeURIComponent(target.innerText.trim()),function(responseTxt,statusTxt,xhr){//load /tampilkan form entry data                    
                        
@@ -744,10 +745,13 @@
                                 status = status||win.status||target.innerText.trim();
                                 switch(status){
                                     case 'Add':{
-                                        //if(hasAttribute("value
-                                        if(target.hasAttribute('disabled')){
-                                            target.removeAttribute('disabled');
-                                        }
+                                    	//if(hasAttribute("value
+                                    	Array.prototype.forEach.call(NA.common.doc.querySelectorAll('div.dialogButtonEntry>a.button'), function (item) {
+                                    		if(item.hasAttribute('disabled')){
+                                    			item.removeAttribute('disabled');
+                                    		}  
+                                    	}); 
+                                        
                                         break;                                        
                                     }
                                     case 'Edit':{
