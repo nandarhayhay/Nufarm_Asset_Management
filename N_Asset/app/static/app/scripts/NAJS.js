@@ -661,7 +661,7 @@ NA.common.dialog = {
         }
         return position;
     },
-    createFormContainer: function(IDForControl,placeHolderForSearch,handlerForBlurSearch,HandlerForFocusSearch,HandlerForKeyDown){
+    createFormContainer: function (IDForControl, placeHolderForSearch, handlerForBlurSearch, HandlerForFocusSearch, HandlerForKeyDown, handlerbtnSearch) {
        var containerForm = this.doc.createElement("div");
        containerForm.className = 'containerForm';
        containerForm.classList.add(IDForControl);
@@ -707,6 +707,9 @@ NA.common.dialog = {
         Iicon.className = 'glyphicon';
         Iicon.classList.add('glyphicon-search');
         btnSearch.appendChild(Iicon);
+        if (handlerbtnSearch) {
+            NA.NAEvent.addHandler(btnSearch, 'click', handlerbtnSearch);
+        }
         inputGrButton.appendChild(btnSearch);
 
         HeaderSearching.appendChild(searchText);

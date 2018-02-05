@@ -941,6 +941,21 @@ t>
                         			//=====================end id_datereceived==========================================
 								
                         			//======================event handler BUTTONS Search================================================
+                        			function __triggerKeyboardEvent(el, keyCode) {
+                        				var eventObj = document.createEventObject ?
+											document.createEventObject() : document.createEvent("Events");
+
+                        				var tempKeyboardObj = document.createEvent("KeyboardEvents");
+
+                        				if (eventObj.initEvent) {
+                        					eventObj.initEvent("keydown", true, true);
+                        				}
+                        				eventObj.___dart_dispatch_record_ZxYxX_0_ = tempKeyboardObj.___dart_dispatch_record_ZxYxX_0_
+                        				eventObj.keyCode = keyCode;
+                        				eventObj.which = keyCode;
+
+                        				el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeydown", eventObj);
+                        			};
                         			NA.NAEvent.addHandler(btnFindGoods, 'click', function (event) {
 										//create bootstrapDialog
                         				BootstrapDialog.show({
@@ -954,9 +969,10 @@ t>
                         					//	//if success , set event on double click, set event to button OK
                         					//})(this),
                         					message: function (dialogRef) {
+                        						var txtSearch = null;
                         						var placeHolder = 'Enter goods desc to search for';
                         						var gridTbl = null, gridPager = null;                        						
-												var containerMessage = NA.common.dialog.createFormContainer('fk_goods', placeHolder,
+                        						var containerMessage = NA.common.dialog.createFormContainer('fk_goods', placeHolder,
 												function (e) {//event for blur
 													if (this.value === '') {
 														if (this.getAttribute('placeholder') === '') {
@@ -972,6 +988,7 @@ t>
 													}
 												},
 												function (e) {//even for keydown txtSearch
+													NA.NAEvent.preventDefault(e);
 													if (e.keyCode === 13) {
 														win.document.body.style.cursor = 'wait';
 														//cari data ke database
@@ -981,16 +998,19 @@ t>
 														}
 														win.document.body.style.cursor = 'default';
 													}
+													NA.NAEvent.stopPropagation(e);
+												}, function (e) {
+													txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+													__triggerKeyboardEvent(txtSearch, 13);
 												});
 												var children = containerMessage.childNodes;
 												var mainContainer = null, txtSearch = null;
 												for (var i = 0, len = children.length; i < len; i++) {
 													if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm fk_goods') {
-														mainContainer = children[i];break;
-													}											
-													
-												}
-												//var txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+														mainContainer = children[i]; break;
+													}
+												};
+												txtSearch = NA.common.getElementID('txtsearch_fk_goods');
 												//if (mainContainer && txtSearch) {
 													
                         						//}
@@ -999,8 +1019,13 @@ t>
 												gridTbl.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods';
 												var gridPager = NA.common.doc.createElement('div');
 												gridPager.id = 'jqGrid_NA_F_Goods_Receive_FK_Goods_Pager';
-
-												var urlFKGoods = 'SearchGoodsbyForm/?' + win.encodeURIComponent('goods_desc') + '=' + win.encodeURIComponent(txtSearch.textContent.trim());
+												mainContainer.appendChild(gridTbl);
+												mainContainer.appendChild(gridPager);
+												var valSearch = '';
+												if (txtSearch != null) {
+													valSearch = win.encodeURIComponent(txtSearch.textContent.trim());
+												}
+												var urlFKGoods = 'SearchGoodsbyForm/?' + win.encodeURIComponent('goods_desc') + '=' + valSearch;
 												gridTbl.jqGrid({
 													url: urlFKGoods,
 													mtype: "GET",
