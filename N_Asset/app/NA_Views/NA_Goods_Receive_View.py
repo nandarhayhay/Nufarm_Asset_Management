@@ -167,10 +167,15 @@ def getGoods(request):
 	"""get goods by itemcode return 'goodsname' + 'brandname' + 'itemcode' as goods criteria = iexact
 	"""
 
-	result='';
+	result={};
 	try:
 		itemcode = request.GET.get('itemcode')
-		result = goods.customs.getGoods(itemcode)[0]		
+		result = goods.customs.getGoods(itemcode)
+		if len(list(result)):
+			result = result[0]
+			result = {'goods':result.goods}
+		else:
+			result = {'goods':''}
 		return HttpResponse(json.dumps(result,cls=DjangoJSONEncoder),status = 200, content_type='application/json') 
 	except Exception as e:					
 		result = repr(e)
@@ -178,12 +183,14 @@ def getGoods(request):
 def getSuplier(request):
 	"""get supliername by supliercode return supliername criteria = ixact'
 	"""
-	result='';
+	result={}
 	try:
 		supliercode = request.GET.get('supliercode')
 		result = NASuplier.customManager.getSuplier(supliercode)
-		if result.count > 0:
-			result = result[0]					
+		if len(list(result)):
+			result = result[0]
+		else :
+			result={}
 		return HttpResponse(json.dumps(result,cls=DjangoJSONEncoder),status = 200, content_type='application/json') 
 	except Exception as e:					
 		result = repr(e)
@@ -191,9 +198,14 @@ def getSuplier(request):
 def getEmployee(request):
 	"""get employee name by nik return employee name criteria = iexact"""
 	nik =  request.GET.get('nik')
+	result={};
 	result = Employee.customManager.getEmployee(nik)
-	if result.count > 0:
-		result = result[0]	
+	if len(list(result)):
+		result = result[0]
+	else :
+		result={}
+	#if result.count > 0:
+	#	result = result[0]	
 		#for brandrow in BrandRows:
 		#	JsonResult = {}
 		#	JsonResult['id'] = brandrow['brandname']
@@ -205,9 +217,15 @@ def getEmployee(request):
 @ensure_csrf_cookie
 def SearchGoodsbyForm(request):
 	"""get goods data for grid searching, retusn idapp,itemcode,goods criteria = icontains"""
+	Isidx = request.GET.get('sidx', '')
+	Isord = request.GET.get('sord', '')
+	
+			
 	searchText = request.GET.get('goods_desc')
 	Ilimit = request.GET.get('rows', '')
-	NAData = goods.customs.searchGoodsByForm(searchText)
+	NAData = None;
+	if(Isord is not None and str(Isord) != ''):
+		NAData = goods.customs.searchGoodsByForm(searchText).order_by('-' + str(Isidx))
 	totalRecord = NAData.count()
 	paginator = Paginator(NAData, int(Ilimit)) 
 	try:
@@ -222,7 +240,8 @@ def SearchGoodsbyForm(request):
 	rows = []
 	i = 0;#idapp,itemcode,goods
 	for row in dataRows.object_list:
-		datarow = {"id" :row['idapp'], "cell" :[row['idapp'],i+1,row['itemcode'],row['goods']]}
+		i+=1
+		datarow = {"id" :str(row['idapp']) +'_fk_goods', "cell" :[row['idapp'],i,row['itemcode'],row['goods']]}
 		rows.append(datarow)
 	results = {"page": page,"total": paginator.num_pages ,"records": totalRecord,"rows": rows }
 	return HttpResponse(json.dumps(results, indent=4,cls=DjangoJSONEncoder),content_type='application/json')
@@ -230,7 +249,7 @@ def SearchSuplierbyForm(request):
 	"""get suplier data for grid return suplier code,supliername, criteria = icontains"""
 	searchText = request.GET.get('supliername')
 	Ilimit = request.GET.get('rows', '')
-	NAData = goods.customs.searchGoodsByForm(searchText)
+	NAData = NASuplier.customManager.getSuplierByForm(searchText)
 	totalRecord = NAData.count()
 	paginator = Paginator(NAData, int(Ilimit)) 
 	try:
@@ -245,7 +264,8 @@ def SearchSuplierbyForm(request):
 	rows = []
 	i = 0;#idapp,itemcode,goods
 	for row in dataRows.object_list:
-		datarow = {"id" :row['supliercode'], "cell" :[i+1,row['supliercode'],row['supliername']]}
+		i+=1
+		datarow = {"id" :row.supliercode, "cell" :[i,row.supliercode,row.supliername]}
 		rows.append(datarow)
 	results = {"page": page,"total": paginator.num_pages ,"records": totalRecord,"rows": rows }
 	return HttpResponse(json.dumps(results, indent=4,cls=DjangoJSONEncoder),content_type='application/json')
@@ -276,31 +296,31 @@ class NA_Goods_Receive_Form(forms.Form):
 	idapp  = forms.IntegerField(widget=forms.HiddenInput(),required=False)
 	
 	fk_goods = forms.CharField(widget=forms.TextInput(attrs={
-                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;',
+                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':1,
                                    'placeholder': 'goods item code','data-value':'goods item code','tittle':'Please enter item code'}),required=True)
-	goods_desc = forms.CharField(max_length=150,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0;',
+	goods_desc = forms.CharField(max_length=150,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0;','readonly':True,
 																						 'placeholder': 'goods item code','data-value':'goods item code','tittle':'goods Desc is required'}))
 	 
 	fk_suplier = forms.CharField(max_length=30,widget=forms.TextInput(attrs={
-                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;',
+                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':2,
                                    'placeholder': 'suplier code','data-value':'suplier code','tittle':'Please enter suplier code'}),required=True)
-	supliername = forms.CharField(max_length=100,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0";',
+	supliername = forms.CharField(max_length=100,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0;','readonly':True,
 																						 'placeholder': 'suplier name','data-value':'suplier name','tittle':'suplier name is required'}))
-	datereceived = forms.DateField(required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;',
+	datereceived = forms.DateField(required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':3,
                                    'placeholder': 'dd/mm/yyyy','data-value':'dd/mm/yyyy','tittle':'Please enter Date Received','patern':'((((0[13578]|1[02])\/(0[1-9]|1[0-9]|2[0-9]|3[01]))|((0[469]|11)\/(0[1-9]|1[0-9]|2[0-9]|3[0]))|((02)(\/(0[1-9]|1[0-9]|2[0-8]))))\/(19([6-9][0-9])|20([0-9][0-9])))|((02)\/(29)\/(19(6[048]|7[26]|8[048]|9[26])|20(0[048]|1[26]|2[048])))'}))
-	totalpurchase = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
-	totalreceived = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
+	totalpurchase = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','tabindex':4,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
+	totalreceived = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','tabindex':5,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
 	fk_p_r_by = forms.CharField(max_length=30,widget=forms.TextInput(attrs={
-                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;',
+                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':6,
                                    'placeholder': 'P R By','data-value':'P R By','tittle':'Employee code(NIK) who PRs'}),required=True)
-	employee_pr = forms.CharField(max_length=150,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0',
+	employee_pr = forms.CharField(max_length=150,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0;','readonly':True,
 																						 'placeholder': 'Employee who PRs','data-value':'Employee who PRs','tittle':'Employee who PRs is required'}))
 	fk_receivedby = forms.CharField(max_length=30,widget=forms.TextInput(attrs={
-                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;',
+                                   'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':7,
                                    'placeholder': 'Who Receives','data-value':'Who Receives','tittle':'Employee code(NIK) who Receives'}),required=True)
-	employee_received = forms.CharField(max_length=150,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0',
+	employee_received = forms.CharField(max_length=150,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0;','readonly':True,
 																						 'placeholder': 'Employee who Receives','data-value':'Employee who Receives','tittle':'Employee who Receives is required'}))
-	descriptions = forms.CharField(max_length=250,widget=forms.Textarea(attrs={'cols':'100','rows':'2','style':'max-width: 520px;width: 444px;height: 45px;','class':'NA-Form-Control','placeholder':'descriptions about goods received (remark)','data-value':'descriptions about goods received (remark)'}),required=False) # models.CharField(db_column='Descriptions', max_length=150, blank=True, null=True)  # Field name made lowercase.
+	descriptions = forms.CharField(max_length=250,widget=forms.Textarea(attrs={'cols':'100','rows':'2','tabindex':8,'style':'max-width: 520px;width: 444px;height: 45px;','class':'NA-Form-Control','placeholder':'descriptions about goods received (remark)','data-value':'descriptions about goods received (remark)'}),required=False) # models.CharField(db_column='Descriptions', max_length=150, blank=True, null=True)  # Field name made lowercase.
 	idapp_fk_goods = forms.IntegerField(widget=forms.HiddenInput())
 	idapp_fk_p_r_by = forms.IntegerField(widget=forms.HiddenInput())
 	idapp_fk_receivedby = forms.IntegerField(widget=forms.HiddenInput())

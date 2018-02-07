@@ -336,22 +336,25 @@ NA.client = function () {
 }();
 
 NA.common = {
-    doc: window.document,
-    //============check validity Entry Form=======================
-    //InitFormValidation : function(formID,eventObject){
-    //    var controls = this.doc.querySelectorAll(formID + ' :input:visible[required,patern,min,max,maxlength,type="text"]')
-    //    Array.prototype.forEach.call(control, function (ctrl) {
-    //        NA.NAEvent.addHandler(ctrl, 'input', function (event) {
-    //            if (!this.validity.valid) {
-    //                this.setCustomValidity('Please enter a valid data');                   
-    //            }
-    //            else {
-    //                this.setCustomValidity('');
-    //            }
-    //        });
-    //    });
-    //},
-
+    doc: window.document,    
+    //============CROSS BROWSER Keyboard event====================
+    triggerKeyboardEvent : function (el, keyCode) {
+        var keyboardEvent = document.createEvent("KeyboardEvent");
+        var initMethod = typeof keyboardEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
+        keyboardEvent[initMethod](
+                           "keydown",
+                            false,      // bubbles oOooOOo0
+                            true,      // cancelable   
+                            window,    // view
+                            false,     // ctrlKeyArg
+                            false,     // altKeyArg
+                            false,     // shiftKeyArg
+                            false,     // metaKeyArg
+                            keyCode,
+                            0          // charCode   
+        );
+        el.dispatchEvent(keyboardEvent);
+    },
     //===========cross browser get Element ByID =====================
     getElementID: function (id) {
         if (this.doc.getElementById) {
@@ -458,7 +461,10 @@ NA.common = {
         }
         return _arr;
     },
-
+    isObjectEmpty : function(obj) {//function ini untuk mengecek apakah object bernilai {}, jika object ada key/method/isinya maka return false
+        for (var x in obj) { if (obj.hasOwnProperty(x))  return false; }
+        return true;
+    },
     //===============Partial Text Selection=====================
     //textbox.value = “Hello world!"
     ////select all text
@@ -576,6 +582,53 @@ NA.common = {
         }
     }(),       
 };
+
+NA.common.mesage = {
+    _confirmDelete : 'Are you sure you want to delete data ?!!.\nOperation can not be undone',
+    _savingSucces : 'Data Saved Succesfuly.',
+    _dataHasChanged : 'Data has changed, \nSave data before closing form ?',
+    _refreshData : 'Data has changed \nIf you continue refreshing page\nAll Changes will be discarded\nContinue refreshing anyway ?.',
+    _existsData : 'Data has exists',
+    _titleInfo : 'Information',
+    _confirmInfo : 'Confirmation'
+};
+Object.defineProperties(NA.common.mesage,  {
+    confirmDelete:{
+        get: function(){
+            return this._confirmDelete;
+        }
+    },
+    savingSucces:{
+        get: function(){
+            return this._savingSucces;
+        }
+    },
+    dataHasChanged:{
+        get: function(){
+            return this._dataHasChanged;
+        } 
+    },
+    refreshData:{
+        get: function(){
+            return this._refreshData;
+        } 
+    },
+    existsData:{
+        get: function(){
+            return this._existsData;
+        } 
+    },
+    titleInfo:{
+        get: function(){
+            return this._titleInfo;
+        } 
+    },
+    confirmInfo:{
+        get: function(){
+            return this._confirmInfo;
+        } 
+    }
+});
 NA.common.dialog = {
     doc: window.document,
     getPageDimensions: function () {
@@ -665,6 +718,7 @@ NA.common.dialog = {
        var containerForm = this.doc.createElement("div");
        containerForm.className = 'containerForm';
        containerForm.classList.add(IDForControl);
+       containerForm.style.cssText = 'margin:auto';
         //create Header for Searching
         var HeaderSearching = this.doc.createElement('div');
         HeaderSearching.className = 'input-group';
@@ -679,9 +733,9 @@ NA.common.dialog = {
         //create TextBox Searching with placeholder
         var searchText = this.doc.createElement('input');
         searchText.type = 'text';
-        searchText.className = 'form-control';
+        searchText.className = 'NA-Form-Control';
         searchText.classList.add(IDForControl);
-
+        searchText.style.cssText = 'border-radius:0';
         searchText.id = 'txtsearch_' + IDForControl;
         searchText.setAttribute('placeholder', placeHolderForSearch);
 
@@ -707,6 +761,7 @@ NA.common.dialog = {
         Iicon.className = 'glyphicon';
         Iicon.classList.add('glyphicon-search');
         btnSearch.appendChild(Iicon);
+        btnSearch.style.height = '27px';
         if (handlerbtnSearch) {
             NA.NAEvent.addHandler(btnSearch, 'click', handlerbtnSearch);
         }
@@ -1106,19 +1161,12 @@ Object.defineProperty(NA.common.AJAX, 'settings', {
     get: function () {
         return this.Xsettings || {}
     },
-    set: function (newSettings) {
-        //var Xsettings = this.Xsettings || {};
-        //Xsettings.data = data || {};
-        //Xsettings.dataType = dataType || 'application/json';//content yang di kirim ke server jika post default nya application/json
-        //Xsettings.url = url || '';
-        //Xsettings.MIMEType = MType || 'text/html';//method overrides the MIME type returned by the server,default 'text/html',override responsetype
-        //Xsettings.requestHeader = requestHeader || {};
-        //Xsettings.timeOut = timeOut || 2000000;
+    set: function (newSettings) {       
         this.Xsettings = newSettings;
     }
 });
 NA.common.AJAX.POST = function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-    if (!this.XHR) { this.createXHR(); }
+    if (NA.common.isObjectEmpty(this.XHR)) { this.createXHR(); }
     var Xurl = url || this.settings.url;
     if (!Xurl || Xurl === '') {
         throw new Error("Please define URL");
@@ -1131,7 +1179,7 @@ NA.common.AJAX.POST = function (url, data, dataType, MIMEType, OnAJAXStart, OnBe
     if (OnError) { this.XHR.onerror = OnError; }
     if (OnLoadEnd) { this.XHR.onloadend = OnLoadEnd; }
     this.XHR.open('POST', Xurl, true);
-    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {} && customRequestHeader != null)
     { this.XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
     this.XHR.setRequestHeader('Content-Type', XdataType);
     //==========prevent browser catching============================
@@ -1145,22 +1193,22 @@ NA.common.AJAX.POST = function (url, data, dataType, MIMEType, OnAJAXStart, OnBe
     return true;
 };
 NA.common.AJAX.GET = function (url, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-    if (!this.XHR) { this.createXHR(); }
+    if (NA.common.isObjectEmpty(this.XHR)) { this.createXHR(); }
     var Xurl = url || this.settings.url;
     if (!Xurl || Xurl === '') {
         throw new Error("Please define URL");
     }
-    var XData = data || this.settings.data, XdataType = dataType || this.settings.dataType;
     if (OnAJAXStart) { OnAJAXStart.call(this.XHR); }
+   
     this.XHR.overrideMimeType(MIMEType || this.settings.MIMEType);
-    if (onload) { this.XHR.onload = OnLoad; }
+    if (OnLoad) { this.XHR.onload = OnLoad; }
     this.XHR.open('GET', Xurl, true);
     if (OnProgress) { this.XHR.onprogress = OnProgress; }
     if (OnError) { this.XHR.onerror = OnError; }
     if (OnLoadEnd) { this.XHR.onloadend = OnLoadEnd; }
-    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {} && customRequestHeader != null)
     { this.XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-    this.XHR.setRequestHeader('Content-Type', XdataType);
+    //this.XHR.setRequestHeader('Content-Type', XdataType);
     //==========prevent browser catching============================
     this.XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
     this.XHR.setRequestHeader('Pragma', 'no - cache');
@@ -1171,17 +1219,20 @@ NA.common.AJAX.GET = function (url, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad,
     return true;
 };
 NA.common.AJAX.SubmitForm = function (url, FormElement, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-    if (!this.XHR) { this.createXHR(); }
+    if (NA.common.isObjectEmpty(this.XHR)) { this.createXHR(); }
     var Xurl = url || this.settings.url;
     if (!Xurl || Xurl === '') {
         throw new Error("Please define URL");
     }
-    var XData = data || this.settings.data, XdataType = dataType || this.settings.dataType;
+    //var XData = data || this.settings.data, XdataType = dataType || this.settings.dataType;
     if (OnAJAXStart) { OnAJAXStart.call(this.XHR); }
     this.XHR.overrideMimeType(MIMEType || this.settings.MIMEType);
-    if (onload) { this.XHR.onload = OnLoad; }
+    if (OnLoad) { this.XHR.onload = OnLoad; }
     this.XHR.open('POST', Xurl, true);
-    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
+    if (OnLoadEnd) { this.XHR.onloadend = OnLoadEnd; }
+    if (OnProgress) { this.XHR.onprogress = OnProgress; }
+    if (OnError) { this.XHR.onerror = OnError; }
+    if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {} && customRequestHeader != null)
     { this.XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
     this.XHR.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     //==========prevent browser catching============================
@@ -1192,127 +1243,6 @@ NA.common.AJAX.SubmitForm = function (url, FormElement, MIMEType, OnAJAXStart, O
     this.XHR.send(NA.common.serializeForm(FormElement));
     return true;
 };
-//NA.common.AJAX = function(){
-//    function createXHR(){
-//        if (typeof XMLHttpRequest != "undefined"){
-//            return new XMLHttpRequest();
-//        } else if (typeof ActiveXObject != "undefined"){
-//            if (typeof arguments.callee.activeXString != "string"){
-//                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
-//                                "MSXML2.XMLHttp"],
-//                    i, len;            
-//                for (i=0,len=versions.length; i < len; i++){
-//                    try {
-//                        var xhr = new ActiveXObject(versions[i]);
-//                        arguments.callee.activeXString = versions[i];
-//                        return xhr;
-//                    } catch (ex){
-//                        //skip
-//                    }
-//                }
-//            }            
-//            return new ActiveXObject(arguments.callee.activeXString);
-//        } else {
-//            throw new Error("No XHR object available.");
-//        }
-//    };
-//    var XHR = null;
-//    var settings = settings || {};
-//    settings.data = settings.data || {};
-//    settings.dataType = settings.dataType || 'application/json';//content yang di kirim ke server jika post default nya application/json
-//    settings.url = settings.url || '';
-//    settings.MIMEType = settings.MIMEType || 'text/html';//method overrides the MIME type returned by the server,default 'text/html',override responsetype
-//    settings.requestHeader = settings.requestHeader || '';
-//    settings.timeOut = settings.timeOut || 2000000;
-//    function create(){
-//        if (XHR == null || typeof XHR == 'undefined') {
-//            XHR = createXHR();
-//        }
-//        return XHR;
-//    };
-//    function XHRSetting(){
-//        return settings;
-//    }
-//    return XHR;
- 
-    //return {
-    //    NAXHR: function () { return XHR; },//get XHR reference
-    //    create: function () { }},
-    //    XHRSettings: function(){},
-    //    POST: function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-            
-    //        var Xurl = url || settings.url ;
-    //        if (!Xurl || Xurl ==='') {
-    //            throw new Error("Please define URL");
-    //        }
-    //        var XData = data || settings.data, XdataType = dataType || settings.dataType;
-    //        if (OnAJAXStart) { OnAJAXStart.call(XHR); }
-    //        XHR.overrideMimeType(MIMEType || settings.MIMEType);
-            
-    //        if (onload) { XHR.onload = OnLoad; }
-    //        if (OnProgress) { XHR.onprogress = OnProgress; }
-    //        if (OnError) { XHR.onerror = OnError; }
-    //        if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }          
-    //        XHR.open('POST', Xurl, true);
-    //        if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
-    //        { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-    //        XHR.setRequestHeader('Content-Type', XdataType);
-    //        //==========prevent browser catching============================
-    //        XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-    //        XHR.setRequestHeader('Pragma', 'no - cache');
-    //        XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
-    //        //==============================================================
-    //        //XHR.setRequestHeader('Accept :' + XdataType);
-    //        if (OnBeforeSend) { OnBeforeSend.call(XHR); }
-    //        if (XData) { XHR.send(XData); }
-    //    },
-    //    GET: function (url, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-    //        var Xurl = url || settings.url;
-    //        if (!Xurl || Xurl === '') {
-    //            throw new Error("Please define URL");
-    //        }          
-    //        if (OnAJAXStart) { OnAJAXStart.call(XHR); }
-    //        XHR.overrideMimeType(MIMEType || settings.MIMEType);
 
-    //        if (onload) { XHR.onload = OnLoad; }
-    //        if (OnProgress) { XHR.onprogress = OnProgress; }
-    //        if (OnError) { XHR.onerror = OnError; }
-    //        if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }        
-    //         XHR.open('GET', Xurl, true);
-    //        if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
-    //        { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-    //        XHR.setRequestHeader('Content-Type', XdataType);
-    //        //==========prevent browser catching============================
-    //        XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-    //        XHR.setRequestHeader('Pragma', 'no - cache');
-    //        XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
-    //        //==============================================================
-    //        if (OnBeforeSend) { OnBeforeSend.call(XHR); }
-    //        XHR.send(null);
-    //    },
-    //    SubmitForm: function (url, FormElement, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-    //        var Xurl = url || settings.url;
-    //        if (!Xurl || Xurl === '') {
-    //            throw new Error("Please define URL");
-    //        }
-    //        if (OnAJAXStart) { OnAJAXStart.call(XHR); }
-    //        XHR.overrideMimeType(MIMEType || settings.MIMEType);
-    //        if (onload) { XHR.onload = OnLoad; }
-    //        if (OnProgress) { XHR.onprogress = OnProgress; }
-    //        if (OnError) { XHR.onerror = OnError; }
-    //        if (OnLoadEnd) { XHR.onloadend = OnLoadEnd; }
-    //        XHR.open('POST', Xurl, true);
-    //        if (typeof customRequestHeader != 'undefined' && customRequestHeader !== '' && customRequestHeader != {})
-    //        { XHR.setRequestHeader(customRequestHeader.key, customRequestHeader.value); }
-    //        XHR.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    //        //==========prevent browser catching============================
-    //        XHR.setRequestHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-    //        XHR.setRequestHeader('Pragma', 'no - cache');
-    //        XHR.setRequestHeader('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
-    //        //==============================================================
-    //        XHR.send(NA.common.serializeForm(FormElement));
-    //    },
-    //};
-//}
 //=================================================================
    

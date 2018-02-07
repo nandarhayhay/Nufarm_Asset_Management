@@ -113,8 +113,9 @@ class NA_BR_Goods_Receive(models.Manager):
 class CustomSuplierManager(models.Manager):
 	def getSuplier(self,supliercode):
 		return super(CustomSuplierManager,self).get_queryset().filter(supliercode__iexact=supliercode).values('supliername')
+		
 	def getSuplierByForm(self,searchText):
-		return super(CustomSuplierManager,self).get_queryset().filter(supliername__icontains=searchText).values('supliercode,supliername')
+		return super(CustomSuplierManager,self).get_queryset().filter(supliername__icontains=searchText).values('supliercode','supliername')
 
 class custEmpManager(models.Manager):
 	def getEmployee(self,nik):

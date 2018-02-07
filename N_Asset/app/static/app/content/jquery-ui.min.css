@@ -476,6 +476,7 @@ input.ui-button::-moz-focus-inner, button.ui-button::-moz-focus-inner {
         font-size: .9em;
         border-collapse: collapse;
         margin: 0 0 .4em;
+        background-image: linear-gradient(48deg,#E0E0E0,#FEFFFD,#8FBC8F);
     }
 
     .ui-datepicker th {
