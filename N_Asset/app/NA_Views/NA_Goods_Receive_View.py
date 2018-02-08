@@ -226,6 +226,8 @@ def SearchGoodsbyForm(request):
 	NAData = None;
 	if(Isord is not None and str(Isord) != ''):
 		NAData = goods.customs.searchGoodsByForm(searchText).order_by('-' + str(Isidx))
+	else:
+		NAData = goods.customs.searchGoodsByForm(searchText)
 	totalRecord = NAData.count()
 	paginator = Paginator(NAData, int(Ilimit)) 
 	try:
@@ -249,7 +251,13 @@ def SearchSuplierbyForm(request):
 	"""get suplier data for grid return suplier code,supliername, criteria = icontains"""
 	searchText = request.GET.get('supliername')
 	Ilimit = request.GET.get('rows', '')
-	NAData = NASuplier.customManager.getSuplierByForm(searchText)
+	Isidx = request.GET.get('sidx', '')
+	Isord = request.GET.get('sord', '')
+	NAData = None;
+	if(Isord is not None and str(Isord) != ''):
+		NAData = NASuplier.customManager.getSuplierByForm(searchText)(searchText).order_by('-' + str(Isidx))
+	else:
+		NAData = NASuplier.customManager.getSuplierByForm(searchText)
 	totalRecord = NAData.count()
 	paginator = Paginator(NAData, int(Ilimit)) 
 	try:
@@ -265,15 +273,20 @@ def SearchSuplierbyForm(request):
 	i = 0;#idapp,itemcode,goods
 	for row in dataRows.object_list:
 		i+=1
-		datarow = {"id" :row.supliercode, "cell" :[i,row.supliercode,row.supliername]}
+		datarow = {"id" :row['supliercode'], "cell" :[i,row['supliercode'],row['supliername']]}
 		rows.append(datarow)
 	results = {"page": page,"total": paginator.num_pages ,"records": totalRecord,"rows": rows }
 	return HttpResponse(json.dumps(results, indent=4,cls=DjangoJSONEncoder),content_type='application/json')
 def SearchEmployeebyform(request):
 	"""get employee data for grid return idapp,nik, employee_name criteria = icontains"""
-	searchText = request.GET.get('employeeName')
+	searchText = request.GET.get('employee_name')
 	Ilimit = request.GET.get('rows', '')
-	NAData = Employee.customManager.getEmloyeebyForm(searchText)
+	Isidx = request.GET.get('sidx', '')
+	Isord = request.GET.get('sord', '')
+	if(Isord is not None and str(Isord) != ''):
+		NAData = Employee.customManager.getEmloyeebyForm(searchText).order_by('-' + str(Isidx))
+	else:
+		NAData = Employee.customManager.getEmloyeebyForm(searchText)
 	totalRecord = NAData.count()
 	paginator = Paginator(NAData, int(Ilimit)) 
 	try:
@@ -308,8 +321,8 @@ class NA_Goods_Receive_Form(forms.Form):
 																						 'placeholder': 'suplier name','data-value':'suplier name','tittle':'suplier name is required'}))
 	datereceived = forms.DateField(required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':3,
                                    'placeholder': 'dd/mm/yyyy','data-value':'dd/mm/yyyy','tittle':'Please enter Date Received','patern':'((((0[13578]|1[02])\/(0[1-9]|1[0-9]|2[0-9]|3[01]))|((0[469]|11)\/(0[1-9]|1[0-9]|2[0-9]|3[0]))|((02)(\/(0[1-9]|1[0-9]|2[0-8]))))\/(19([6-9][0-9])|20([0-9][0-9])))|((02)\/(29)\/(19(6[048]|7[26]|8[048]|9[26])|20(0[048]|1[26]|2[048])))'}))
-	totalpurchase = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','tabindex':4,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
-	totalreceived = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','tabindex':5,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
+	totalpurchase = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':4,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
+	totalreceived = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':5,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
 	fk_p_r_by = forms.CharField(max_length=30,widget=forms.TextInput(attrs={
                                    'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':6,
                                    'placeholder': 'P R By','data-value':'P R By','tittle':'Employee code(NIK) who PRs'}),required=True)
