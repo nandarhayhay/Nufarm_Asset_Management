@@ -115,7 +115,7 @@ class CustomSuplierManager(models.Manager):
 		return super(CustomSuplierManager,self).get_queryset().filter(supliercode__iexact=supliercode).values('supliername')
 		
 	def getSuplierByForm(self,searchText):
-		return super(CustomSuplierManager,self).get_queryset().filter(supliername__icontains=searchText).values('supliercode','supliername')
+		return super(CustomSuplierManager,self).get_queryset().filter(Q(supliername__icontains=searchText) & Q(inactive__exact=0)).values('supliercode','supliername')
 
 class custEmpManager(models.Manager):
 	def getEmployee(self,nik):

@@ -92,14 +92,17 @@ def ShowEntry_Receive(request):
 	status = 'Add'
 	initializationForm={}
 	statuscode = 200
+	data = None
 	if request.POST:
-		status = request.POST.get('status')
+		data = request.body
+		data = json.loads(data)
+		status = data('status')
 	else:
 		status = 'Add' if request.GET.get('status') == None else request.GET.get('status')	
 		#set initilization
 	if status == 'Add':		
 		if request.POST:
-			form = NA_Goods_Receive_Form(request.POST)
+			form = NA_Goods_Receive_Form(data)
 			statuscode = 200
 			if form.is_valid():
 				#save data

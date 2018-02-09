@@ -346,33 +346,34 @@ t>
 								function () {
 									if (this.status === '200') {
 										var confirmText = JSON.parse(this.responseText);
-										var retval = true;
-										BootstrapDialog.confirm({
-											title: NA.common.mesage.titleInfo,
-											message: confirmText,
-											type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
-											closable: false, // <-- Default value is false
-											draggable: true, // <-- Default value is false
-											btnCancelLabel: 'NO.', // <-- Default value is 'Cancel',
-											btnOKLabel: 'Yes.', // <-- Default value is 'OK',
-											btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog type will be used,
-											callback: function (result) {
-												// result will be true if button was click, while it will be false if users close the dialog directly.
-												if (result) {
-													if (!frmEntry.checkValidity()) {
-														var inputbtn = NA.common.getElementID('inputButton');
-														inputbtn.click();
-													}
-													else {
-														retval = submitForm();
-													}
-												}
-											}
+										return BootstrapDialog.confirm({
+										    title: NA.common.mesage.titleInfo,
+										    message: NA.common.mesage.dataHasChanged,
+										    type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+										    animate: false,
+										    closable: false, // <-- Default value is false
+										    draggable: true, // <-- Default value is false
+										    btnCancelLabel: 'NO.', // <-- Default value is 'Cancel',
+										    btnOKLabel: 'Yes.', // <-- Default value is 'OK',
+										    btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog type will be used,
+										    callback: function (result) {
+										        // result will be true if button was click, while it will be false if users close the dialog directly.
+										        if (result) {
+										            if (!frmEntry.checkValidity()) {
+										                var inputbtn = NA.common.getElementID('inputButton');
+										                inputbtn.click();
+										            }
+										            else {
+										                if (submitForm()) {
+										                    NA.common.dialog.closeDialog(dialog);
+										                }
+										            }
+										        }
+										        else {
+										            NA.common.dialog.closeDialog(dialog);
+										        }
+										    }
 										});
-
-										if (!retval) {
-											throw new Error('');
-										}
 									}
 								}, null, function () { XhrError(this); throw new Error('') },
 								function () { document.body.style.cursor = 'default'; }, null
@@ -392,6 +393,7 @@ t>
 								title: NA.common.mesage.titleInfo,
 								message: NA.common.mesage.dataHasChanged,
 								type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                                animate:false,
 								closable: false, // <-- Default value is false
 								draggable: true, // <-- Default value is false
 								btnCancelLabel: 'NO.', // <-- Default value is 'Cancel',
@@ -429,6 +431,17 @@ t>
 			document.body.style.cursor = 'default';
 			return true;
 		};
+		function formatDate(date) {
+		    var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+		    if (month.length < 2) month = '0' + month;
+		    if (day.length < 2) day = '0' + day;
+
+		    return [year, month, day].join('-');
+		}
 		function submitForm() {
 			//var valuesForm = JSON.stringify(getValuesForm());
 			var valuesForm = getValuesForm();
@@ -437,9 +450,13 @@ t>
 				var el = document.getElementsByName("csrfmiddlewaretoken");
 				return el[0].getAttribute("value");
 			})();
+			var FDate = $('#id_datereceived').val(); FDate = $.datepicker.parseDate('dd/mm/yy', FDate);
+			CDate = formatDate(FDate);
+
+			valuesForm['datereceived'] = CDate;
 			var NAAjax = NA.common.AJAX;
 			//POST: function (url, data, dataType, MIMEType, OnAJAXStart, OnBeforeSend, OnLoad, OnProgress, OnError, OnLoadEnd, customRequestHeader) {
-			NAAjax.POST('ShowEntry_Receive', valuesForm, 'application/x-www-form-urlencoded', 'application/json',
+			NAAjax.POST('ShowEntry_Receive', JSON.stringify(valuesForm), 'application/x-www-form-urlencoded', 'application/json',
 				function () {
 					window.document.body.style.cursor = 'wait';
 				},
@@ -447,7 +464,8 @@ t>
 				function () {
 					if (this.statusTxt == "OK") {
 						if (grid) {
-							grid.trigger("reloadGrid", [{ page: 1 }])
+						    grid.trigger("reloadGrid", [{ page: 1 }])
+						    return true;
 						}
 						//reloadJquery$("#jqGrid_NA_F_Goods").trigger("reloadGrid", [{ page: 1 }]);
 					}
@@ -469,7 +487,7 @@ t>
 			//		return false;
 			//	}
 			//});
-			return true;
+			return false;
 		};
 
 		//atur tampilan form searching entry
