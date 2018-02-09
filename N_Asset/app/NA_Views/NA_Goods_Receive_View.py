@@ -255,7 +255,7 @@ def SearchSuplierbyForm(request):
 	Isord = request.GET.get('sord', '')
 	NAData = None;
 	if(Isord is not None and str(Isord) != ''):
-		NAData = NASuplier.customManager.getSuplierByForm(searchText)(searchText).order_by('-' + str(Isidx))
+		NAData = NASuplier.customManager.getSuplierByForm(searchText).order_by('-' + str(Isidx))
 	else:
 		NAData = NASuplier.customManager.getSuplierByForm(searchText)
 	totalRecord = NAData.count()
