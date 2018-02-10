@@ -256,6 +256,8 @@ t>
 				employee_received = elemployee_received.value;
 			var eldescriptions = NA.common.getElementID('id_descriptions'),
 				descriptions = eldescriptions.value;
+			var status = window.status||NA.common.getElementID('id_status').value,
+				hasRefData = NA.common.getElementID('id_hasRefData').value;
 			return {
 				idapp:idapp,
 				idapp_fk_goods: idapp_fk_goods,
@@ -272,7 +274,9 @@ t>
 				idapp_fk_receivedby: idapp_fk_receivedby,
 				fk_receivedby: fk_receivedby,
 				employee_received:employee_received,
-				descriptions: descriptions				
+				descriptions: descriptions,
+				status: status,
+				hasRef:hasRefData
 			};
 		};
 		function getGridCellValue(thegrid,CeltoGet) {
@@ -1348,7 +1352,7 @@ t>
                         					}]
                         				});
 										//Atur tampilan                        			
-
+                        				restyleBoostrapDialog();
                         				var gbox = NA.common.doc.querySelector('div#gbox_jqGrid_NA_F_Goods_Receive_fk_suplier');
                         				gbox.style.width = '432px';
                         				var gview = NA.common.doc.querySelector('div#gview_jqGrid_NA_F_Goods_Receive_fk_suplier');

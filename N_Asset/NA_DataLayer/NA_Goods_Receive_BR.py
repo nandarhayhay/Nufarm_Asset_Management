@@ -56,7 +56,7 @@ class NA_BR_Goods_Receive(models.Manager):
 		if self.__class__.c is None:
 			 self.__class__.c = connection.cursor()
 		try:
-			hasRef = commonFunct.str2bool(Data.hasRef)			
+			hasRef = commonFunct.str2bool(Data.hasRefData)			
 			with transaction.atomic():
 				Params = {'FK_goods':Data.idapp_fk_goods, 'DateReceived':Data.datereceived, 'FK_Suplier':Data.fk_suplier, 'TotalPurchased':Data.totalpurchase,
 							'TotalReceived':Data.totalreceived,'FK_ReceivedBy':Data.idapp_fk_received,'FK_P_R_By':Data.idapp_fk_p_r_by,'Descriptions':Data.Descriptions}
