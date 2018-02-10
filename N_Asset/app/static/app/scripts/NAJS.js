@@ -1206,7 +1206,7 @@ NA.common.AJAX.POST = function (url, data, dataType, MIMEType, OnAJAXStart, OnBe
     var XData = data || this.settings.data, XdataType = dataType || this.settings.dataType;
     if (OnAJAXStart) { OnAJAXStart.call(this.XHR); }
     this.XHR.overrideMimeType(MIMEType || this.settings.MIMEType);
-    if (onload) { this.XHR.onload = OnLoad; }
+    if (OnLoad) { this.XHR.onload = OnLoad; }
     if (OnProgress) { this.XHR.onprogress = OnProgress; }
     if (OnError) { this.XHR.onerror = OnError; }
     if (OnLoadEnd) { this.XHR.onloadend = OnLoadEnd; }

@@ -298,21 +298,21 @@ t>
 		};
 		function XhrError(xhr) {
 			try {
-				var messageErr = this.responseText;
-				var contentype = this.getResponseHeader('Content-Type')
+				var messageErr = xhr.responseText;
+				var contentype = xhr.getResponseHeader('Content-Type')
 				if (contentype === 'application/json') {
-					messageErr = JSON.parse(this.responseText);
+					messageErr = JSON.parse(xhr.responseText);
 				}
-				var message = this.responseText;
+				var message = xhr.responseText;
 				if (messageErr) {
 					message = messageErr.message;
 				}
 				if (message) {
-					alert('An error occurred: ' + error + '\n' + this.status + ": " + message);
+					alert('An error occurred: ' + message);
 				}
 				document.body.style.cursor = 'default';
 			} catch (e) {
-				alert('An error occurred: ' + error + '\n' + this.status + ": " + e.message);
+				alert('An error occurred: ' + e + '\n' + e.message);
 				document.body.style.cursor = 'default';
 			}
 			return false;
@@ -369,12 +369,15 @@ t>
 										            }
 										            else {
 										                if (submitForm()) {
-										                    NA.common.dialog.closeDialog(dialog);
+										                	//clear kan semua data
+										                	//reset menjadi seperti original value
+															
+										                	//for (var member in myObject) delete myObject[member]
 										                }
 										            }
 										        }
 										        else {
-										            NA.common.dialog.closeDialog(dialog);
+										        	return false;
 										        }
 										    }
 										});
@@ -465,18 +468,21 @@ t>
 					window.document.body.style.cursor = 'wait';
 				},
 				null,
-				function () {
-					if (this.statusTxt == "OK") {
+				function (e) {
+					if (this.statusText == "success") {
 						if (grid) {
-						    grid.trigger("reloadGrid", [{ page: 1 }])
-						    return true;
+							grid.trigger("reloadGrid", [{ page: 1 }])
+							return true;
 						}
 						//reloadJquery$("#jqGrid_NA_F_Goods").trigger("reloadGrid", [{ page: 1 }]);
 					}
+					else {//error berarti
+						XhrError(this); throw new Error('')
+					}
 					document.body.style.cursor = 'default';
 				}, null,
-				function(){XhrError(this);throw new Error('')},
-				function () {
+				function(e){XhrError(this);throw new Error('')},
+				function (e) {
 					window.document.body.style.cursor = 'default';
 				});
 			//$.post("ShowEntry_Receive", valuesForm, function (data, status) {
@@ -900,15 +906,15 @@ t>
 															'application/json',//overrideMimeType returned by the server
 															function () { window.document.body.style.cursor = 'wait'; },
 															null,//nggak usah di isi bila tidak perlu
-															function () {//function executed after data has been returned by server(XHR.onload)
+															function (e) {//function executed after data has been returned by server(XHR.onload)
 																var data = JSON.parse(this.responseText);
 																if (data) {
 																	var txtsuplier = NA.common.getElementID('id_supliername');
 																	txtsuplier.value = data['supliername']||'';																	
 																}
-															}, null, function () {//function untuk ajax error
+															}, null, function (e) {//function untuk ajax error
 																throw new Error(this.responseText + '\nStatus code :' + this.statusText);
-															}, function () { window.document.body.style.cursor = 'default'; },//function ajax complete
+															}, function (e) { window.document.body.style.cursor = 'default'; },//function ajax complete
 															null//(parameter tambahan)nggak usah di isi bila tidak perlu(bila mau di isi isi dengan object javascript {key:value}
 															);
                         								break;

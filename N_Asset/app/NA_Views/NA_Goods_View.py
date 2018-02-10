@@ -112,7 +112,7 @@ def getCurrentDataModel(request,form):
 	return {'itemcode':form.cleaned_data['itemcode'],'goodsname':form.cleaned_data['goodsname'],'brandname':form.cleaned_data['brandname'],
 		 'typeapp':form.cleaned_data['typeapp'],'unit':form.cleaned_data['unit'],'priceperunit':decimal.Decimal(form.cleaned_data['priceperunit']),
 		 'depreciationmethod':form.cleaned_data['depreciationmethod'],'economiclife':decimal.Decimal(form.cleaned_data['economiclife'])
-		 ,'placement':form.cleaned_data['placement'],'descriptions':request.POST.get('descriptions'),'inactive':True if request.POST.get('inactive') == 'true' else False,'createddate':str(datetime.now().date()),'createdby':request.user.username if request.user.username is not None and request.user != '' else 'Admin' }
+		 ,'placement':form.cleaned_data['placement'],'descriptions':request.POST.get('descriptions'),'inactive':True if request.POST.get('inactive') == 'true' else False,'createddate':str(datetime.now().date()),'createdby':request.user.username if (request.user.username is not None and request.user.username != '') else 'Admin' }
 @ensure_csrf_cookie
 def ShowEntry(request):
 	authentication_classes = []

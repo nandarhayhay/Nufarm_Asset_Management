@@ -56,36 +56,36 @@ class NA_BR_Goods_Receive(models.Manager):
 		if self.__class__.c is None:
 			 self.__class__.c = connection.cursor()
 		try:
-			hasRef = commonFunct.str2bool(Data.hasRefData)			
+			hasRef = commonFunct.str2bool(str(Data['hasRefData']))			
 			with transaction.atomic():
-				Params = {'FK_goods':Data.idapp_fk_goods, 'DateReceived':Data.datereceived, 'FK_Suplier':Data.fk_suplier, 'TotalPurchased':Data.totalpurchase,
-							'TotalReceived':Data.totalreceived,'FK_ReceivedBy':Data.idapp_fk_received,'FK_P_R_By':Data.idapp_fk_p_r_by,'Descriptions':Data.Descriptions}
+				Params = {'FK_goods':Data['idapp_fk_goods'], 'DateReceived':Data['datereceived'], 'FK_Suplier':Data['fk_suplier'], 'TotalPurchased':Data['totalpurchase'],
+							'TotalReceived':Data['totalreceived'],'FK_ReceivedBy':Data['idapp_fk_receivedby'],'FK_P_R_By':Data['idapp_fk_p_r_by'],'Descriptions':Data['descriptions']}
 				if Status == StatusForm.Input:
 					#insert data transaction
-					Query = "INSERT INTO n_a_goods_receive (FK_goods, DateReceived, FK_Suplier, TotalPurchased, TotalReceived, FK_ReceivedBy, FK_P_R_By, CreatedDate, CreatedBy,  Descriptions) \
-							VALUES (%(FK_goods)s, %(DateReceived)s, %(FK_Suplier)s, %(TotalPurchased)s, %(TotalReceived)s, %(FK_ReceivedBy)s, %(FK_P_R_By)%,(%DateReceived)s, %(CreatedBy)s,  %(Descriptions)s)"
-					Params  = Params(CreatedBy=Data.CreatedBy) 
+					Query = """INSERT INTO n_a_goods_receive (FK_goods, DateReceived, FK_Suplier, TotalPurchased, TotalReceived, FK_ReceivedBy, FK_P_R_By, CreatedDate, CreatedBy,  Descriptions) \
+							VALUES (%(FK_goods)s, %(DateReceived)s, %(FK_Suplier)s, %(TotalPurchased)s, %(TotalReceived)s, %(FK_ReceivedBy)s, %(FK_P_R_By)s,CURRENT_DATE, %(CreatedBy)s,  %(Descriptions)s)"""
+					Params.update(CreatedBy=Data['createdby']) 
 				elif Status == StatusForm.Edit:
-					Query = "UPDATE n_a_goods_receive SET DateReceived = %(DateReceived)s,FK_Suplier= %(FK_Suplier)s,TotalPurchased = %(TotalPurchased)s,FK_ReceivedBy=%(FK_ReceivedBy)s,\
-					FK_P_R_By = %(FK_P_R_By)%,ModifiedDate = CURRENT_DATE,ModifiedBy = %(ModifiedBy)s,Descriptions = %(Descriptions)s)"
+					Query = """UPDATE n_a_goods_receive SET DateReceived = %(DateReceived)s,FK_Suplier= %(FK_Suplier)s,TotalPurchased = %(TotalPurchased)s,FK_ReceivedBy=%(FK_ReceivedBy)s,\
+					FK_P_R_By = %(FK_P_R_By)s,ModifiedDate = CURRENT_DATE,ModifiedBy = %(ModifiedBy)s,Descriptions = %(Descriptions)s)"""
 					if not hasRef:#jika sudah ada transaksi,total received tidak bisa di edit
-						Query = Query + ",TotalReceived = %(TotalReceived)s "
-						Params = Params.update(Qty=Data.TotalReceived)
-					Query = Query + " WHERE IDApp = %(IDApp)s"
-					Params  = Params.update(ModifiedBy=Data.CreatedBy) 
-					Params = Params.update(IDApp=Data.IDApp)
+						Query = Query + """,TotalReceived = %(TotalReceived)s """
+						Params.update(Qty=Data['totalreceived'])
+					Query = Query + """ WHERE IDApp = %(IDApp)s"""
+					Params.update(ModifiedBy=Data['createdBy']) 
+					Params.update(IDApp=Data['idapp'])
 				self.__class__.c.execute(Query,Params)
 				#update NA_stock
-				Query = "SELECT EXISTS (SELECT IDApp FROM n_a_stock WHERE IDApp = %(idapp_FK_goods)s)"
-				self.__class__.c.execute(Query,{'idapp_FK_goods':Data.idapp_fk_goods})
+				Query = """SELECT EXISTS (SELECT IDApp FROM n_a_stock WHERE IDApp = %(idapp_FK_goods)s)"""
+				self.__class__.c.execute(Query,{'idapp_FK_goods':Data['idapp_fk_goods']})
 				if self.__class__.c.rowcount >0:
 					if not hasRef:#jika sudah ada transaksi,stock tidak bisa di edit
-						Query= "UPDATE n_a_stock SET TotalQty = TotalQty + %s,TIsNew = TIsNew + %s,TGoods_Received = TGoods_Received + %s,ModifiedDate = NOW(),ModifiedBy = %s WHERE FK_Goods = %s"
-						Params = [Data.totalreceived,Data.totalreceived,Data.totalreceived,Data.CreatedBy,Data.idapp_fk_goods]
+						Query= """UPDATE n_a_stock SET TotalQty = TotalQty + %s,TIsNew = TIsNew + %s,TGoods_Received = TGoods_Received + %s,ModifiedDate = NOW(),ModifiedBy = %s WHERE FK_Goods = %s"""
+						Params = [Data['totalreceived'],Data['totalreceived'],Data['totalreceived'],Data['createdby'],Data['idapp_fk_goods']]
 				else:
-					Query = "INSERT INTO n_a_stock(FK_Goods, TotalQty, TIsUsed, TIsNew, TIsRenew, TGoods_Return, TGoods_Received, TMaintenance, CreatedDate, CreatedBy) \
-							 VALUES (%(FK_goods)s,%(TotalQty)s,0,%(TIsNew),0,0,%(TotalReceived)s,0,now(),%(CreatedBy)s)"
-					Params = {'FK_goods':Data.idapp_fk_goods, 'TotalQty':Data.totalreceived,'TIsNew':Data.totalreceived,'TotalReceived':Data.totalreceived, 'CreatedBy':Data.CreatedBy}
+					Query = """INSERT INTO n_a_stock(FK_Goods, TotalQty, TIsUsed, TIsNew, TIsRenew, TGoods_Return, TGoods_Received, TMaintenance, CreatedDate, CreatedBy) \
+							 VALUES (%(FK_goods)s,%(TotalQty)s,0,%(TIsNew),0,0,%(TotalReceived)s,0,now(),%(CreatedBy)s)"""
+					Params = {'FK_goods':Data['idapp_fk_goods'], 'TotalQty':Data['totalreceived'],'TIsNew':Data['totalreceived'],'TotalReceived':Data['totalreceived'], 'Createdby':Data['createdby']}
 				self.__class__.c.execute(Query,Params)
 		except Exception as e:
 			if self.__class__.c is not None:

@@ -74,8 +74,8 @@ def NA_Goods_Receive_Search(request):
 	
 def getCurrentDataModel(request,form):	#fk_goods, datereceived, fk_suplier, totalpurchase, totalreceived,  fk_receivedby fk_p_r_by, idapp_fk_goods, idapp_fk_p_r_by, idapp_fk_receivedby,descriptions
 	return {'idapp_fk_goods':form.cleaned_data['idapp_fk_goods'],'fk_goods':form.cleaned_data['fk_goods'],'datereceived':form.cleaned_data['datereceived'],'fk_suplier':form.cleaned_data['fk_suplier'],
-		 'totalpurchase':form.cleaned_data['totalpurchase'],'fk_receivedby':form.cleaned_data['fk_receivedby'],'idapp_fk_p_r_by':form.cleaned_data['idapp_fk_p_r_by'],'hasRefData':form.cleaned_data['hasRefData'],
-		 'idapp_fk_receivedby':form.cleaned_data['idapp_fk_receivedby'],'descriptions':form.cleaned_data['descriptions'],'createddate':str(datetime.now().date()),'createdby':request.user.username if (request.user.username is not None and request.user != '') else 'Admin' }
+		 'totalpurchase':form.cleaned_data['totalpurchase'],'totalreceived':form.cleaned_data['totalreceived'],'fk_receivedby':form.cleaned_data['fk_receivedby'],'idapp_fk_p_r_by':form.cleaned_data['idapp_fk_p_r_by'],'hasRefData':form.cleaned_data['hasRefData'],
+		 'idapp_fk_receivedby':form.cleaned_data['idapp_fk_receivedby'],'descriptions':form.cleaned_data['descriptions'],'createddate':str(datetime.now().date()),'createdby':request.user.username if (request.user.username is not None and request.user.username != '') else 'Admin' }
 def HasExists(request):
 	FK_goods = request.POST.get('fk_goods')
 	totalpurchase = request.POST.get('totalpurchase')
@@ -109,8 +109,7 @@ def ShowEntry_Receive(request):
 				#ALTER TABLE n_a_goods MODIFY IDApp INT AUTO_INCREMENT PRIMARY KEY
 				form.clean()					
 				data = getCurrentDataModel(request,form)	
-				#check if exists the same data to prevent users double input,parameter data to check FK_goods,datereceived,totalpurchase
-				
+				#check if exists the same data to prevent users double input,parameter data to check FK_goods,datereceived,totalpurchase				
 				result = NAGoodsReceive.objects.SaveData(data,StatusForm.Input)
 				if result != 'success':
 					statuscode = 500
@@ -119,8 +118,8 @@ def ShowEntry_Receive(request):
 				return HttpResponse(json.dumps({'message':'invalid form data'}),status = 400, content_type='application/json')
 		else:				
 			form = NA_Goods_Receive_Form(initial=initializationForm)
-			form.fields['status'].widget.attrs = {'value':status};	
-			form.fields['hasRefData'] = False
+			form.fields['status'].widget.attrs = {'value':status}	
+			form.fields['hasRefData'].widget.attrs = {'value': False}
 			return render(request, 'app/Transactions/Goods_Receive.html', {'form' : form})
 	elif status == 'Edit' or status == "Open":	
 		hasRefData = NAGoodsReceive.objects.hasReference({FK_goods:reques.GET.get('idapp_fk_goods'), DateReceived:reques.GET.get('DateReceived')},False)	
@@ -129,7 +128,7 @@ def ShowEntry_Receive(request):
 			form = NA_Goods_Receive_Form(data)
 			if form.is_valid():
 				form.clean()
-				#save data	
+				#save data
 				data = getCurrentDataModel(request,form);
 				data.update(IDApp=data['idapp'])
 				data.update(hasRefData=hasRefData)
@@ -344,7 +343,7 @@ class NA_Goods_Receive_Form(forms.Form):
 	status = forms.CharField(widget=forms.HiddenInput())
 		#initializeForm = forms.CharField(widget=forms.HiddenInput(attrs={'value':{'depreciationmethod':'SL','economiclife':5.00,'placement':'Gudang IT','inactive':False}}),required=False)
 	initializeForm = forms.CharField(widget=forms.HiddenInput(),required=False)
-	hasRefData = forms.BooleanField(widget=forms.CheckboxInput(),required=False)
+	hasRefData = forms.BooleanField(widget=forms.HiddenInput(),required=False)
 	
 	#class Meta:
 	#	model = NAGoodsReceive
