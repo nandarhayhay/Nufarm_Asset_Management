@@ -46,10 +46,10 @@ def NA_Goods_Receive_Search(request):
 	criteria = ResolveCriteria.getCriteriaSearch(str(Icriteria))
 	dataType = ResolveCriteria.getDataType(str(IdataType))
 	if(Isord is not None and str(Isord) != ''):
-		NAData = NAGoodsReceive.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by('-' + str(Isidx))
+		NAData = NAGoodsReceive.objects.PopulateQuery([str(Isidx)],IcolumnName,IvalueKey,criteria,dataType)
 	else:
-		NAData = NAGoodsReceive.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType)
-	totalRecord = NAData.count()
+		NAData = NAGoodsReceive.objects.PopulateQuery([],IcolumnName,IvalueKey,criteria,dataType)
+	totalRecord = len(list(NAData))
 	paginator = Paginator(NAData, int(Ilimit)) 
 	try:
 		page = request.GET.get('page', '1')

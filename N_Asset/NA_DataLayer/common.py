@@ -29,97 +29,98 @@ class ResolveCriteria:
 		self.valueData = value
 		self.colKey = columnKey
 	def DefaultModel(self):
-		filterfield = colKey + '__istarswith'
+		filterfield = self.colKey + '__istarswith'
 		if self.criteria==CriteriaSearch.Beetween:
-			if typeofData==DataType.Boolean or typeofData==DataType.Char or typeofData==DataType.NChar or typeofData==DataType.NVarChar \
-				or typeofData==DataType.VarChar:
+			if self.typeofData==DataType.Boolean or self.typeofData==DataType.Char or self.typeofData==DataType.NChar or self.typeofData==DataType.NVarChar \
+				or self.typeofData==DataType.VarChar:
 					raise ValueError('value type is in valid')
-			if typeofData==DataType.DateTime:
-				if ',' in str(valueData):
-					strValueKeys = str(valueData).split(',')
-					filterfield = colKey + '__range'
+			if self.typeofData==DataType.DateTime:
+				if ',' in str(self.valueData):
+					strValueKeys = str(self.valueData).split(',')
+					filterfield = self.colKey + '__range'
 					return {filterfield:[datetime((str(strValueKeys[0])[0:3]),str(strValueKeys[0])[5:6],str(strValueKeys[0])[7:8]),datetime((str(strValueKeys[1])[0:3]),str(strValueKeys[1])[5:6],str(strValueKeys[1])[7:8])]}
-			elif typeofData==DataType.BigInt or typeofData==DataType.Decimal or typeofData==DataType.Float or typeofData==DataType.Integer or typeofData==DataType.Money:
-				return {filterfield:[valueData[0],valueData[1]]}
+			elif self.typeofData==DataType.BigInt or self.typeofData==DataType.Decimal or self.typeofData==DataType.Float or self.typeofData==DataType.Integer or self.typeofData==DataType.Money:
+				return {filterfield:[self.valueData[0],self.valueData[1]]}
 			else:
 				raise ValueError('value type is in valid')
 		elif self.criteria==CriteriaSearch.BeginWith:
-			if typeofData==DataType.Char or typeofData==DataType.VarChar or typeofData==DataType.NVarChar:
-				return {filterfield:valueData}
+			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
+				return {filterfield:self.valueData}
 			else:
 				raise ValueError('value type is in valid')
 		elif self.criteria==CriteriaSearch.EndWith:
-			if typeofData==DataType.Char or typeofData==DataType.VarChar or typeofData==DataType.NVarChar:
-				filterfield = colKey + '__iendswith'
+			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
+				filterfield = self.colKey + '__iendswith'
 			else:
 				raise ValueError('value type is in valid')
-			return {filterfield:valueData}
+			return {filterfield:self.valueData}
 
 	def Sql(self):
 		if self.criteria==CriteriaSearch.Beetween:
-			if typeofData==DataType.Boolean or typeofData==DataType.Char or typeofData==DataType.NChar or typeofData==DataType.NVarChar \
-				or typeofData==DataType.VarChar:
+			if self.typeofData==DataType.Boolean or self.typeofData==DataType.Char or self.typeofData==DataType.NChar or self.typeofData==DataType.NVarChar \
+				or self.typeofData==DataType.VarChar:
 					raise ValueError('value type is in valid')
-			if typeofData==DataType.DateTime:
-				values = str(valueData).split('-')
+			if self.typeofData==DataType.DateTime:
+				values = str(self.valueData).split('-')
 				startDate = values[0]
 				endDate = values[1]
-				__query = ' >= {0!s} AND ' + colKey + ' <= {1!s}'.format(startDate,endDate)
+				self.__class__.__query = ' >= {0!s} AND ' + self.colKey + ' <= {1!s}'.format(startDate,endDate)
 		elif self.criteria==CriteriaSearch.BeginWith:
-			if typeofData==DataType.Char or typeofData==DataType.VarChar or typeofData==DataType.NVarChar:
-				__query = ' LIKE {0!s}%'.format(str(valueData))
+			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
+				ResolveCriteria.__query= ' LIKE {0!s}%'.format(str(self.valueData))
 		elif self.criteria==CriteriaSearch.EndWith:
-			if typeofData==DataType.Char or typeofData==DataType.VarChar or typeofData==DataType.NVarChar:
-				__query = ' LIKE %{0!s}'.format(str(valueData))
+			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
+				ResolveCriteria.__query = ' LIKE %{0!s}'.format(str(self.valueData))
 		elif self.criteria == CriteriaSearch.Equal:
-			__query = ' = {0}'.format(valueData)
+			ResolveCriteria.__query = ' = {0}'.format(self.valueData)
 		elif self.criteria==CriteriaSearch.Greater:
-			if typeofData==DataType.Integer or typeOfData== DataType.Decimal or typeofData==DataType.Float or typeofData==DataType.Money \
-				or typeofData==DataType.BigInt:
-				__query = ' > {0}'.format(float(valueData))
-			elif typeofData==DataType.DateTime:
-				__query = ' > {%Y-%m-%d}'.format(datetime((str(valueData)[0:3]),str(valueData)[5:6],str(valueData)[7:8]))
+			if self.typeofData==DataType.Integer or self.typeofData==DataType.Decimal or self.typeofData==DataType.Float or self.typeofData==DataType.Money \
+				or self.typeofData==DataType.BigInt:
+				ResolveCriteria.__query = ' > {0}'.format(float(self.valueData))
+			elif self.typeofData==DataType.DateTime:
+				ResolveCriteria.__query = ' > {%Y-%m-%d}'.format(datetime((str(self.valueData)[0:3]),str(self.valueData)[5:6],str(self.valueData)[7:8]))
 		elif self.criteria==CriteriaSearch.GreaterOrEqual:
-			if typeofData==DataType.Integer or typeOfData== DataType.Decimal or typeofData==DataType.Float or typeofData==DataType.Money \
-				or typeofData==DataType.BigInt:
-				__query = ' > {0}'.format(float(valueData))
-			elif typeofData==DataType.DateTime:
+			if self.typeofData==DataType.Integer or self.typeofData== DataType.Decimal or self.typeofData==DataType.Float or self.typeofData==DataType.Money \
+				or self.typeofData==DataType.BigInt:
+				ResolveCriteria.__query = ' > {0}'.format(float(self.valueData))
+			elif self.typeofData==DataType.DateTime:
 				#format data yang di masukan di valueData mesti dijadikan tahun-bulan-tanggal sebelum di proses
-				__query = ' >= {%Y-%m-%d}'.format(datetime((str(valueData)[0:3]),str(valueData)[5:6],str(valueData)[7:8]))
+				ResolveCriteria.__query = ' >= {%Y-%m-%d}'.format(datetime((str(self.valueData)[0:3]),str(self.valueData)[5:6],str(self.valueData)[7:8]))
 		elif self.criteria==CriteriaSearch.In:
-			if ',' in str(valueData):
-				strValueKeys = str(valueData).split(',')
-				rowFilter = " IN('"
+			rowFilter = " IN('"
+			if ',' in str(self.valueData):
+				strValueKeys = str(self.valueData).split(',')				
 				for i in range(len(strValueKeys)):
 					rowFilter += strValueKeys[i] + "'"
 					if i < len(strValueKeys) -1:
 						rowFilter += ","
 				rowFilter += ")"
-			if typeofData==DataType.Char or typeofData==DataType.VarChar or typeofData==DataType.NVarChar:
+			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
 				if rowFilter != " IN(')":
-					__query = rowFilter
+					ResolveCriteria.__query = rowFilter
 				else:
-					__query = " IN ('{0!s}')".format(str(valueData))
-			elif typeofData==DataType.DateTime:
+					ResolveCriteria.__query = " IN ('{0!s}')".format(str(self.valueData))
+			elif self.typeofData==DataType.DateTime:
 			#format data yang di masukan di valueData mesti dijadikan tahun-bulan-tanggal sebelum di proses	
-				__query = ' IN {%Y-%m-%d}'.format(datetime((str(valueData)[0:3]),str(valueData)[5:6],str(valueData)[7:8]))
+				ResolveCriteria.__query = ' IN {%Y-%m-%d}'.format(datetime((str(self.valueData)[0:3]),str(self.valueData)[5:6],str(self.valueData)[7:8]))
 		elif self.criteria==CriteriaSearch.Less:
-			if typeofData==DataType.Integer or typeOfData== DataType.Decimal or typeofData==DataType.Float or typeofData==DataType.Money \
-				or typeofData==DataType.BigInt:
-				__query = ' < {0}'.format(float(valueData))
-			elif typeofData==DataType.DateTime:
-				__query = ' < {%Y-%m-%d}'.format(datetime((str(valueData)[0:3]),str(valueData)[5:6],str(valueData)[7:8]))
+			if self.typeofData==DataType.Integer or self.typeofData== DataType.Decimal or self.typeofData==DataType.Float or self.typeofData==DataType.Money \
+				or self.typeofData==DataType.BigInt:
+				ResolveCriteria.__query = ' < {0}'.format(float(self.valueData))
+			elif self.typeofData==DataType.DateTime:
+				ResolveCriteria.__query = ' < {%Y-%m-%d}'.format(datetime((str(self.valueData)[0:3]),str(self.valueData)[5:6],str(self.valueData)[7:8]))
 		elif self.criteria==CriteriaSearch.LessOrEqual:
-			if typeofData==DataType.Integer or typeOfData== DataType.Decimal or typeofData==DataType.Float or typeofData==DataType.Money \
-				or typeofData==DataType.BigInt:
-				__query = ' <= {0}'.format(float(valueData))
-			elif typeofData==DataType.DateTime:
-				__query = ' <= {%Y-%m-%d}'.format(datetime((str(valueData)[0:3]),str(valueData)[5:6],str(valueData)[7:8]))
+			if self.typeofData==DataType.Integer or self.typeofData== DataType.Decimal or self.typeofData==DataType.Float or self.typeofData==DataType.Money \
+				or self.typeofData==DataType.BigInt:
+				ResolveCriteria.__query = ' <= {0}'.format(float(self.valueData))
+			elif self.typeofData==DataType.DateTime:
+				ResolveCriteria.__query = ' <= {%Y-%m-%d}'.format(datetime((str(self.valueData)[0:3]),str(self.valueData)[5:6],str(self.valueData)[7:8]))
 		elif self.criteria==CriteriaSearch.Like:
-			if typeofData==DataType.Char or typeofData==DataType.VarChar or typeofData==DataType.NVarChar:
-				__query = ' LIKE %{0!s}%'.format(str(valueData))
+			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
+				ResolveCriteria.__query = ' LIKE %{0!s}%'.format(str(self.valueData))
 		elif self.criteria==CriteriaSearch.NotEqual:
-				__query = ' <>{0} '.format(str(valueData))
+				ResolveCriteria.__query = ' <>{0} '.format(str(self.valueData))
+		return ResolveCriteria.__query
 
 	def getDataType(strDataType):
 		if strDataType == 'int':
