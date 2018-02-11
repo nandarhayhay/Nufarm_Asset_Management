@@ -477,7 +477,7 @@ t>
 						//reloadJquery$("#jqGrid_NA_F_Goods").trigger("reloadGrid", [{ page: 1 }]);
 					}
 					else {//error berarti
-						XhrError(this); throw new Error('')
+						XhrError(this); document.body.style.cursor = 'default'; throw new Error('')
 					}
 					document.body.style.cursor = 'default';
 				}, null,

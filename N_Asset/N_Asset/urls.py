@@ -40,7 +40,7 @@ urlpatterns = [
 
 	#View the Goods
 	url(r'^NA_Goods/$',NA_Goods_View.NA_Goods,name='GoodMaster'),
-	url(r'^NA_Goods/NA_Goods_Search/$',NA_Goods_View.NA_Goods_Search,name='searchGoods'),
+	url(r'^NA_Goods/NA_Goods_Search/$',NA_Goods_View.NA_Goods_Search,name='GoodsManager'),
 	url(r'^NA_Goods/SearchBrand/$',NA_Goods_View.Search_Brand, name='SearchBrand'),
     url(r'^NA_Goods/ShowEntry',NA_Goods_View.ShowEntry,name='ShowEntry'),
 	url(r'^NA_Goods/customFilter',NA_Goods_View.ShowCustomFilter,name='ShowCustomFilter'),
@@ -49,6 +49,8 @@ urlpatterns = [
 
 	#view the goods_receive
 		url(r'^NA_Goods_Receive/$',NA_Goods_Receive_View.NA_Goods_Receive,name='GoodsReceive'),
+
+		url(r'^NA_Goods_Receive/NA_Goods_Receive_Search/$',NA_Goods_Receive_View.NA_Goods_Receive_Search,name='GoodsReceiveManager'),
 		url(r'^NA_Goods_Receive/ShowEntry_Receive',NA_Goods_Receive_View.ShowEntry_Receive,name='ShowEntryReceivey'),
 		url(r'^NA_Goods_Receive/getGoods/$',NA_Goods_Receive_View.getGoods,name='getGoods'),
 		url(r'^NA_Goods_Receive/Delete/$',NA_Goods_Receive_View.Delete,name='delete'),
