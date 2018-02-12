@@ -233,7 +233,7 @@ class NAGoodsReceive(models.Model):
 	createdby = models.CharField(db_column='Createdby', max_length=50)
 	modifieddate = models.DateTimeField(db_column='ModifiedDate', blank=True, null=True)
 	modifiedby = models.CharField(db_column='ModifiedBy', max_length=50, blank=True, null=True)
-	descriptions =  models.CharField(db_column='Descriptions', max_length=150, blank=True, null=True)  # Field name made lowercase.
+	descriptions =  models.CharField(db_column='Descriptions', max_length=250, blank=True, null=True)  # Field name made lowercase.
 	class Meta:
 		managed = False
 		db_table = 'n_a_goods_receive'

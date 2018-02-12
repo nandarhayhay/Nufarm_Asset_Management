@@ -55,11 +55,6 @@ class NA_BR_Goods_Receive(models.Manager):
 		cur.close()
 		return (result,totalRecords)
 	#idapp,fk_goods, idapp_fk_goods,datereceived, fk_suplier,supliername, totalpurchase, totalreceived, idapp_fk_received, fk_receivedby,employee_received,idapp_fk_p_r_by, fk_p_r_by,employee_pr, descriptions	
-	def items_count(Query):
-		cursor = connection.cursor()
-		cursor.execute(Query)
-		row = cursor.fetchone()
-		return row[0]
 
 	def getData(self,IDApp):
 		Query = """SELECT ngr.IDapp,ngr.FK_goods AS idapp_fk_goods,g.itemcode AS FK_goods, CONCAT(g.goodsname,' ', g.brandname,' ',IFNULL(g.typeapp,' ')) as goods,\
@@ -71,24 +66,26 @@ class NA_BR_Goods_Receive(models.Manager):
 	def hasExists(self,itemcode,datereceived,totalPurchase):
 		return super(NA_BR_Goods_Receive,self).get_queryset().filter(Q(itemcode__iexact=itemcode) & Q(datereceived__icontains=datereceived)).exists()#Q(member=p1) | Q(member=p2)
 	def hasReference(self,Data,mustCloseConnection):
-		#cek transaksi dari mulai datereceived apakah ada pengeluaran barang untuk barang ini yang statusnya new
-		if self.__class__.c is None:
-			self.__class__.c = connection.cursor()
-
+		#cek transaksi dari mulai datereceived apakah ada pengeluaran barang untuk barang ini yang statusnya new	
+		self.__class__.c = connection.cursor()
+		cur = self.__class__.c
 		Query = "SELECT EXISTS(SELECT IDApp FROM n_a_goods_lending WHERE FK_goods = %(FK_goods)s AND IsNew = 1 AND Status = 'L' AND DateLending >= (%DateReceived)s AND Qty >= 1) \
 				OR  EXISTS(SELECT IDApp FROM n_a_goods_outwards WHERE FK_Goods = %(FK_goods)s AND DateReleased >= (%DateReceived)s AND IsNew = 1 AND Qty >= 1)"
 		TParams =  {'FK_goods':Data.idapp_fk_goods, 'DateReceived':Data.datereceived}
-		c.execute(Query,TParams)
+		cur.execute(Query,TParams)
 		hasRef = c.rowcount >0
-		if mustCloseConnection:
+		if mustCloseConnSection:
 			self.__class__.c.close()
 		return hasRef
 	def SaveData(self,Data,Status=StatusForm.Input):
-		if self.__class__.c is None:
-			 self.__class__.c = connection.cursor()
+		self.__class__.c = connection.cursor()
+		cur = self.__class__.c
 		try:
 			hasRef = commonFunct.str2bool(str(Data['hasRefData']))			
 			with transaction.atomic():
+
+				#sum kan total Receive
+				#Query = """SELECT SUM(T
 				Params = {'FK_goods':Data['idapp_fk_goods'], 'DateReceived':Data['datereceived'], 'FK_Suplier':Data['fk_suplier'], 'TotalPurchase':Data['totalpurchase'],
 							'TotalReceived':Data['totalreceived'],'FK_ReceivedBy':Data['idapp_fk_receivedby'],'FK_P_R_By':Data['idapp_fk_p_r_by'],'Descriptions':Data['descriptions']}
 				if Status == StatusForm.Input:
@@ -105,26 +102,25 @@ class NA_BR_Goods_Receive(models.Manager):
 					Query = Query + """ WHERE IDApp = %(IDApp)s"""
 					Params.update(ModifiedBy=Data['createdBy']) 
 					Params.update(IDApp=Data['idapp'])
-				self.__class__.c.execute(Query,Params)
+				cur.execute(Query,Params)
 				#update NA_stock
-				Query = """SELECT EXISTS (SELECT IDApp FROM n_a_stock WHERE IDApp = %(idapp_FK_goods)s)"""
-				self.__class__.c.execute(Query,{'idapp_FK_goods':Data['idapp_fk_goods']})
-				if self.__class__.c.rowcount >0:
+				Query = """SELECT EXISTS (SELECT IDApp FROM n_a_stock WHERE idapp_FK_goods = %(idapp_FK_goods)s)"""
+				cur.execute(Query,{'idapp_FK_goods':Data['idapp_fk_goods']})
+				if cur.rowcount >0:
 					if not hasRef:#jika sudah ada transaksi,stock tidak bisa di edit
-						Query= """UPDATE n_a_stock SET TotalQty = TotalQty + %s,TIsNew = TIsNew + %s,TGoods_Received = TGoods_Received + %s,ModifiedDate = NOW(),ModifiedBy = %s WHERE FK_Goods = %s"""
+						Query= """UPDATE n_a_stock SET TIsNew = TIsNew + %s,TGoods_Received = TGoods_Received + %s,ModifiedDate = NOW(),ModifiedBy = %s WHERE FK_Goods = %s"""
 						Params = [Data['totalreceived'],Data['totalreceived'],Data['totalreceived'],Data['createdby'],Data['idapp_fk_goods']]
+					else:
+						cur.close()	
+						return 'success'
 				else:
 					Query = """INSERT INTO n_a_stock(FK_Goods, TotalQty, TIsUsed, TIsNew, TIsRenew, TGoods_Return, TGoods_Received, TMaintenance, CreatedDate, CreatedBy) \
 							 VALUES (%(FK_goods)s,%(TotalQty)s,0,%(TIsNew),0,0,%(TotalReceived)s,0,now(),%(CreatedBy)s)"""
 					Params = {'FK_goods':Data['idapp_fk_goods'], 'TotalQty':Data['totalreceived'],'TIsNew':Data['totalreceived'],'TotalReceived':Data['totalreceived'], 'Createdby':Data['createdby']}
-				self.__class__.c.execute(Query,Params)
+				cur.execute(Query,Params)
 		except Exception as e:
-			if self.__class__.c is not None:
-				self.__class__.c.close()								
-			return repr(e)
-		finally:
-			if self.__class__.c is not None:
-				self.__class__.c.close()
+			cur.close()								
+			return repr(e)	
 		return 'success'
 	def delete(self,Data):
 		try:

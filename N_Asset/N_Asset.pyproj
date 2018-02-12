@@ -88,6 +88,7 @@
     <Folder Include="N_Asset\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Alter-table_Rev.docx" />
     <Content Include="app\static\app\content\Dialog.css" />
     <Content Include="app\static\app\content\jquery-ui.min.css" />
     <Content Include="app\static\app\content\MainLayouts.css" />

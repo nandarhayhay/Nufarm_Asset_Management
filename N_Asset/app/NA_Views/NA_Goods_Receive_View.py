@@ -56,10 +56,10 @@ def NA_Goods_Receive_Search(request):
 	dataRows = NAData[0]
 		
 	rows = []
-	#column IDapp 	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
+	#column IDapp 	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived,CreatedDate, CreatedBy
 	i = 0;
 	for row in dataRows:
-		datarow = {"id" :row['IDApp'], "cell" :[i+1,row['goods'],row['datereceived'],row['supliername'],row['FK_ReceivedBy'],row['receivedby'],row['FK_P_R_By'], \
+		datarow = {"id" :row['IDApp'], "cell" :[row['IDApp'],i+1,row['goods'],row['datereceived'],row['supliername'],row['FK_ReceivedBy'],row['receivedby'],row['FK_P_R_By'], \
 			row['pr_by'],row['totalpurchase'],row['totalreceived'],datetime.date(row['CreatedDate']),row['CreatedBy']]}
 		#datarow = {"id" :row.idapp, "cell" :[row.idapp,row.itemcode,row.goodsname,row.brandname,row.unit,row.priceperunit, \
 		#	row.placement,row.depreciationmethod,row.economiclife,row.createddate,row.createdby]}
@@ -317,10 +317,10 @@ class NA_Goods_Receive_Form(forms.Form):
                                    'placeholder': 'suplier code','data-value':'suplier code','tittle':'Please enter suplier code'}),required=True)
 	supliername = forms.CharField(max_length=100,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0;','readonly':True,
 																						 'placeholder': 'suplier name','data-value':'suplier name','tittle':'suplier name is required'}))
-	datereceived = forms.DateField(required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':3,
+	datereceived = forms.DateField(required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'width:95px;display:inline-block;margin-right:5px;','tabindex':3,
                                    'placeholder': 'dd/mm/yyyy','data-value':'dd/mm/yyyy','tittle':'Please enter Date Received','patern':'((((0[13578]|1[02])\/(0[1-9]|1[0-9]|2[0-9]|3[01]))|((0[469]|11)\/(0[1-9]|1[0-9]|2[0-9]|3[0]))|((02)(\/(0[1-9]|1[0-9]|2[0-8]))))\/(19([6-9][0-9])|20([0-9][0-9])))|((02)\/(29)\/(19(6[048]|7[26]|8[048]|9[26])|20(0[048]|1[26]|2[048])))'}))
-	totalpurchase = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':4,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
-	totalreceived = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':5,'style':'width:82px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
+	totalpurchase = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':4,'style':'width:75px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
+	totalreceived = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':5,'style':'width:80px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
 	fk_p_r_by = forms.CharField(max_length=30,widget=forms.TextInput(attrs={
                                    'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':6,
                                    'placeholder': 'P R By','data-value':'P R By','tittle':'Employee code(NIK) who PRs'}),required=True)

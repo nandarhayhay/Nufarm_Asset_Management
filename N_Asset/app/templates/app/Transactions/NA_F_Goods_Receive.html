@@ -140,12 +140,12 @@ t>
 					grid.jqGrid({
 						url: url,
 						mtype: "GET",
-						datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
+						datatype: "json",//#column IDapp  no	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived,CreatedDate, CreatedBy 
 						colNames: ['idapp', 'NO', 'goods Description', 'Date Received', 'Suplier Name', 'FK_ReceivedBy', 'Received By', 'FK_P_R_By ', 'Purchase Request By', 'Total Purchased', 'Total Received', 'Created Date', 'Created By'],
 						colModel: [
                             { name: 'idapp', key: true, hidden: true, align: 'left' },
-                            { name: 'NO', width: 50, align: 'right', sortable: false, editable: false, },
-                            { name: 'goods', index: 'itemcode', width: 140, sortable: true, editable: false, align: 'left', },
+                            { name: 'NO', width: 40, align: 'right', sortable: false, editable: false, },
+                            { name: 'goods', index: 'goods', width: 150, sortable: true, editable: false, align: 'left', },
                             { name: 'datereceived', index: 'datereceived', sortable: true, width: 120, formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' } },
                             { name: 'supliername', index: 'supliername', width: 150, sortable: true, editable: false, align: 'left', },
                             //formatter : 'date', formatoptions: { srcformat : 'Y-m-d H:i:s', newformat :'ShortDate'}},
@@ -154,15 +154,10 @@ t>
                             { name: 'FK_P_R_By', index: 'FK_ReceivedBy', hidden: true, },
                             { name: 'pr_by', index: 'pr_by', width: 120, sortable: true, editable: false, align: 'left', },
                             {
-                            	name: 'totalpurchase', index: 'totalpurchase', width: 100, sortable: true, align: 'right', formatter: 'currency', formatoptions: {
-                            		decimalSeparator: ",", thousandsSeparator: ".", decimalPlaces: 2, prefix: "Rp "
-                            	},
+                            	name: 'totalpurchase', index: 'totalpurchase', width: 100, sortable: true, align: 'right',                             	
                             },
                             {
-                            	name: 'totalreceived', index: 'totalreceived', width: 100, sortable: true, align: 'right', formatter: 'currency', formatoptions: {
-                            		decimalSeparator: ",", thousandsSeparator: ".", decimalPlaces: 2, prefix: "Rp "
-                            	},
-                            },
+                                name: 'totalreceived', index: 'totalreceived', width: 100, sortable: true, align: 'right',},
                             { name: 'createddate', index: 'CreatedDate', sortable: true, width: 120, formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' } },
                             { name: 'reatedby', index: 'CreatedBy', sortable: true, width: 110, editable: false, },
 						],
@@ -785,7 +780,6 @@ t>
 			NA.NAEvent.addHandler(btnClose, 'click', function (event) {
 				NA.NAEvent.preventDefault(event);
 				ExecuteHandler('Close');
-				NA.common.dialog.closeDialog(dialog);
 				if (event) {
 					NA.NAEvent.stopPropagation(event);
 				}
