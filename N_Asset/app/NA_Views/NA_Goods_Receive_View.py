@@ -41,29 +41,24 @@ def NA_Goods_Receive_Search(request):
 	Ilimit = request.GET.get('rows', '')
 	Isidx = request.GET.get('sidx', '')
 	Isord = request.GET.get('sord', '')
-	if(',' in Isidx):
-		Isidx = Isidx.split(',')
+	if 'suplier' in Isidx:#ganti suplier key column jadi supliername
+		#IndexS = Isidx.index['suplier']
+		#del(Isidx[IndexS])
+		#Isindx.insert(IndexS,'supliername')
+		str(Isidx).replace('suplier','supliername') 
 	criteria = ResolveCriteria.getCriteriaSearch(str(Icriteria))
 	dataType = ResolveCriteria.getDataType(str(IdataType))
-	if(Isord is not None and str(Isord) != ''):
-		NAData = NAGoodsReceive.objects.PopulateQuery([str(Isidx)],IcolumnName,IvalueKey,criteria,dataType)
+	if(Isord is not None and str(Isord) != '') or(Isidx is not None and str(Isidx) != ''):
+		NAData = NAGoodsReceive.objects.PopulateQuery(str(Isidx),Isord,Ilimit, request.GET.get('page', '1'),IcolumnName,IvalueKey,criteria,dataType)#return tuples
 	else:
-		NAData = NAGoodsReceive.objects.PopulateQuery([],IcolumnName,IvalueKey,criteria,dataType)
-	totalRecord = len(list(NAData))
-	paginator = Paginator(NAData, int(Ilimit)) 
-	try:
-		page = request.GET.get('page', '1')
-	except ValueError:
-		page = 1
-	try:
-		dataRows = paginator.page(page)
-	except (EmptyPage, InvalidPage):
-		dataRows = paginator.page(paginator.num_pages)
+		NAData = NAGoodsReceive.objects.PopulateQuery('','DESC',Ilimit, request.GET.get('page', '1'),IcolumnName,IvalueKey,criteria,dataType)#return tuples
+	totalRecord = NAData[1]
+	datarows = NAData[0]
 		
 	rows = []
 	#column IDapp 	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
 	i = 0;
-	for row in dataRows.object_list:
+	for row in dataRows:
 		datarow = {"id" :row['idapp'], "cell" :[i+1,row['goods'],row['datereceived'],row['supliername'],row['FK_ReceivedBy'],row['receivedby'],row['FK_P_R_By'], \
 			row['pr_by'],row['totalpurchased'],row['totalreceived'],row['inactive'],datetime.date(row['CreatedDate']),row['CreatedBy']]}
 		#datarow = {"id" :row.idapp, "cell" :[row.idapp,row.itemcode,row.goodsname,row.brandname,row.unit,row.priceperunit, \

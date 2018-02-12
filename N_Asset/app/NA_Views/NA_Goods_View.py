@@ -49,7 +49,13 @@ def NA_Goods_Search(request):
 	criteria = ResolveCriteria.getCriteriaSearch(str(Icriteria))
 	dataType = ResolveCriteria.getDataType(str(IdataType))
 	if(Isord is not None and str(Isord) != ''):
-		NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by('-' + str(Isidx))
+		if ',' in Isidx:
+			NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by(",".join(str(Isidx)))
+		else:
+			if Isord == 'desc':
+				NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by('-' + str(Isidx))
+			else:
+				NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by(str(Isidx))
 	else:
 		NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType)			
 #		from django.db.models import F

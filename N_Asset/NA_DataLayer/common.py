@@ -67,10 +67,10 @@ class ResolveCriteria:
 				self.__class__.__query = ' >= {0!s} AND ' + self.colKey + ' <= {1!s}'.format(startDate,endDate)
 		elif self.criteria==CriteriaSearch.BeginWith:
 			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
-				ResolveCriteria.__query= ' LIKE {0!s}%'.format(str(self.valueData))
+				ResolveCriteria.__query= " LIKE '{0!s}%'".format(str(self.valueData))
 		elif self.criteria==CriteriaSearch.EndWith:
 			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
-				ResolveCriteria.__query = ' LIKE %{0!s}'.format(str(self.valueData))
+				ResolveCriteria.__query = " LIKE '%{0!s}'".format(str(self.valueData))
 		elif self.criteria == CriteriaSearch.Equal:
 			ResolveCriteria.__query = ' = {0}'.format(self.valueData)
 		elif self.criteria==CriteriaSearch.Greater:
@@ -117,7 +117,7 @@ class ResolveCriteria:
 				ResolveCriteria.__query = ' <= {%Y-%m-%d}'.format(datetime((str(self.valueData)[0:3]),str(self.valueData)[5:6],str(self.valueData)[7:8]))
 		elif self.criteria==CriteriaSearch.Like:
 			if self.typeofData==DataType.Char or self.typeofData==DataType.VarChar or self.typeofData==DataType.NVarChar:
-				ResolveCriteria.__query = ' LIKE %{0!s}%'.format(str(self.valueData))
+				ResolveCriteria.__query = " LIKE '%{0!s}%'".format(str(self.valueData))
 		elif self.criteria==CriteriaSearch.NotEqual:
 				ResolveCriteria.__query = ' <>{0} '.format(str(self.valueData))
 		return ResolveCriteria.__query
