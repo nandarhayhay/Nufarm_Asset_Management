@@ -140,7 +140,7 @@ t>
 					grid.jqGrid({
 						url: url,
 						mtype: "GET",
-						datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+						datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
 						colNames: ['idapp', 'NO', 'goods Description', 'Date Received', 'Suplier Name', 'FK_ReceivedBy', 'Received By', 'FK_P_R_By ', 'Purchase Request By', 'Total Purchased', 'Total Received', 'Created Date', 'Created By'],
 						colModel: [
                             { name: 'idapp', key: true, hidden: true, align: 'left' },
@@ -154,7 +154,7 @@ t>
                             { name: 'FK_P_R_By', index: 'FK_ReceivedBy', hidden: true, },
                             { name: 'pr_by', index: 'pr_by', width: 120, sortable: true, editable: false, align: 'left', },
                             {
-                            	name: 'totalpurchased', index: 'totalpurchased', width: 100, sortable: true, align: 'right', formatter: 'currency', formatoptions: {
+                            	name: 'totalpurchase', index: 'totalpurchase', width: 100, sortable: true, align: 'right', formatter: 'currency', formatoptions: {
                             		decimalSeparator: ",", thousandsSeparator: ".", decimalPlaces: 2, prefix: "Rp "
                             	},
                             },
@@ -1121,7 +1121,7 @@ t>
                         						gridTbl.jqGrid({
                         							url: urlFKGoods,
                         							mtype: "GET",
-                        							datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+                        							datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
                         							colNames: ['idapp', 'NO', 'itemcode', 'goods Description', ],
                         							colModel: [
 														{ name: 'idapp', key: true, hidden: true, align: 'left' },
@@ -1430,7 +1430,7 @@ t>
                         						gridTbl.jqGrid({
                         							url: urlPR,
                         							mtype: "GET",
-                        							datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+                        							datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
                         							colNames: ['idapp', 'NO', 'NIK', 'Employee Name', ],
                         							colModel: [
 														{ name: 'idapp', key: true, hidden: true, align: 'left' },
@@ -1578,7 +1578,7 @@ t>
                         						gridTbl.jqGrid({
                         							url: urlPR,
                         							mtype: "GET",
-                        							datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+                        							datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
                         							colNames: ['idapp', 'NO', 'NIK', 'Employee Name', ],
                         							colModel: [
 														{ name: 'idapp', key: true, hidden: true, align: 'left' },

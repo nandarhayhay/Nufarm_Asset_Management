@@ -30,7 +30,7 @@ def NA_Goods_Receive(request):
 	populate_combo.append({'label':'Suplier Name','columnName':'suplier','dataType':'varchar'})
 	populate_combo.append({'label':'Received By','columnName':'receivedby','dataType':'varchar'})
 	populate_combo.append({'label':'PR By','columnName':'pr_by','dataType':'varchar'})
-	populate_combo.append({'label':'Total Purchased','columnName':'totalpurchased','dataType':'int'})
+	populate_combo.append({'label':'Total Purchased','columnName':'totalpurchase','dataType':'int'})
 	populate_combo.append({'label':'Total Received','columnName':'totalreceived','dataType':'int'})
 	return render(request,'app/Transactions/NA_F_Goods_Receive.html',{'populateColumn':populate_combo})
 def NA_Goods_Receive_Search(request):
@@ -52,19 +52,19 @@ def NA_Goods_Receive_Search(request):
 		NAData = NAGoodsReceive.objects.PopulateQuery(str(Isidx),Isord,Ilimit, request.GET.get('page', '1'),IcolumnName,IvalueKey,criteria,dataType)#return tuples
 	else:
 		NAData = NAGoodsReceive.objects.PopulateQuery('','DESC',Ilimit, request.GET.get('page', '1'),IcolumnName,IvalueKey,criteria,dataType)#return tuples
-	totalRecord = NAData[1]
-	datarows = NAData[0]
+	totalRecord = NAData[1][0]
+	dataRows = NAData[0]
 		
 	rows = []
-	#column IDapp 	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchased totalreceived 
+	#column IDapp 	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
 	i = 0;
 	for row in dataRows:
-		datarow = {"id" :row['idapp'], "cell" :[i+1,row['goods'],row['datereceived'],row['supliername'],row['FK_ReceivedBy'],row['receivedby'],row['FK_P_R_By'], \
-			row['pr_by'],row['totalpurchased'],row['totalreceived'],row['inactive'],datetime.date(row['CreatedDate']),row['CreatedBy']]}
+		datarow = {"id" :row['IDApp'], "cell" :[i+1,row['goods'],row['datereceived'],row['supliername'],row['FK_ReceivedBy'],row['receivedby'],row['FK_P_R_By'], \
+			row['pr_by'],row['totalpurchase'],row['totalreceived'],datetime.date(row['CreatedDate']),row['CreatedBy']]}
 		#datarow = {"id" :row.idapp, "cell" :[row.idapp,row.itemcode,row.goodsname,row.brandname,row.unit,row.priceperunit, \
 		#	row.placement,row.depreciationmethod,row.economiclife,row.createddate,row.createdby]}
 		rows.append(datarow)
-	results = {"page": page,"total": paginator.num_pages ,"records": totalRecord,"rows": rows }
+	results = {"page": int(request.GET.get('page', '1')),"total": totalRecord/int( request.GET.get('page', '1')) ,"records": totalRecord,"rows": rows }
 	return HttpResponse(json.dumps(results, indent=4,cls=DjangoJSONEncoder),content_type='application/json')
 	
 def getCurrentDataModel(request,form):	#fk_goods, datereceived, fk_suplier, totalpurchase, totalreceived,  fk_receivedby fk_p_r_by, idapp_fk_goods, idapp_fk_p_r_by, idapp_fk_receivedby,descriptions
