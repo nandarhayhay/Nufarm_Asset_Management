@@ -141,11 +141,11 @@ t>
 						url: url,
 						mtype: "GET",
 						datatype: "json",//#column IDapp  no	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived,CreatedDate, CreatedBy 
-						colNames: ['idapp', 'NO', 'goods Description', 'Date Received', 'Suplier Name', 'FK_ReceivedBy', 'Received By', 'FK_P_R_By ', 'Purchase Request By', 'Total Purchased', 'Total Received', 'Created Date', 'Created By'],
+						colNames: ['idapp', 'NO', 'goods name', 'Date Received', 'Suplier Name', 'FK_ReceivedBy', 'Received By', 'FK_P_R_By ', 'Purchase Request By', 'Total Purchased', 'Total Received','Descriptions', 'Created Date', 'Created By'],
 						colModel: [
                             { name: 'idapp', key: true, hidden: true, align: 'left' },
                             { name: 'NO', width: 40, align: 'right', sortable: false, editable: false, },
-                            { name: 'goods', index: 'goods', width: 150, sortable: true, editable: false, align: 'left', },
+                            { name: 'goods', index: 'goods', width: 120, sortable: true, editable: false, align: 'left', },
                             { name: 'datereceived', index: 'datereceived', sortable: true, width: 120, formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' } },
                             { name: 'supliername', index: 'supliername', width: 150, sortable: true, editable: false, align: 'left', },
                             //formatter : 'date', formatoptions: { srcformat : 'Y-m-d H:i:s', newformat :'ShortDate'}},
@@ -157,7 +157,9 @@ t>
                             	name: 'totalpurchase', index: 'totalpurchase', width: 100, sortable: true, align: 'right',                             	
                             },
                             {
-                                name: 'totalreceived', index: 'totalreceived', width: 100, sortable: true, align: 'right',},
+                            	name: 'totalreceived', index: 'totalreceived', width: 100, sortable: true, align: 'right',
+                            },
+							{ name: 'descriptions', index: 'descriptions', width: 120, sortable: true, editable: false, align: 'left', },
                             { name: 'createddate', index: 'CreatedDate', sortable: true, width: 120, formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' } },
                             { name: 'reatedby', index: 'CreatedBy', sortable: true, width: 110, editable: false, },
 						],
@@ -253,6 +255,8 @@ t>
 				descriptions = eldescriptions.value;
 			var status = window.status||NA.common.getElementID('id_status').value,
 				hasRefData = NA.common.getElementID('id_hasRefData').value;
+			var eldescBySystem = NA.common.getElementID('id_descbysystem'),
+				descbysystem = eldescBySystem.value;
 			return {
 				idapp:idapp,
 				idapp_fk_goods: idapp_fk_goods,
@@ -271,7 +275,8 @@ t>
 				employee_received:employee_received,
 				descriptions: descriptions,
 				status: status,
-				hasRef:hasRefData
+				hasRef: hasRefData,
+				descbysystem : descbysystem
 			};
 		};
 		function getGridCellValue(thegrid,CeltoGet) {
@@ -763,6 +768,8 @@ t>
 			var dialog = NA.common.dialog.doc.querySelector("div.containerDialog"),
         	   btnOKCancel = NA.NAEvent.doc.querySelectorAll('div.dialogButtonOKCancel>a.button'),
 			   btnClose = NA.common.dialog.doc.querySelector('button.ui-button.ui-dialog-titlebar-close');
+			//rubah dialog top nya jadi 10px saja
+			dialog.style.top = "10px";
 			Array.prototype.forEach.call(btnOKCancel, function (item) {//buat jadi foreach mesti convert dulu ke array
 				NA.NAEvent.addHandler(item, 'click', function (event) {
 					NA.NAEvent.preventDefault(event);
@@ -1661,6 +1668,62 @@ t>
                         				tdInfo.style.width = '110px';
                         				var pager = NA.common.getElementID('jqGrid_NA_F_Goods_Receive_fk_receivedby_Pager');
                         				pager.style.width = '430px';
+                        			});
+
+                        			//JQGrid Item Detail
+                        			gridTbl = $('jqGrid_NA_F_Goods_Receive_Detail');
+                        			gridPager = $('jqGrid_NA_F_Goods_Receive_Detail_Pager');
+                        			gridTbl.jqGrid({
+                        				data: (function () {
+                        					if (win.status === 'Open' || win.status === 'Edit') {
+
+                        					}
+                        				})(),
+                        				datatype: "json",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
+                        				colNames: ['idapp', 'NO', 'itemcode', 'goods Description', ],
+                        				colModel: [
+											{ name: 'idapp', key: true, hidden: true, align: 'left' },
+											{ name: 'no', width: 40, align: 'right', sortable: false, editable: false, },
+											{ name: 'itemcode', width: 80, align: 'left', sortable: true, editable: false, },
+											{ name: 'goods', index: 'goods', width: 290, sortable: true, editable: false, align: 'left', },
+                        				],
+                        				ondblClickRow: function (rowId) {
+                        					//fire button OK
+                        					var btnOK = dialogRef.getButton('btnOKFindGoods');
+                        					btnOK.click();
+                        				},
+                        				gridComplete: function () {
+                        					document.body.style.cursor = 'default';
+                        				},
+                        				loadError: function (xhr, textStatus, errorThrown) {
+                        					var error_msg = xhr.responseText
+                        					var msg = "Some errors occurred during processing:"
+                        					msg += '\n\n' + error_msg
+                        					alert(msg)
+                        				},
+                        				cellEdit: false,
+                        				viewrecords: true,
+                        				height: '150px',
+                        				rowNum: 500,
+                        				rowList: [20, 50, 100, 200, 300, 500],
+                        				sortname: "itemcode",
+                        				sortorder: "asc",
+                        				multiSort: true,
+                        				//shrinkToFit: false,
+                        				iconSet: "fontAwesome",
+                        				//forceFit: true,
+                        				//toolbar: true,
+                        				scrollrows: true,
+                        				//hidegrid: true,
+                        				//caption: "Transactions ---Find goods",
+                        				pager: "#jqGrid_NA_F_Goods_Receive_FK_Goods_Pager"
+                        			});
+                        			gridTbl.navGrid('#jqGrid_NA_F_Goods_Receive_FK_Goods_Pager', {
+                        				search: false, // show search button on the toolbar
+                        				add: false,
+                        				edit: false,
+                        				del: false,
+                        				refresh: false
                         			});
                         			//======================end event handler BUTTONS Search================================================
                         		}

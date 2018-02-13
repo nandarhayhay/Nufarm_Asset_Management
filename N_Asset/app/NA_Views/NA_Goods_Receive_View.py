@@ -60,7 +60,7 @@ def NA_Goods_Receive_Search(request):
 	i = 0;
 	for row in dataRows:
 		datarow = {"id" :row['IDApp'], "cell" :[row['IDApp'],i+1,row['goods'],row['datereceived'],row['supliername'],row['FK_ReceivedBy'],row['receivedby'],row['FK_P_R_By'], \
-			row['pr_by'],row['totalpurchase'],row['totalreceived'],datetime.date(row['CreatedDate']),row['CreatedBy']]}
+			row['pr_by'],row['totalpurchase'],row['totalreceived'],row['descriptions'],datetime.date(row['CreatedDate']),row['CreatedBy']]}
 		#datarow = {"id" :row.idapp, "cell" :[row.idapp,row.itemcode,row.goodsname,row.brandname,row.unit,row.priceperunit, \
 		#	row.placement,row.depreciationmethod,row.economiclife,row.createddate,row.createdby]}
 		rows.append(datarow)
@@ -142,7 +142,7 @@ def ShowEntry_Receive(request):
 			#idapp,fk_goods, idapp_fk_goods,datereceived, fk_suplier,supliername, totalpurchase, totalreceived, idapp_fk_received, fk_receivedby,employee_received,idapp_fk_p_r_by, fk_p_r_by,employee_pr, descriptions	
 			NAData = {'idapp':IDApp,'idapp_fk_goods':Ndata.idapp_fk_goods,'fk_goods':Ndata.fk_goods,'goods_desc':Ndata.goods,'datereceived':Ndata.datereceived,'fk_suplier':Ndata.fk_suplier,'supliername':Ndata.supliername,
 					'totalpurchase':Ndata.totalpurchase,'totalreceived':Ndata.totalreceived,'idapp_fk_received':Ndata.idapp_fk_received,'fk_receivedby':Ndata.fk_receivedby,'employee_received':Ndata.employee_received,
-					'idapp_fk_p_r_by':Ndata.idapp_fk_p_r_by,'fk_p_r_by':Ndata.idapp_fk_p_r_by,'employee_pr':Ndata.employee_pr,'descriptions':Ndata.descriptions}
+					'idapp_fk_p_r_by':Ndata.idapp_fk_p_r_by,'fk_p_r_by':Ndata.idapp_fk_p_r_by,'employee_pr':Ndata.employee_pr,'descriptions':Ndata.descriptions,'descbysystem':Ndata.descbysystem}
 			NAData.update(initializeForm=json.dumps(NAData,cls=DjangoJSONEncoder)) 
 			form = NA_Goods_Receive_Form(data=NAData)
 			form.fields['status'].widget.attrs = {'value':status}
@@ -317,7 +317,7 @@ class NA_Goods_Receive_Form(forms.Form):
                                    'placeholder': 'suplier code','data-value':'suplier code','tittle':'Please enter suplier code'}),required=True)
 	supliername = forms.CharField(max_length=100,required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'border-bottom-right-radius:0;border-top-right-radius:0;','readonly':True,
 																						 'placeholder': 'suplier name','data-value':'suplier name','tittle':'suplier name is required'}))
-	datereceived = forms.DateField(required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'width:95px;display:inline-block;margin-right:5px;','tabindex':3,
+	datereceived = forms.DateField(required=True,widget=forms.TextInput(attrs={'class': 'NA-Form-Control','style':'width:100px;display:inline-block;margin-right:5px;','tabindex':3,
                                    'placeholder': 'dd/mm/yyyy','data-value':'dd/mm/yyyy','tittle':'Please enter Date Received','patern':'((((0[13578]|1[02])\/(0[1-9]|1[0-9]|2[0-9]|3[01]))|((0[469]|11)\/(0[1-9]|1[0-9]|2[0-9]|3[0]))|((02)(\/(0[1-9]|1[0-9]|2[0-8]))))\/(19([6-9][0-9])|20([0-9][0-9])))|((02)\/(29)\/(19(6[048]|7[26]|8[048]|9[26])|20(0[048]|1[26]|2[048])))'}))
 	totalpurchase = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':4,'style':'width:75px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
 	totalreceived = forms.IntegerField(max_value=1000,required=True,widget=forms.NumberInput(attrs={'class': 'NA-Form-Control','maxlength':4, 'min':1, 'max':9000,'tabindex':5,'style':'width:80px;;display:inline-block;margin-right:5px;','placeholder': 'Total Purchased','data-value':'Total Purchased','tittle':'Total purchased is required','patern':'[1-9]\d{1,9}','step':'any'}))
@@ -339,7 +339,13 @@ class NA_Goods_Receive_Form(forms.Form):
 		#initializeForm = forms.CharField(widget=forms.HiddenInput(attrs={'value':{'depreciationmethod':'SL','economiclife':5.00,'placement':'Gudang IT','inactive':False}}),required=False)
 	initializeForm = forms.CharField(widget=forms.HiddenInput(),required=False)
 	hasRefData = forms.BooleanField(widget=forms.HiddenInput(),required=False)
-	
+	descbysystem = forms.CharField(max_length=250,widget=forms.HiddenInput(),required=False)
+	dataForGridDetail = forms.CharField(max_length=2000,widget=forms.HiddenInput(),required=False)
+	 #var data = [
+  #          { id: "10", Name: "Name 1", PackageCode: "83123a", other: "x", subobject: { x: "a", y: "b", z: [1, 2, 3]} },
+  #          { id: "20", Name: "Name 3", PackageCode: "83432a", other: "y", subobject: { x: "c", y: "d", z: [4, 5, 6]} },
+  #          { id: "30", Name: "Name 2", PackageCode: "83566a", other: "z", subobject: { x: "e", y: "f", z: [7, 8, 9]} }
+  #      ],
 	#class Meta:
 	#	model = NAGoodsReceive
 	#	exclude = ('createdby','createddate','modifiedby','modifieddate')
@@ -357,3 +363,4 @@ class NA_Goods_Receive_Form(forms.Form):
 		idapp_fk_receivedby = self.cleaned_data.get('idapp_fk_receivedby')
 		descriptions = self.cleaned_data.get('descriptions')
 		hasRefData = self.cleaned_data.get('hasRefData')
+		descbysystem = self.cleaed_data.get('descbysystem')
