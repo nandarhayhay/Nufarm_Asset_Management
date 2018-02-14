@@ -514,9 +514,25 @@ t>
 			footerButton.style.cssText = 'padding-top:8px;';
 		};
 
-		function getAllSelectOptions() {
-		}
+		//var localSelectBrands = function (data) {
+		//	var retval = {};
+		//	if (!NA.common.isObjectEmpty(data)) {
 
+		//		for (var i = 0; i < data.length; i++) {
+		//			retval[i] = data.brandname;
+		//		}
+		//	}
+		//};
+		function fetcBrands(elem, cmName) {
+			//$("#id_brandname").autocomplete({ source: "SearchBrand/", minLength: 1, });
+			$(elem).autocomplete({
+				//source: $(this).jqGrid("getUniqueValueFromColumnIndex", cmName),
+				source: "getBrandForDetailEntry/",
+				minLength: 1,
+				delay: 0,
+				minLength: 0
+			});
+		};
 		//========================END GROUP FUNCTION DECLARATION===================================
         
 		//=======================GROUP FUNCTION EVENT=============================================
@@ -870,7 +886,11 @@ t>
                         		};
 
                         	    //grid detail 
-                        	    //JQGrid Item Detail
+                        		//JQGrid Item Detail
+                        		var HasRef = NA.common.getElementID('hasRefData').value;
+								 
+                        		hasRef = HasRef.valueOf();
+                        		var AllowEdit = (!hasRef) && (!win.status !== 'Open')
                         		gridTbl = $('jqGrid_NA_F_Goods_Receive_Detail');
                         		gridPager = $('jqGrid_NA_F_Goods_Receive_Detail_Pager');
                         		gridTbl.jqGrid({
@@ -886,14 +906,61 @@ t>
                                         { name: 'fk_appp', hidden: true },
                                         { name: 'no', key: true, width: 40, align: 'right', sortable: false, editable: false, },
                                         {
-                                            name: 'brandname', width: 140, align: 'left', sortable: true, editable: true, align: 'center',
-                                            editable: true,
-                                            cellEdit: true,
-                                            edittype: 'select',
-                                            formatter: 'select',
-                                            editoptions: { value: getAllSelectOptions() }
+                                        	//ref https://jsfiddle.net/OlegKi/ugxvr75q/ or https://stackoverflow.com/questions/42662684/inlineedit-with-one-column-auto-complete-text-field or https://techbrij.com/jqgrid-flexbox-jquery-autocomplete-edit
+                                        	//addrowdata ref http://www.trirand.com/blog/?page_id=393/help/add-empty-row
+                                            name: 'brandname', width: 140, align: 'left', sortable: true, 
+                                            editable: AllowEdit,
+                                            cellEdit: AllowEdit,
+                                            editrules: { required: true },
+                                            autoResizing: { minColWidth: 140, },
+											edittype : 'text',
+                                            editoptions: {
+                                            	dataInit: function (elem) {
+                                            		fetcBrands.call(this, elem, "brandname");
+                                            	}
+                                            }, 
+                                            //edittype: 'select',
+                                            //formatter: 'select',
+                                            //editoptions: {
+                                            //	value: (function () {
+                                            //		if (win.status === 'Open' || win.status === 'Edit') {
+                                            //			return localSelectBrands(initializeForm.dataForGridDetail);
+                                            //		}
+                                            //		else {
+
+                                            //		}
+                                            //	})(),
+                                            //}
                                         },
-                                        { name: 'goods', index: 'goods', width: 290, sortable: true, editable: false, align: 'left', },
+                                        {
+                                        	name: 'priceperunit', width: 90, sortable: true, align: 'right',
+                                        	editable: AllowEdit,
+                                        	cellEdit: AllowEdit,
+                                        	editrules: { required: false },
+                                        	autoResizing: { minColWidth: 140, },
+                                        	formatoptions: { decimalSeparator: ",", thousandsSeparator: "." },
+                                        },
+										{
+											name: 'typeapp', width: 80, align: 'left',
+											editable: AllowEdit,
+											cellEdit: AllowEdit,
+											editrules: { required: false },
+											autoResizing: { minColWidth: 80, },											
+										},
+										{
+											name: 'serialnumber', width: 100,  align: 'left',
+											editable: AllowEdit,
+											cellEdit: AllowEdit,
+											editrules: { required: false },
+											autoResizing: { minColWidth: 100, },
+										},
+										{
+											name: 'warranty', width: 100, align: 'left',
+											editable: AllowEdit,
+											cellEdit: AllowEdit,
+											editrules: { required: false },
+											autoResizing: { minColWidth: 100, },
+										},
                         		    ],
                         		    cellEdit: false,
                         		    viewrecords: true,

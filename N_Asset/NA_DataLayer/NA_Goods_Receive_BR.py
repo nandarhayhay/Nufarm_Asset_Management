@@ -137,6 +137,17 @@ class NA_BR_Goods_Receive(models.Manager):
 				if self.__class__.c is not None:
 					self.__class__.c.close()
 				return repr(e)
+	def getBrandsForDetail(self,searchText):
+		#ambil data di receive_goods_detail,union dengan brandname di table goods
+		Query = """SELECT DISCTINCT(BrandName) FROM n_a_goods WHREE BrandName LIKE '%{0!s}%' \
+				   UNION \
+				   SELECT DISTINCT(BrandName) FROM n_a_goods_detail WHERE BrandName LIKE '%{1!s}%'"""
+		self.__class__.c = connection.cursor()
+		cur = self.__class__.c
+		cur.execute(Query,[searchText,searchText])
+		data = query.dictfetchall(cur)
+		cur.close()
+		return data
 class CustomSuplierManager(models.Manager):
 	def getSuplier(self,supliercode):
 		return super(CustomSuplierManager,self).get_queryset().filter(supliercode__iexact=supliercode).values('supliername')
