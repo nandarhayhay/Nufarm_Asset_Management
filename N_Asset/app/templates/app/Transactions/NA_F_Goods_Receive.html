@@ -917,7 +917,9 @@ t>
                                             editoptions: {
                                             	dataInit: function (elem) {
                                             		fetcBrands.call(this, elem, "brandname");
-                                            	}
+                                            	}, placeholder: (function () {
+                                            	    if ($(this).val() != '') { return 'choose if exists'; }
+                                            	})(), title: 'Avoid mised-typing brand name !', class: 'NA-Form-Control'
                                             }, 
                                             //edittype: 'select',
                                             //formatter: 'select',
@@ -936,30 +938,47 @@ t>
                                         	name: 'priceperunit', width: 90, sortable: true, align: 'right',
                                         	editable: AllowEdit,
                                         	cellEdit: AllowEdit,
-                                        	editrules: { required: false },
+                                        	edittype: 'text',
+                                            template: 'number',
+                                        	editrules: { required: false,integer:false, },
                                         	autoResizing: { minColWidth: 140, },
+                                        	editoptions: { defaultValue: 0, class: 'NA-Form-Control',patern :'^[0-9]+([\.,][0-9]+)?$',
+                                        	    step:'any', tittle:'Please enter valid value',  },
+                                        	formatter: 'number',
                                         	formatoptions: { decimalSeparator: ",", thousandsSeparator: "." },
                                         },
 										{
 											name: 'typeapp', width: 80, align: 'left',
 											editable: AllowEdit,
 											cellEdit: AllowEdit,
-											editrules: { required: false },
+											edittype: 'text',
+											editrules: { required: true },
+											editoptions: { class: 'NA-Form-Control' },
 											autoResizing: { minColWidth: 80, },											
 										},
 										{
 											name: 'serialnumber', width: 100,  align: 'left',
 											editable: AllowEdit,
 											cellEdit: AllowEdit,
-											editrules: { required: false },
+											edittype: 'text',
+											editrules: { required: true, },
+											editoptions: { defaultValue: 'N/A', class: 'NA-Form-Control' },
 											autoResizing: { minColWidth: 100, },
 										},
 										{
 											name: 'warranty', width: 100, align: 'left',
 											editable: AllowEdit,
 											cellEdit: AllowEdit,
-											editrules: { required: false },
+											edittype: 'text',
+											template: 'number',
+											editrules: { required: false,integer:false, },
 											autoResizing: { minColWidth: 100, },
+											editoptions: {
+											    defaultValue: 1, class: 'NA-Form-Control', patern: '^[0-9]+([\.,][0-9]+)?$',
+											    step: 'any', tittle: 'Please enter valid value',
+											},
+                                            formatter:'number',
+											formatoptions: { decimalSeparator: ",", thousandsSeparator: "." },
 										},
                         		    ],
                         		    cellEdit: false,
@@ -971,6 +990,8 @@ t>
                         		            return c.length;
                         		        }
                         		    })(),
+                        		    cmTemplate: { autoResizable: true, editable: true },
+                        		    autoResizing: { compact: true, resetWidthOrg: true },
                         		    sortname: "brandname",
                         		    sortorder: "asc",
                         		    multiSort: true,
@@ -981,7 +1002,7 @@ t>
                         		    scrollrows: true,
                         		    //hidegrid: true,
                         		    //caption: "Transactions ---Find goods",
-                        		    pager: "#jqGrid_NA_F_Goods_Receive_FK_Goods_Pager"
+                        		    pager: "#jqGrid_NA_F_Goods_Receive_Detail_Pager"
                         		});
                         	    //gridTbl.navGrid(gridPager,{
                         		//    edit:false,add:false,del:false,search:false
