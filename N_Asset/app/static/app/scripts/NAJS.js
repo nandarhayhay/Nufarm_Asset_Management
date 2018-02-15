@@ -1276,5 +1276,35 @@ NA.common.AJAX.SubmitForm = function (url, FormElement, MIMEType, OnAJAXStart, O
     return true;
 };
 
+NA.Priviledge = {
+    _roleName: 'SysAdmin',
+    _rolCode: 'SA',
+    _userName: 'Nandar',
+    _password: '',
+    _isAdmin:true,
+}
+Object.defineProperties(NA.Priviledge, {
+    RoleName: {
+        get: function () { return this._roleName;},
+        set:function(newValue){return this._roleName = newValue;}
+    },
+    RolCode: {
+        get: function () { return this._rolCode; },
+        set: function (newValue) { this._rolCode = newValue; },
+    },
+    UserName: {
+        get: function () { this._userName; },
+        set: function (newValue) { this._userName = newValue; },
+    },
+    password: {
+        get: function () { this._password; },
+        set: function (newValue) { this._password = newValue; },
+    },
+    IsAdmin: {
+        get: function () { this._isAdmin; },
+        set: function (newValue) { this._isAdmin = newValue; },
+    }
+});
+
 //=================================================================
    

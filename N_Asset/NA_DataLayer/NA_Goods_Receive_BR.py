@@ -69,13 +69,29 @@ class NA_BR_Goods_Receive(models.Manager):
 		#cek transaksi dari mulai datereceived apakah ada pengeluaran barang untuk barang ini yang statusnya new	
 		self.__class__.c = connection.cursor()
 		cur = self.__class__.c
-		Query = "SELECT EXISTS(SELECT IDApp FROM n_a_goods_lending WHERE FK_goods = %(FK_goods)s AND IsNew = 1 AND Status = 'L' AND DateLending >= (%DateReceived)s AND Qty >= 1) \
-				OR  EXISTS(SELECT IDApp FROM n_a_goods_outwards WHERE FK_Goods = %(FK_goods)s AND DateReleased >= (%DateReceived)s AND IsNew = 1 AND Qty >= 1)"
-		TParams =  {'FK_goods':Data.idapp_fk_goods, 'DateReceived':Data.datereceived}
+		Query ="""SELECT DISTINCT(SerialNumber) AS SerialNumber FROM n_a_goods_receive_detail WHERE FKApp = %s AND SerialNumber IS NOT NULL"""
+		cur.execute(Query,[Data.idapp])
+		results = [item	for item in cur.fetchall()]		
+		if len(results) > 0:
+			strResult = ','.join(['%']*len(results))# "%s, %s, %s, ... %s"
+			Query = "SELECT EXISTS(SELECT IDApp FROM n_a_goods_lending WHERE FK_goods = %s AND IsNew = 1 AND Status = 'L' AND DateLending >= %s AND Qty >= 1 AND SerialNumber  IN ({0})) \
+					OR  EXISTS(SELECT IDApp FROM n_a_goods_outwards WHERE FK_Goods = %s AND DateReleased >= %s AND IsNew = 1 AND Qty >= 1 AND SerialNumber  IN ({1}) )".format(strResult,strResult)
+		TParams =  [Data.idapp_fk_goods, Data.datereceived,results,Data.idapp_fk_goods, Data.datereceived,results]
 		cur.execute(Query,TParams)
-		hasRef = c.rowcount >0
+		hasRef = cur.rowcount >0
+		if not hasRef:
+			Query ="""SELECT DISTINCT(TypeApp) AS TypeApp FROM n_a_goods_receive_detail WHERE FKApp = %s AND TypeApp IS NOT NULL"""
+			cur.execute(Query,[Data.idapp])
+			results = [item	for item in cur.fetchall()]	
+			if len(results) > 0:
+				strResult = ','.join(['%']*len(results))# "%s, %s, %s, ... %s"
+				Query = "SELECT EXISTS(SELECT IDApp FROM n_a_goods_lending WHERE FK_goods = %s AND IsNew = 1 AND Status = 'L' AND DateLending >= %s AND Qty >= 1 AND TypeApp IN ({0})) \
+					OR  EXISTS(SELECT IDApp FROM n_a_goods_outwards WHERE FK_Goods = %s AND DateReleased >= %s AND IsNew = 1 AND Qty >= 1 AND TypeApp IN ({1}) )".format(strResult,strResult)
+				TParams =  [Data.idapp_fk_goods, Data.datereceived,results,Data.idapp_fk_goods, Data.datereceived,results]
+				cur.execute(Query,TParams)
+				hasRef = cur.rowcount >0
 		if mustCloseConnSection:
-			self.__class__.c.close()
+			cur.close()
 		return hasRef
 	def SaveData(self,Data,Status=StatusForm.Input):
 		self.__class__.c = connection.cursor()

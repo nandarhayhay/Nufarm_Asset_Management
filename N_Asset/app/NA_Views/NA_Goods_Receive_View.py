@@ -117,15 +117,14 @@ def ShowEntry_Receive(request):
 			form.fields['hasRefData'].widget.attrs = {'value': False}
 			return render(request, 'app/Transactions/Goods_Receive.html', {'form' : form})
 	elif status == 'Edit' or status == "Open":	
-		hasRefData = NAGoodsReceive.objects.hasReference({FK_goods:reques.GET.get('idapp_fk_goods'), DateReceived:reques.GET.get('DateReceived')},False)	
+		hasRefData = NAGoodsReceive.objects.hasReference({idapp:data['idapp'],FK_goods:['idapp_fk_goods'], datereceived:data['datereceived']},False)	
 		if request.POST:
-
 			form = NA_Goods_Receive_Form(data)
 			if form.is_valid():
 				form.clean()
 				#save data
 				data = getCurrentDataModel(request,form);
-				data.update(IDApp=data['idapp'])
+				data.update(idapp=data['idapp'])
 				data.update(hasRefData=hasRefData)
 				result = NAGoodsReceive.objects.SaveData(data,StatusForm.Edit)
 				if result != 'success':
@@ -136,11 +135,11 @@ def ShowEntry_Receive(request):
 				#return HttpResponse('success', 'text/plain')
 		else:
 			#get data from database
-			IDApp = reques.GET.get('IDApp')
+			IDApp = data['idapp']
 			#Ndata = goods.objects.getData(IDApp)[0]
 			Ndata = NAGoodsReceive.objects.getData(IDApp)[0]	
 			#idapp,fk_goods, idapp_fk_goods,datereceived, fk_suplier,supliername, totalpurchase, totalreceived, idapp_fk_received, fk_receivedby,employee_received,idapp_fk_p_r_by, fk_p_r_by,employee_pr, descriptions	
-			NAData = {'idapp':IDApp,'idapp_fk_goods':Ndata.idapp_fk_goods,'fk_goods':Ndata.fk_goods,'goods_desc':Ndata.goods,'datereceived':Ndata.datereceived,'fk_suplier':Ndata.fk_suplier,'supliername':Ndata.supliername,
+			NAData = {'idapp':idapp,'idapp_fk_goods':Ndata.idapp_fk_goods,'fk_goods':Ndata.fk_goods,'goods_desc':Ndata.goods,'datereceived':Ndata.datereceived,'fk_suplier':Ndata.fk_suplier,'supliername':Ndata.supliername,
 					'totalpurchase':Ndata.totalpurchase,'totalreceived':Ndata.totalreceived,'idapp_fk_received':Ndata.idapp_fk_received,'fk_receivedby':Ndata.fk_receivedby,'employee_received':Ndata.employee_received,
 					'idapp_fk_p_r_by':Ndata.idapp_fk_p_r_by,'fk_p_r_by':Ndata.idapp_fk_p_r_by,'employee_pr':Ndata.employee_pr,'descriptions':Ndata.descriptions,'descbysystem':Ndata.descbysystem}
 			NAData.update(initializeForm=json.dumps(NAData,cls=DjangoJSONEncoder)) 
@@ -150,6 +149,14 @@ def ShowEntry_Receive(request):
 				form.fields['totalreceived'].disabled = True
 			form.fields['hasRefData'].widget.attrs = {'value': str2bool(hasRefData)} 
 			return render(request, 'app/Transactions/Goods_Receive.html', {'form' : form})
+def HasRef(request):
+	result = False
+	try:		
+		return HttpResponse(json.dumps({'message':result}),status = 500, content_type='application/json')
+	except Exception as e:
+		result = repr(e)
+		return HttpResponse(json.dumps({'message':result}),status = 500, content_type='application/json')
+	result = NAGoodsReceive.objects.hasReference({idapp:data['idapp'],FK_goods:['idapp_fk_goods'], datereceived:data['datereceived']},False)
 def Delete(request):
 	try:
 		#result=NAGoodsReceive.objects.delete(

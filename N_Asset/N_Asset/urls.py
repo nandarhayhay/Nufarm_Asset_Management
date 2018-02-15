@@ -61,6 +61,7 @@ urlpatterns = [
 		url(r'^NA_Goods_Receive/SearchSuplierbyForm/$',NA_Goods_Receive_View.SearchSuplierbyForm,name='SearchSuplierbyForm'),
 		url(r'^NA_Goods_Receive/SearchEmployeebyform/$',NA_Goods_Receive_View.SearchEmployeebyform,name='SearchEmployeebyform'),
 		url(r'^NA_Goods_Receive/getBrandForDetailEntry/$',NA_Goods_Receive_View.getBrandForDetailEntry,name='getBrandForDetailEntry'),
+		url(r'^NA_Foods_Receive/HasRef/$',NA_Goods_Receive_View.HasRef,name='HasRef'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

@@ -533,6 +533,251 @@ t>
 				minLength: 0
 			});
 		};
+		function CreateGridDetail() {
+
+			//grid detail 
+			//JQGrid Item Detail
+			var HasRef = NA.common.getElementID('hasRefData').value;
+
+			hasRef = HasRef.valueOf();
+			var AllowEdit = (!hasRef) && (!win.status !== 'Open')
+			var gridTbl = $('#jqGrid_NA_F_Goods_Receive_Detail'),
+			gridPager = $('#jqGrid_NA_F_Goods_Receive_Detail_Pager');
+			gridTbl.jqGrid({
+				data: (function () {
+					if (win.status === 'Open' || win.status === 'Edit') {
+						return JSON.parse(initializeForm.dataForGridDetail);
+					}
+				})(),
+				datatype: "local",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
+				colNames: ['idapp', 'fkapp', 'NO', 'BrandName', 'Price/Unit', 'Type', 'Serial Number', 'warranty', 'End of Warranty', 'CreatedBy', 'CreatedDate', 'ModifiedBy', 'ModifiedDate'],
+				colModel: [
+					{ name: 'idapp', hidden: true },
+					{ name: 'fk_appp', hidden: true },
+					{ name: 'no', key: true, width: 40, align: 'right', sortable: false, editable: false, },
+					{
+						//ref https://jsfiddle.net/OlegKi/ugxvr75q/ or https://stackoverflow.com/questions/42662684/inlineedit-with-one-column-auto-complete-text-field or https://techbrij.com/jqgrid-flexbox-jquery-autocomplete-edit
+						//addrowdata ref http://www.trirand.com/blog/?page_id=393/help/add-empty-row
+						name: 'brandname', width: 140, align: 'left', sortable: true,
+						editable: AllowEdit,
+						cellEdit: AllowEdit,
+						editrules: { required: true },
+						autoResizing: { minColWidth: 140, },
+						edittype: 'text',
+						editoptions: {
+							dataInit: function (elem) {
+								fetcBrands.call(this, elem, "brandname");
+							}, placeholder: (function () {
+								if ($(this).val() != '') { return 'Choose if exists'; }
+							})(), title: 'Avoid mised-typing brand name !', class: 'NA-Form-Control'
+						},
+						//edittype: 'select',
+						//formatter: 'select',
+						//editoptions: {
+						//	value: (function () {
+						//		if (win.status === 'Open' || win.status === 'Edit') {
+						//			return localSelectBrands(initializeForm.dataForGridDetail);
+						//		}
+						//		else {
+
+						//		}
+						//	})(),
+						//}
+					},
+					{
+						name: 'priceperunit', width: 90, sortable: true, align: 'right',
+						editable: AllowEdit,
+						cellEdit: AllowEdit,
+						edittype: 'text',
+						template: 'number',
+						editrules: { required: false, integer: false, },
+						autoResizing: { minColWidth: 140, },
+						editoptions: {
+							defaultValue: 0, class: 'NA-Form-Control', patern: '^[0-9]+([\.,][0-9]+)?$',
+							step: 'any', tittle: 'Please enter valid value',
+						},
+						formatter: 'number',
+						formatoptions: { decimalSeparator: ",", thousandsSeparator: "." },
+					},
+					{
+						name: 'typeapp', width: 80, align: 'left',
+						editable: AllowEdit,
+						cellEdit: AllowEdit,
+						edittype: 'text',
+						editrules: { required: (function () { return NA.priviledge.IsAdmin; })() },
+						editoptions: { class: 'NA-Form-Control' },
+						autoResizing: { minColWidth: 80, },
+					},
+					{
+						name: 'serialnumber', width: 100, align: 'left',
+						editable: AllowEdit,
+						cellEdit: AllowEdit,
+						edittype: 'text',
+						editrules: { required: (function () { return NA.priviledge.IsAdmin; })(), },
+						editoptions: { defaultValue: 'N/A', class: 'NA-Form-Control' },
+						autoResizing: { minColWidth: 100, },
+					},
+					{
+						name: 'warranty', width: 100, align: 'left',
+						editable: AllowEdit,
+						cellEdit: AllowEdit,
+						edittype: 'text',
+						template: 'number',
+						editrules: { required: (function () { return NA.priviledge.IsAdmin; })(), integer: false, },
+						autoResizing: { minColWidth: 100, },
+						editoptions: {
+							defaultValue: 1, class: 'NA-Form-Control', patern: '^[0-9]+([\.,][0-9]+)?$',
+							step: 'any', tittle: 'Please enter valid value',
+						},
+						formatter: 'number',
+						formatoptions: { decimalSeparator: ",", thousandsSeparator: "." },
+					},
+					{
+						name: 'endofwarranty', width: 100, align: 'left',
+						hidden: (function () {
+							return (win.status === 'Open')
+						})(),
+						editable: false,
+						cellEdit: false,
+						autoResizing: { minColWidth: 80, },
+						editoptions: {
+							class: 'NA-Form-Control',
+						},
+						formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' }
+					},
+					{
+						name: 'createdby', width: l00, align: 'left',
+						hidden: (function () {
+							return (win.status === 'Open')
+						})(),
+						editable: false,
+						cellEdit: false,
+						autoResizing: { minColWidth: 100, },
+						editoptions: {
+							defaultValue: (function () { return NA.priviledge.UserName; })(),
+							class: 'NA-Form-Control',
+						},
+
+					},
+					{
+						name: 'createddate', width: l00, align: 'left',
+						hidden: (function () {
+							return (win.status === 'Open')
+						})(),
+						editable: false,
+						cellEdit: false,
+						autoResizing: { minColWidth: 100, },
+						editoptions: {
+							class: 'NA-Form-Control',
+						},
+						formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' }
+					},
+					{
+						name: 'modifiedby',
+						hidden: (function () {
+							return ((win.status === 'Open' || win.status === 'Edit') && (NA.priviledge.IsAdmin === true))
+						})(),
+						editable: false,
+						cellEdit: false,
+						autoResizing: { minColWidth: 100, },
+						editoptions: {
+							defaultValue: (function () { return NA.priviledge.UserName; })(),
+							class: 'NA-Form-Control',
+						},
+					},
+					{
+						name: 'modifieddate', width: l00, align: 'left',
+						hidden: (function () {
+							return ((win.status === 'Open' || win.status === 'Edit') && (NA.priviledge.IsAdmin === true))
+						})(),
+						editable: false,
+						cellEdit: false,
+						autoResizing: { minColWidth: 100, },
+						editoptions: {
+							class: 'NA-Form-Control',
+						},
+						formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F Y' }
+					},
+				],
+				cellEdit: true,
+				viewrecords: true,
+				height: '150px',
+				rowNum: (function () {
+					if (win.status === 'Open' || win.status === 'Edit') {
+						var c = JSON.parse(initializeForm.dataForGridDetail);
+						return c.length;
+					}
+				})(),
+				cmTemplate: { autoResizable: true, editable: true },
+				autoResizing: { compact: true, resetWidthOrg: true },
+				sortname: "brandname",
+				sortorder: "asc",
+				multiSort: true,
+				//shrinkToFit: false,
+				iconSet: "fontAwesome",
+				//forceFit: true,
+				//toolbar: true,
+				scrollrows: true,
+				//hidegrid: true,
+				//caption: "Transactions ---Find goods",
+				pager: "#jqGrid_NA_F_Goods_Receive_Detail_Pager"
+			});
+			gridTbl.navGrid(gridPager,{
+				edit:false,add:false,del:false,search:false
+			}).navButtonAdd(grdPager,{
+				caption:"Clear Or Reset", buttonimg:"", onClickButton: function(){
+					//var datarow = {name1: value1, name2: value2', ...};
+					//var su=jQuery("#grid_id").addRowData("X",datarow,"last");
+					//if(su) { jQuery("#grid_id").setSelection('X') }; }, position:"last"
+			}).navButtonAdd(grdPager,{
+				caption:"Validate", buttonimg:"", onClickButton: function(){
+					//var datarow = {name1: value1, name2: value2', ...};
+					//var su=jQuery("#grid_id").addRowData("X",datarow,"last");
+					//if(su) { jQuery("#grid_id").setSelection('X') }; }, position:"last"
+			});
+			//assign delete key event
+			gridTbl.on("keyup", "tr", function (e) {
+				//var rowid = parseInt($(this).attr("id"));
+				var rowId = grid.jqGrid('getGridParam', 'selrow');
+				if (e.keyCode == 46) {
+					//var btnDelete = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(5)')
+					//btnDelete.click();
+					//return false;
+					if(win.status === 'Open'){
+						NA.NAEvent.preventDefault(e);
+						return false;
+					}
+					if(win.status === 'Edit'){
+						//check reference
+						var NAAjax = NA.common.AJAX;
+						
+					}
+					var rowId = grid.jqGrid('getGridParam', 'selrow');
+					gridTbl.delRowData(rowId);
+					//check referenced data
+				
+				}
+			});
+			//gridTbl.navGrid(gridPager,{
+			//    edit:false,add:false,del:false,search:false
+			//}).navButtonAdd('gridPager',{
+			//    caption:"Save", buttonimg:"fullpath/row-insert-under.gif", onClickButton: function(){
+			//        var datarow = {name1: value1, name2: value2', ...};
+			//        var su=jQuery("#grid_id").addRowData("X",datarow,"last");
+			//        if(su) { jQuery("#grid_id").setSelection('X') }; }, position:"last"
+			//}).navButtonAdd('#Pager',{
+			//    caption:"Delete", buttonimg:"fullpath/row-delete.gif", onClickButton: function(){
+			//        var gr = jQuery("#grid_id").getGridParam("selrow");
+			//        if( gr != null ) {
+			//            jQuery("#grid_id").delGridRow(gr,{afterSubmit: function(xhr,postdata){ alert ('After Submit: ' +
+			//            postdata); return [true]},
+			//                url: 'delete.php'});
+			//        } else {
+			//            alert("Please Select Row to delete!");
+			//        };
+			//    }, position:"last"
+			//});
+		}
 		//========================END GROUP FUNCTION DECLARATION===================================
         
 		//=======================GROUP FUNCTION EVENT=============================================
@@ -678,19 +923,7 @@ t>
 			SearchData.setValue('');
 			LoadData(1);
 			window.document.body.style.cursor = 'default';
-		};	
-
-		function deletegridDetail(e) {
-		    {
-		        //var rowid = parseInt($(this).attr("id"));
-		        var rowId = gridTbl.jqGrid('getGridParam', 'selrow');
-		        if (e.keyCode == 46) {
-		            var btnDelete = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(5)')
-		            btnDelete.click();
-		            return false;
-		        }
-		    }
-		};
+		};		
 		//=======================END GROUP FUNCTION EVENT========================================
 
 		//=======================GROUP ASSINGED HANDLER ========================================= 
@@ -714,70 +947,83 @@ t>
 			var idapp = getGridCellValue(grid,'idapp');
 			if (idapp) {
 				NA.NAEvent.preventDefault(event);
-				if (!confirm('are you sure you want to delete data\nOperation can not be undone ?')) {
-					return false;
-				}
-				NA.NAEvent.preventDefault(event);
-				try {
-					//delete data di server                  
-					//$(selector).post(URL,data,function(data,status,xhr),dataType)-->return data type
-
-					var url = NA.common.addURLParam('Delete/', 'idapp', idapp);
-					var NAAjax = NA.common.AJAX;
-					NAAjax.POST(url,
-						{ 'idapp': idapp },
-						'application/json',
-						'application/json',
-						null, null,
-						function () {
-							var textStatus = JSON.parse(this.responseText);
-							if (textStatus === 'success') {
-							 var rowNum = grid.getGridParam('rowNum'),
-							 allRecords = grid.getGridParam('records'),
-							 totalPages = parseInt((allRecords / rowNum) + 1),
-							 curPage = grid.getGridParam('page'),
-							 rowId = grid.jqGrid('getGridParam', 'selrow'),
-								curRecount = grid.jqGrid('getGridParam', 'reccount');
-								mustReload = true;
-								if (parseInt(curRecount) === 1) {
-									if (totalPages > 1) {
-										curPage--;
-									}
-									else {
-										mustReload = false;
-										grid.delRowData(rowId);
-									}
+			 	return BootstrapDialog.confirm({
+					title: NA.common.mesage.titleInfo,
+					message: NA.common.mesage.confirmDelete,
+					type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+					animate: false,
+					closable: false, // <-- Default value is false
+					draggable: true, // <-- Default value is false
+					btnCancelLabel: 'NO.', // <-- Default value is 'Cancel',
+					btnOKLabel: 'Yes.', // <-- Default value is 'OK',
+					btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog type will be used,
+					callback: function (result) {
+						// result will be true if button was click, while it will be false if users close the dialog directly.
+						if (result) {
+							try {
+								//delete data di server 
+								var url = NA.common.addURLParam('Delete/', 'idapp', idapp);
+								var NAAjax = NA.common.AJAX;
+								NAAjax.POST(url,
+									{ 'idapp': idapp },
+									'application/json',
+									'application/json',
+									null, null,
+									function () {
+										var textStatus = JSON.parse(this.responseText);
+										if (textStatus === 'success') {
+											var rowNum = grid.getGridParam('rowNum'),
+											allRecords = grid.getGridParam('records'),
+											totalPages = parseInt((allRecords / rowNum) + 1),
+											curPage = grid.getGridParam('page'),
+											rowId = grid.jqGrid('getGridParam', 'selrow'),
+											curRecount = grid.jqGrid('getGridParam', 'reccount');
+											mustReload = true;
+											if (parseInt(curRecount) === 1) {
+												if (totalPages > 1) {
+													curPage--;
+												}
+												else {
+													mustReload = false;
+													grid.delRowData(rowId);
+												}
+											}
+											else if (parseInt(totalPages) === 1) {
+												mustReload = false;
+												grid.delRowData(rowId);
+											}
+											else if (parseInt(curRecount) > 1) {
+												mustReload = false;
+												grid.delRowData(rowId);
+											}
+											if (mustReload) {
+												window.document.body.style.cursor = 'wait';
+												grid.trigger("reloadGrid", [{ page: curPage }]);
+											}
+										}
+									}, null,
+									function () { throw new error(this.responseText + '\nStatus code :' + this.statusText); },
+									function () { window.document.body.style.cursor = 'default'; },
+									null);
+								//$.post(url, {}, function (data, textStatus, jqXHR) {
+								NA.NAEvent.stopPropagation(event);
+								//});
+							} catch (e) {
+								console.log(e);
+								window.document.body.style.cursor = 'default';
+								if (JSON.parse(e.message)) {
+									alert(e.name + ': ' + JSON.parse(e.message));
 								}
-								else if (parseInt(totalPages) === 1) {
-									mustReload = false;
-									grid.delRowData(rowId);
-								}
-								else if (parseInt(curRecount) > 1) {
-									mustReload = false;
-									grid.delRowData(rowId);
-								}
-								if (mustReload) {
-									window.document.body.style.cursor = 'wait';
-									grid.trigger("reloadGrid", [{ page: curPage }]);
+								else {
+									alert(e);
 								}
 							}
-						}, null,
-						function () { throw new error(this.responseText + '\nStatus code :' + this.statusText); },
-						function () { window.document.body.style.cursor = 'default'; },
-						null);
-					//$.post(url, {}, function (data, textStatus, jqXHR) {
-					NA.NAEvent.stopPropagation(event);
-					//});
-				} catch (e) {
-					console.log(e);
-					window.document.body.style.cursor = 'default';
-					if (JSON.parse(e.message)) {
-						alert(e.name + ': ' + JSON.parse(e.message));
+						}
+						else {
+							return false;
+						}
 					}
-					else {
-						alert(e);
-					}
-				}
+				});
 			}
 			else {
 				document.body.style.cursor = 'default';
@@ -826,7 +1072,7 @@ t>
 				if (target.innerText === ' Add' || target.innerText === ' Edit' || target.innerText === ' Open') {
 					if (target.innerText.trim() !== 'Add') {
 						var idapp = getGridCellValue(grid,'idapp');
-						if (typeof idapp == 'undefined' || IDApp === '') {
+						if (typeof idapp == 'undefined' || idapp === '') {
 							alert('Please select data to edit');
 							var dialog = dialog || NA.common.dialog.doc.querySelector("div.containerDialog");
 							if (dialog) {
@@ -885,144 +1131,6 @@ t>
                         			}
                         		};
 
-                        	    //grid detail 
-                        		//JQGrid Item Detail
-                        		var HasRef = NA.common.getElementID('hasRefData').value;
-								 
-                        		hasRef = HasRef.valueOf();
-                        		var AllowEdit = (!hasRef) && (!win.status !== 'Open')
-                        		gridTbl = $('jqGrid_NA_F_Goods_Receive_Detail');
-                        		gridPager = $('jqGrid_NA_F_Goods_Receive_Detail_Pager');
-                        		gridTbl.jqGrid({
-                        		    data: (function () {
-                        		        if (win.status === 'Open' || win.status === 'Edit') {
-                        		            return JSON.parse(initializeForm.dataForGridDetail);
-                        		        }
-                        		    })(),
-                        		    datatype: "local",//column IDapp, NO,	goods 	datereceived supliername FK_ReceivedBy 	receivedby FK_P_R_By pr_by totalpurchase totalreceived 
-                        		    colNames: ['idapp', 'NO', 'itemcode', 'goods Description', ],
-                        		    colModel: [
-                                        { name: 'idapp', hidden: true },
-                                        { name: 'fk_appp', hidden: true },
-                                        { name: 'no', key: true, width: 40, align: 'right', sortable: false, editable: false, },
-                                        {
-                                        	//ref https://jsfiddle.net/OlegKi/ugxvr75q/ or https://stackoverflow.com/questions/42662684/inlineedit-with-one-column-auto-complete-text-field or https://techbrij.com/jqgrid-flexbox-jquery-autocomplete-edit
-                                        	//addrowdata ref http://www.trirand.com/blog/?page_id=393/help/add-empty-row
-                                            name: 'brandname', width: 140, align: 'left', sortable: true, 
-                                            editable: AllowEdit,
-                                            cellEdit: AllowEdit,
-                                            editrules: { required: true },
-                                            autoResizing: { minColWidth: 140, },
-											edittype : 'text',
-                                            editoptions: {
-                                            	dataInit: function (elem) {
-                                            		fetcBrands.call(this, elem, "brandname");
-                                            	}, placeholder: (function () {
-                                            	    if ($(this).val() != '') { return 'choose if exists'; }
-                                            	})(), title: 'Avoid mised-typing brand name !', class: 'NA-Form-Control'
-                                            }, 
-                                            //edittype: 'select',
-                                            //formatter: 'select',
-                                            //editoptions: {
-                                            //	value: (function () {
-                                            //		if (win.status === 'Open' || win.status === 'Edit') {
-                                            //			return localSelectBrands(initializeForm.dataForGridDetail);
-                                            //		}
-                                            //		else {
-
-                                            //		}
-                                            //	})(),
-                                            //}
-                                        },
-                                        {
-                                        	name: 'priceperunit', width: 90, sortable: true, align: 'right',
-                                        	editable: AllowEdit,
-                                        	cellEdit: AllowEdit,
-                                        	edittype: 'text',
-                                            template: 'number',
-                                        	editrules: { required: false,integer:false, },
-                                        	autoResizing: { minColWidth: 140, },
-                                        	editoptions: { defaultValue: 0, class: 'NA-Form-Control',patern :'^[0-9]+([\.,][0-9]+)?$',
-                                        	    step:'any', tittle:'Please enter valid value',  },
-                                        	formatter: 'number',
-                                        	formatoptions: { decimalSeparator: ",", thousandsSeparator: "." },
-                                        },
-										{
-											name: 'typeapp', width: 80, align: 'left',
-											editable: AllowEdit,
-											cellEdit: AllowEdit,
-											edittype: 'text',
-											editrules: { required: true },
-											editoptions: { class: 'NA-Form-Control' },
-											autoResizing: { minColWidth: 80, },											
-										},
-										{
-											name: 'serialnumber', width: 100,  align: 'left',
-											editable: AllowEdit,
-											cellEdit: AllowEdit,
-											edittype: 'text',
-											editrules: { required: true, },
-											editoptions: { defaultValue: 'N/A', class: 'NA-Form-Control' },
-											autoResizing: { minColWidth: 100, },
-										},
-										{
-											name: 'warranty', width: 100, align: 'left',
-											editable: AllowEdit,
-											cellEdit: AllowEdit,
-											edittype: 'text',
-											template: 'number',
-											editrules: { required: false,integer:false, },
-											autoResizing: { minColWidth: 100, },
-											editoptions: {
-											    defaultValue: 1, class: 'NA-Form-Control', patern: '^[0-9]+([\.,][0-9]+)?$',
-											    step: 'any', tittle: 'Please enter valid value',
-											},
-                                            formatter:'number',
-											formatoptions: { decimalSeparator: ",", thousandsSeparator: "." },
-										},
-                        		    ],
-                        		    cellEdit: false,
-                        		    viewrecords: true,
-                        		    height: '150px',
-                        		    rowNum: (function () {
-                        		        if (win.status === 'Open' || win.status === 'Edit') {
-                        		            var c = JSON.parse(initializeForm.dataForGridDetail);
-                        		            return c.length;
-                        		        }
-                        		    })(),
-                        		    cmTemplate: { autoResizable: true, editable: true },
-                        		    autoResizing: { compact: true, resetWidthOrg: true },
-                        		    sortname: "brandname",
-                        		    sortorder: "asc",
-                        		    multiSort: true,
-                        		    //shrinkToFit: false,
-                        		    iconSet: "fontAwesome",
-                        		    //forceFit: true,
-                        		    //toolbar: true,
-                        		    scrollrows: true,
-                        		    //hidegrid: true,
-                        		    //caption: "Transactions ---Find goods",
-                        		    pager: "#jqGrid_NA_F_Goods_Receive_Detail_Pager"
-                        		});
-                        	    //gridTbl.navGrid(gridPager,{
-                        		//    edit:false,add:false,del:false,search:false
-                        	    //}).navButtonAdd('gridPager',{
-                        		//    caption:"Save", buttonimg:"fullpath/row-insert-under.gif", onClickButton: function(){
-                        		//        var datarow = {name1: value1, name2: value2', ...};
-                        		//        var su=jQuery("#grid_id").addRowData("X",datarow,"last");
-                        		//        if(su) { jQuery("#grid_id").setSelection('X') }; }, position:"last"
-                        		//}).navButtonAdd('#Pager',{
-                        		//    caption:"Delete", buttonimg:"fullpath/row-delete.gif", onClickButton: function(){
-                        		//        var gr = jQuery("#grid_id").getGridParam("selrow");
-                        		//        if( gr != null ) {
-                        		//            jQuery("#grid_id").delGridRow(gr,{afterSubmit: function(xhr,postdata){ alert ('After Submit: ' +
-                                //            postdata); return [true]},
-                        		//                url: 'delete.php'});
-                        		//        } else {
-                        		//            alert("Please Select Row to delete!");
-                        		//        };
-                        		//    }, position:"last"
-                        		//});
 
                         		if (status !== 'Open' && status !== '') {//hanya untuk status Add/Edit                                   
                         			//simpan original data di initializeForm
