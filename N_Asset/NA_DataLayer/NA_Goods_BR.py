@@ -1,4 +1,4 @@
-﻿from django.db import models
+from django.db import models
 from NA_DataLayer.common import *
 from django.db.models import Count, Case, When,Value, CharField
 from django.db import transaction;
@@ -6,6 +6,8 @@ from django.db import connection
 from django.core import exceptions
 from decimal import Decimal, DecimalException
 from django.db.models import F
+from django.db.models import Value
+from django.db.models.functions import Concat
 class NA_BR_Goods(models.Manager):
 	def PopulateQuery(self,columnKey,ValueKey,criteria=CriteriaSearch.Like,typeofData=DataType.VarChar):
 		NAData = None
@@ -68,7 +70,7 @@ class NA_BR_Goods(models.Manager):
 	def SearchBrand(self,term):
 		return super(NA_BR_Goods,self).get_queryset().filter(brandname__istartswith=term).values('brandname').distinct()
 	def SearchGoods(self,term):
-		return super(NA_BR_Goods,self).get_queryset().filter(brandname__istartswith=term).values('goodsname').distinct()
+		return super(NA_BR_Goods,self).get_queryset().filter(goodsname__istartswith=term).values('goodsname').distinct()
 	def getData(self,itemCode):
 		#MyModel.objects.all().annotate(mycolumn=Value('xxx', output_field=CharField()))
 		NData = super(NA_BR_Goods,self).get_queryset().filter(itemcode__exact=itemCode)
@@ -109,7 +111,9 @@ class NA_BR_Goods(models.Manager):
 			if(Status==StatusForm.Input):
 				if(self.HasExist(itemCode)):
 					raise Exception('data has exists')	
-				obj.save(force_insert=True, using=self.db)
+				#save data to table na_receive
+				#update table stock
+				#obj.save(force_insert=True, using=self.db)
 				return "success"
 			elif(Status==StatusForm.Edit):				
 				if(not self.HasExist(itemCode)):
@@ -121,3 +125,13 @@ class NA_BR_Goods(models.Manager):
 		return obj
 	def Delete(self,itemCode):
 		return super(NA_BR_Goods,self).get_queryset().filter(itemcode__iexact=itemCode).delete()
+	#def get_queryset(self):
+	#	return goodsQueryset(self.model, using=self._db)
+class CustomManager(models.Manager):
+	def getGoods(self,itemCode):
+		return super(CustomManager,self).raw("SELECT IDApp,CONCAT(goodsname,' ', brandname,' ',IFNULL(typeapp,' ')) as goods FROM n_a_goods WHERE itemcode = %(itemCode)s",{'itemCode':itemCode})
+	def searchGoodsByForm(self,goods_desc):#values('m', 'b').annotate(n=F('m'), a=F('b'))/renameValue=F('goods')).values('idapp,itemcode,goods')
+		#get_queryset().filter(goods__icontains=goods_desc)..values('idapp,itemcode,goods')
+		data = super(CustomManager,self).get_queryset().annotate(goods=Concat('goodsname', Value(' '), 'brandname' , Value(' '), 'itemcode'))
+		data = data.filter(goods__icontains=goods_desc).values('idapp','itemcode','goods')
+		return data

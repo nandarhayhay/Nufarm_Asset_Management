@@ -89,7 +89,7 @@ window.Modernizr = (function( window, document, undefined ) {
     //   elem.style.webkitBorderRadius
 
     // Webkit ghosts their properties in lowercase but Opera & Moz do not.
-    // Microsoft uses a lowercase `ms` instead of the correct `Ms` in IE8+
+    // Microsoft uses a lowercase 'ms' instead of the correct 'Ms' in IE8+
     //   erik.eae.net/archives/2008/03/10/21.48.10/
 
     // More here: github.com/Modernizr/Modernizr/issues/issue/21
@@ -218,11 +218,11 @@ window.Modernizr = (function( window, document, undefined ) {
         element = element || document.createElement(TAGNAMES[eventName] || 'div');
         eventName = 'on' + eventName;
 
-        // When using `setAttribute`, IE skips "unload", WebKit skips "unload" and "resize", whereas `in` "catches" those
+        // When using 'setAttribute', IE skips "unload", WebKit skips "unload" and "resize", whereas 'in' "catches" those
         var isSupported = eventName in element;
 
         if ( !isSupported ) {
-          // If it has no `setAttribute` (i.e. doesn't implement Node interface), try generic element
+          // If it has no 'setAttribute' (i.e. doesn't implement Node interface), try generic element
           if ( !element.setAttribute ) {
             element = document.createElement('div');
           }
@@ -230,7 +230,7 @@ window.Modernizr = (function( window, document, undefined ) {
             element.setAttribute(eventName, '');
             isSupported = is(element[eventName], 'function');
 
-            // If property was created, "remove it" (by setting value to `undefined`)
+            // If property was created, "remove it" (by setting value to 'undefined')
             if ( !is(element[eventName], 'undefined') ) {
               element[eventName] = undefined;
             }
@@ -339,7 +339,7 @@ window.Modernizr = (function( window, document, undefined ) {
     // testProps is a generic CSS / DOM property test.
 
     // In testing support for a given CSS property, it's legit to test:
-    //    `elem.style[styleName] !== undefined`
+    //    'elem.style[styleName] !== undefined'
     // If the property is supported it will return an empty string,
     // if unsupported it will return undefined.
 
@@ -684,7 +684,7 @@ window.Modernizr = (function( window, document, undefined ) {
         if ( ret && 'webkitPerspective' in docElement.style ) {
 
           // Webkit allows this media query to succeed only if the feature is enabled.
-          // `@media (transform-3d),(-webkit-transform-3d){ ... }`
+          // '@media (transform-3d),(-webkit-transform-3d){ ... }'
           injectElementWithStyles('@media (transform-3d),(-webkit-transform-3d){#modernizr{left:9px;position:absolute;height:3px;}}', function( node, rule ) {
             ret = node.offsetLeft === 9 && node.offsetHeight === 3;
           });
@@ -757,7 +757,7 @@ window.Modernizr = (function( window, document, undefined ) {
                 bool      = new Boolean(bool);
                 bool.ogg  = elem.canPlayType('video/ogg; codecs="theora"')      .replace(/^no$/,'');
 
-                // Without QuickTime, this value will be `undefined`. github.com/Modernizr/Modernizr/issues/546
+                // Without QuickTime, this value will be 'undefined'. github.com/Modernizr/Modernizr/issues/546
                 bool.h264 = elem.canPlayType('video/mp4; codecs="avc1.42E01E"') .replace(/^no$/,'');
 
                 bool.webm = elem.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/^no$/,'');
@@ -794,7 +794,7 @@ window.Modernizr = (function( window, document, undefined ) {
     // In FF4, if disabled, window.localStorage should === null.
 
     // Normally, we could not test that directly and need to do a
-    //   `('localStorage' in window) && ` test first because otherwise Firefox will
+    //   '('localStorage' in window) && ' test first because otherwise Firefox will
     //   throw bugzil.la/365772 if cookies are disabled
 
     // Also in iOS5 Private Browsing mode, attempting to use localStorage.setItem
@@ -1096,7 +1096,7 @@ window.Modernizr = (function( window, document, undefined ) {
       }
 
       /**
-       * Returns the value of `html5.elements` as an array.
+       * Returns the value of 'html5.elements' as an array.
        * @private
        * @returns {Array} An array of shived element node names.
        */
@@ -1150,12 +1150,12 @@ window.Modernizr = (function( window, document, undefined ) {
         }
 
         // Avoid adding some elements to fragments in IE < 9 because
-        // * Attributes like `name` or `type` cannot be set/changed once an element
+        // * Attributes like 'name' or 'type' cannot be set/changed once an element
         //   is inserted into a document/fragment
-        // * Link elements with `src` attributes that are inaccessible, as with
+        // * Link elements with 'src' attributes that are inaccessible, as with
         //   a 403 response, will cause the tab/window to crash
-        // * Script elements appended to fragments will execute when their `src`
-        //   or `text` property is set
+        // * Script elements appended to fragments will execute when their 'src'
+        //   or 'text' property is set
         return node.canHaveChildren && !reSkip.test(nodeName) ? data.frag.appendChild(node) : node;
       }
 
@@ -1184,7 +1184,7 @@ window.Modernizr = (function( window, document, undefined ) {
       }
 
       /**
-       * Shivs the `createElement` and `createDocumentFragment` methods of the document.
+       * Shivs the 'createElement' and 'createDocumentFragment' methods of the document.
        * @private
        * @param {Document|DocumentFragment} ownerDocument The document.
        * @param {Object} data of the document.
@@ -1209,7 +1209,7 @@ window.Modernizr = (function( window, document, undefined ) {
         ownerDocument.createDocumentFragment = Function('h,f', 'return function(){' +
           'var n=f.cloneNode(),c=n.createElement;' +
           'h.shivMethods&&(' +
-            // unroll the `createElement` calls
+            // unroll the 'createElement' calls
             getElements().join().replace(/\w+/g, function(nodeName) {
               data.createElem(nodeName);
               data.frag.createElement(nodeName);
@@ -1250,7 +1250,7 @@ window.Modernizr = (function( window, document, undefined ) {
       /*--------------------------------------------------------------------------*/
 
       /**
-       * The `html5` object is exposed so that more elements can be shived and
+       * The 'html5' object is exposed so that more elements can be shived and
        * existing shiving can be detected on iframes.
        * @type Object
        * @example
@@ -1282,7 +1282,7 @@ window.Modernizr = (function( window, document, undefined ) {
         'supportsUnknownElements': supportsUnknownElements,
 
         /**
-         * A flag to indicate that the document's `createElement` and `createDocumentFragment`
+         * A flag to indicate that the document's 'createElement' and 'createDocumentFragment'
          * methods should be overwritten.
          * @memberOf html5
          * @type Boolean
@@ -1290,13 +1290,13 @@ window.Modernizr = (function( window, document, undefined ) {
         'shivMethods': (options.shivMethods !== false),
 
         /**
-         * A string to describe the type of `html5` object ("default" or "default print").
+         * A string to describe the type of 'html5' object ("default" or "default print").
          * @memberOf html5
          * @type String
          */
         'type': 'default',
 
-        // shivs the document according to the specified `html5` object options
+        // shivs the document according to the specified 'html5' object options
         'shivDocument': shivDocument,
 
         //creates a shived element
@@ -1376,7 +1376,7 @@ window.Modernizr = (function( window, document, undefined ) {
     // Modernizr.prefixed() returns the prefixed or nonprefixed property name variant of your input
     // Modernizr.prefixed('boxSizing') // 'MozBoxSizing'
 
-    // Properties must be passed as dom-style camelcase, rather than `box-sizing` hypentated style.
+    // Properties must be passed as dom-style camelcase, rather than 'box-sizing' hypentated style.
     // Return values will also be the camelCase variant, if you need to translate that to hypenated style use:
     //
     //     str.replace(/([A-Z])/g, function(str,m1){ return '-' + m1.toLowerCase(); }).replace(/^ms-/,'-ms-');
