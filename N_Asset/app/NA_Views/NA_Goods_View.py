@@ -1,9 +1,9 @@
-﻿from django.shortcuts import render
+from django.shortcuts import render
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 from django.utils.dateformat import DateFormat
-from NA_Models.models import goods, LogEvent
+from NA_Models.models import goods
 from django.core import serializers
 from NA_DataLayer.common import CriteriaSearch
 from NA_DataLayer.common import ResolveCriteria
@@ -49,7 +49,13 @@ def NA_Goods_Search(request):
 	criteria = ResolveCriteria.getCriteriaSearch(str(Icriteria))
 	dataType = ResolveCriteria.getDataType(str(IdataType))
 	if(Isord is not None and str(Isord) != ''):
-		NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by('-' + str(Isidx))
+		if ',' in Isidx:
+			NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by(",".join(str(Isidx)))
+		else:
+			if Isord == 'desc':
+				NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by('-' + str(Isidx))
+			else:
+				NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType).order_by(str(Isidx))
 	else:
 		NAData = goods.objects.PopulateQuery(IcolumnName,IvalueKey,criteria,dataType)			
 #		from django.db.models import F
@@ -112,7 +118,7 @@ def getCurrentDataModel(request,form):
 	return {'itemcode':form.cleaned_data['itemcode'],'goodsname':form.cleaned_data['goodsname'],'brandname':form.cleaned_data['brandname'],
 		 'typeapp':form.cleaned_data['typeapp'],'unit':form.cleaned_data['unit'],'priceperunit':decimal.Decimal(form.cleaned_data['priceperunit']),
 		 'depreciationmethod':form.cleaned_data['depreciationmethod'],'economiclife':decimal.Decimal(form.cleaned_data['economiclife'])
-		 ,'placement':form.cleaned_data['placement'],'descriptions':request.POST.get('descriptions'),'inactive':True if request.POST.get('inactive') == 'true' else False,'createddate':str(datetime.now().date()),'createdby':request.user.username if request.user.username is not None and request.user != '' else 'Admin' }
+		 ,'placement':form.cleaned_data['placement'],'descriptions':request.POST.get('descriptions'),'inactive':True if request.POST.get('inactive') == 'true' else False,'createddate':str(datetime.now().date()),'createdby':request.user.username if (request.user.username is not None and request.user.username != '') else 'Admin' }
 @ensure_csrf_cookie
 def ShowEntry(request):
 	authentication_classes = []
@@ -147,7 +153,7 @@ def ShowEntry(request):
 					#newItem = goods(**data)
 					
 					#newItem = 
-	#					IcolumnName = request.GET.get('columnName');
+	#IcolumnName = request.GET.get('columnName');
 	#IvalueKey =  request.GET.get('valueKey')
 	#IdataType =  request.GET.get('dataType')
 	#Icriteria =  request.GET.get('criteria')
@@ -161,7 +167,6 @@ def ShowEntry(request):
 			else:				
 				form = NA_Goods_Form(initial=initializationForm)
 				form.fields['status'].widget.attrs = {'value':status};	
-				#form.fields['initializeForm'].widget.attrs = {'value':json.dumps(initializationForm)}
 				return render(request, 'app/MasterData/NA_Entry.html', {'form' : form})
 		elif status == 'Edit' or status == "Open":		
 			hasRefData = goods.objects.hasreferenced(itemcode)
@@ -172,8 +177,7 @@ def ShowEntry(request):
 					#save data	
 					data = getCurrentDataModel(request,form);
 					data.update(idapp=request.POST.get('idapp'))	
-					data['modifieddate'] = datetime.now()
-					data['modifiedby'] = request.user.username
+				
 					if hasRefData:
 						return HttpResponse(json.dumps({'message':'can not edit data \nData has referenced child data'}),status = statuscode, content_type='application/json')										
 					result = goods.objects.SaveData(StatusForm.Edit,**data)
@@ -209,31 +213,10 @@ def setInActive(request):
 def deleteItem(request):
 	result='';
 	try:
-		itemcode = request.GET.get('itemCode')
-		log_goods = goods.objects.filter(itemcode=itemcode).values('itemcode','goodsname','brandname','typeapp','priceperunit',\
-			'depreciationmethod','unit','economiclife','placement','descriptions','inactive','createdby','createddate', 'modifieddate', 'modifiedby')[0]
+		itemcode = request.GET.get('itemCode');
 		hasref = goods.objects.hasreferenced(itemcode)
 		if hasref:
 			return HttpResponse(json.dumps({'message':'can not delete data \nData has referenced child data'}),status = 500, content_type='application/json')
-		LogEvent.objects.create(nameapp='Deleted Goods',typeapp='P', descriptionsapp={
-                    'deleted':[
-                        log_goods['itemcode'],
-                        log_goods['goodsname'],
-						log_goods['brandname'],
-                        log_goods['typeapp'],
-                        str(log_goods['priceperunit']),
-                        log_goods['depreciationmethod'],
-                        log_goods['unit'],
-                        str(log_goods['economiclife']),
-                        log_goods['placement'],
-                        log_goods['descriptions'],
-                        log_goods['inactive'],
-                        log_goods['createddate'].strftime('%d %B %Y %H:%M:%S'),
-                        log_goods['createdby'],
-                        log_goods['modifieddate'],
-                        log_goods['modifiedby']
-                        ]
-                    }, createdby=str(request.user.username))
 		goods.objects.Delete(itemcode)
 		return HttpResponse(json.dumps({'message':'success'}),status = 200, content_type='application/json') 
 	except Exception as e:					

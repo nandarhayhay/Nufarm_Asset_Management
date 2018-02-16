@@ -4,7 +4,6 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <Name>N_Asset</Name>
     <RootNamespace>N_Asset</RootNamespace>
-    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,8 +11,7 @@
     <ProjectGuid>4b410ecb-5c2d-4d98-bcca-daec4bcc5d33</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <ProjectTypeGuids>{5F0BE9CA-D677-4A4D-8806-6076C0FAAD37};{349c5851-65df-11da-9384-00065b846f21};{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>manage.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -29,58 +27,29 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="app\admin.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="app\forms.py" />
-    <Compile Include="app\middleware.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="app\models.py" />
-    <Compile Include="app\NA_Views\NA_Acc_Fa_View.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="app\NA_Views\NA_EmailData_View.py">
+    <Compile Include="app\NA_Views\NA_Goods_Receive_View.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\NA_Views\NA_Goods_View.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\NA_Views\NA_LogEvent_View.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="app\NA_Views\NA_Suplier_View.py" />
-    <Compile Include="app\NA_Views\NA_To_Grids.py" />
-    <Compile Include="app\NA_Views\NA_User_View.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="app\NA_Views\__init__.py" />
-    <Compile Include="app\NA_Views\NA_Employee_View.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="app\tests.py" />
     <Compile Include="app\views.py" />
     <Compile Include="app\__init__.py" />
+    <Compile Include="app\migrations\__init__.py" />
     <Compile Include="manage.py" />
     <Compile Include="NA_DataLayer\admin.py" />
-    <Compile Include="NA_DataLayer\NA_Acc_FA.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="NA_DataLayer\jqgrid.py" />
     <Compile Include="NA_DataLayer\NA_Goods_BR.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="NA_DataLayer\NA_Suplier.py">
+    <Compile Include="NA_DataLayer\NA_Goods_Receive_BR.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="NA_DataLayer\NA_User\models.py" />
-    <Compile Include="NA_DataLayer\NA_User\forms.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="NA_DataLayer\NA_User\__init__.py" />
     <Compile Include="NA_DataLayer\__init__.py" />
-    <Compile Include="NA_DataLayer\NA_Employee.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="NA_Domain\NA_Goods.py">
       <SubType>Code</SubType>
     </Compile>
@@ -88,7 +57,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="NA_Domain\__init__.py" />
-    <Compile Include="NA_Models\apps.py" />
     <Compile Include="NA_Models\models.py" />
     <Compile Include="NA_Models\__init__.py" />
     <Compile Include="N_Asset\__init__.py" />
@@ -98,45 +66,53 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="app\" />
+    <Folder Include="app\migrations\" />
     <Folder Include="app\NA_Views\" />
     <Folder Include="app\static\" />
     <Folder Include="app\static\app\" />
     <Folder Include="app\static\app\content\" />
     <Folder Include="app\static\app\fonts\" />
     <Folder Include="app\static\app\images\" />
+    <Folder Include="app\static\app\images\JqueryImages\" />
     <Folder Include="app\static\app\scripts\" />
     <Folder Include="app\static\app\scripts\JqGridJS\" />
     <Folder Include="app\static\app\scripts\JqGridJS\i18n\" />
-    <Folder Include="app\static\app\Upload\" />
-    <Folder Include="app\static\app\Upload\email_data\" />
-    <Folder Include="app\static\app\Upload\email_data\rimba47prayoga\" />
-    <Folder Include="app\static\NA_User_Image\" />
-    <Folder Include="app\static\NA_User_Image\img\" />
-    <Folder Include="app\static\NA_User_Image\UploadImg\" />
     <Folder Include="app\templates\" />
     <Folder Include="app\templates\app\" />
     <Folder Include="app\templates\app\MasterData\" />
-    <Folder Include="app\templates\app\NA_User\" />
-    <Folder Include="app\templates\app\Search\" />
+    <Folder Include="app\templates\app\Transactions\" />
     <Folder Include="app\templates\app\UserControl\" />
     <Folder Include="NA_DataLayer\" />
-    <Folder Include="NA_DataLayer\NA_User\" />
     <Folder Include="NA_Domain\" />
     <Folder Include="NA_Models\" />
     <Folder Include="N_Asset\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AlterNA.sql" />
     <Content Include="app\static\app\content\Dialog.css" />
     <Content Include="app\static\app\content\jquery-ui.min.css" />
     <Content Include="app\static\app\content\MainLayouts.css" />
     <Content Include="app\static\app\content\Menu.css" />
-    <Content Include="app\static\app\content\font-awesome.min.css" />
     <Content Include="app\static\app\content\NA_commonEntry.css" />
     <Content Include="app\static\app\content\ui.jqgrid.css" />
+    <Content Include="app\static\app\images\dots.gif" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_diagonals-small_0_aaaaaa_40x40.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_diagonals-thick_15_444444_40x40.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_diagonals-thick_95_ffdc2e_40x40.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_glass_55_fbf5d0_1x400.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_highlight-hard_30_285c00_1x100.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_highlight-soft_33_4CAF50_1x100.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_highlight-soft_50_0b9910_1x100.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_highlight-soft_60_4CAF50_1x100.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-bg_inset-soft_10_4CAF50_1x100.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-icons_0a0101_256x240.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-icons_4eb305_256x240.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="app\static\app\images\JqueryImages\ui-icons_ffffff_256x240.png" />
     <Content Include="app\static\app\images\NufarmLogo.jpg" />
     <Content Include="app\static\app\images\bgLogo.jpg" />
     <Content Include="app\static\app\images\Examplemyself.jpg" />
-    <Content Include="app\static\app\scripts\easyloader.js" />
+    <Content Include="app\static\app\scripts\bootstrap-dialog.js" />
     <Content Include="app\static\app\scripts\JqGridJS\grid.base.js" />
     <Content Include="app\static\app\scripts\JqGridJS\grid.celledit.js" />
     <Content Include="app\static\app\scripts\JqGridJS\grid.common.js" />
@@ -157,31 +133,18 @@
     <Content Include="app\static\app\scripts\JqGridJS\jquery.fmatter.js" />
     <Content Include="app\static\app\scripts\JqGridJS\jquery.jqGrid.js" />
     <Content Include="app\static\app\scripts\JqGridJS\JsonXml.js" />
-    <Content Include="app\static\app\scripts\jquery-1.11.0.min.js" />
-    <Content Include="app\static\app\scripts\jquery-1.11.1.js" />
     <Content Include="app\static\app\scripts\jquery-ui.js" />
-    <Content Include="app\static\app\scripts\jquery-ui.min.js" />
-    <Content Include="app\static\app\scripts\jquery.tree.js" />
-    <Content Include="app\static\app\scripts\jspdf.min.js" />
     <Content Include="app\static\app\scripts\NAJS.js" />
+    <Content Include="app\static\app\scripts\jquery-1.11.1.js" />
+    <Content Include="app\static\app\scripts\jquery-1.11.1.min.js" />
     <Content Include="app\static\app\scripts\jquery.jqGrid.js" />
-    <Content Include="app\static\app\scripts\NA_EmailData.js" />
-    <Content Include="app\static\app\Upload\email_data\rimba47prayoga\rimba47prayoga_employee.pdf" />
+    <Content Include="app\static\app\scripts\_references.js" />
     <Content Include="app\templates\app\Dummy.html" />
-    <Content Include="app\templates\app\MasterData\EntryEmployee.html" />
-    <Content Include="app\templates\app\MasterData\EntrySuplier.html" />
-    <Content Include="app\templates\app\MasterData\Entry_AccFA.html" />
+    <Content Include="app\templates\app\layout.html" />
     <Content Include="app\templates\app\MasterData\NA_Entry.html" />
-    <Content Include="app\templates\app\MasterData\NA_F_Acc_FA.html" />
-    <Content Include="app\templates\app\MasterData\NA_F_EmailData.html">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="app\templates\app\MasterData\NA_F_Goods.html" />
-    <Content Include="app\templates\app\MasterData\NA_F_Employee.html" />
-    <Content Include="app\templates\app\MasterData\NA_F_Suplier.html" />
-    <Content Include="app\templates\app\NA_User\NA_User_Profile.html" />
-    <Content Include="app\templates\app\NA_User\NA_User_Register.html" />
-    <Content Include="app\templates\app\Search\BySearch.html" />
+    <Content Include="app\templates\app\Transactions\Goods_Receive.html" />
+    <Content Include="app\templates\app\Transactions\NA_F_Goods_Receive.html" />
     <Content Include="app\templates\app\UserControl\customFilter.html" />
     <Content Include="NA_DataLayer\common.py" />
     <Content Include="requirements.txt" />
@@ -194,14 +157,19 @@
     <Content Include="app\static\app\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="app\static\app\scripts\bootstrap.js" />
     <Content Include="app\static\app\scripts\bootstrap.min.js" />
+    <Content Include="app\static\app\scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="app\static\app\scripts\jquery-1.10.2.min.map" />
+    <Content Include="app\static\app\scripts\jquery.validate-vsdoc.js" />
+    <Content Include="app\static\app\scripts\jquery.validate.js" />
+    <Content Include="app\static\app\scripts\jquery.validate.min.js" />
+    <Content Include="app\static\app\scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="app\static\app\scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="app\static\app\scripts\modernizr-2.6.2.js" />
     <Content Include="app\static\app\scripts\respond.js" />
     <Content Include="app\static\app\scripts\respond.min.js" />
-    <Content Include="app\static\app\scripts\_references.js" />
     <Content Include="app\templates\app\about.html" />
     <Content Include="app\templates\app\contact.html" />
     <Content Include="app\templates\app\index.html" />
-    <Content Include="app\templates\app\layout.html" />
     <Content Include="app\templates\app\login.html" />
     <Content Include="app\templates\app\loginpartial.html" />
   </ItemGroup>
