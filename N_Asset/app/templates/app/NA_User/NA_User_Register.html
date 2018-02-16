@@ -1,0 +1,115 @@
+﻿<style>
+.form-group{
+	margin-bottom: 15px;
+}
+
+label{
+	margin-bottom: 15px;
+}
+
+input,
+input::-webkit-input-placeholder {
+    font-size: 11px;
+    padding-top: 3px;
+}
+
+
+.main-center{
+ 	margin-top: 30px;
+ 	margin: 0 auto;
+ 	max-width: 330px;
+    background:none
+}
+
+.login-button{
+	margin-top: 5px;
+}
+
+.login-register{
+	font-size: 11px;
+	text-align: center;
+}
+#form_user {
+    background:none;
+    width:450px;
+    margin:10px 0 30px 0;
+}
+.left-label{
+    text-align:left;
+    font-weight:bold
+}
+span.input-group-addon {
+    background:white;
+    border-color:#4CAF50;
+    color:#4CAF50;
+}
+form#form_user input.form-control {
+    border-left-color:#4CAF50;
+    box-shadow:none
+}
+form#form_user input.form-control:focus {
+    border-color:#4CAF50;
+    box-shadow:none
+}
+</style>
+<form class="form-horizontal" method="post" action="{% url 'register' %}" id="form_user" enctype="multipart/form-data">
+    {% csrf_token %}
+	<div class="row">
+		<div class="col-sm-6">
+            <label for="name" class="control-label" style="text-align: left;font-weight:bold">First Name :</label>
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+				{{form.first_name}}
+			</div>
+		</div>
+        <div class="col-sm-6" style="padding: 0 15px 0 0;">
+            <label for="name" class="control-label" style="text-align: left;font-weight:bold">Last Name :</label>
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+				{{form.last_name}}
+			</div>
+		</div>
+	</div>
+    <div class="row">
+		<div class="col-sm-6">
+            <label for="username" class="control-label" style="text-align: left;font-weight:bold">Username :</label>
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+				{{form.username}}
+			</div>
+		</div>
+        <div class="col-sm-6">
+            <label class="control-label" for="textinput" style="text-align: left;font-weight:bold">Picture :</label>
+            {{form.picture}}
+        </div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+            <label for="email" class="control-label" style="text-align: left;font-weight:bold">Email :</label>
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+				{{form.email}}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+            <label for="password" class="control-label" style="text-align: left;font-weight:bold">Password :</label>
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+				{{form.password1}}
+			</div>
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-sm-12">
+            <label for="confirm" class="control-label" style="text-align: left;font-weight:bold">Confirm Password :</label>
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+				{{form.password2}}
+			</div>
+		</div>
+    </div>
+    <input type="submit" style="display:none" id="user_submit"/>
+    {{form.initializeForm_user}}
+</form>

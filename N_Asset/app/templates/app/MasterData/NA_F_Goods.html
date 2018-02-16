@@ -3,6 +3,8 @@
 {% for itemCombo in populateColumn %}
 <li><a href="#" data-tipe="{{itemCombo.dataType}}" data-column="{{itemCombo.columnName}}">{{itemCombo.label}}</a></li>
 {% endfor %}
+<li><a id="custSearch" href="#">CustomSearch</a></li>
+
 {% endblock %}
 
 {% block javascriptAndUI %}
@@ -10,20 +12,25 @@
 <!--================================Load Script Modules NA ===========================================-->
 <script type="text/javascript" src="../../../static/app/scripts/NAJS.js"></script>
 <!--=======================================================================================================-->
-
+<script>
+    function get_csrf(){
+        csrf_token = '{{csrf_token}}'
+        return csrf_token
+    }
+</script>
 <script type="text/javascript">
     
-	(function(){ 
-		
-		if (!NA.common.getElementID('CustomSearch')){
-			var parentC = NA.common.doc.querySelector('ul.dropdown-menu.search');
-			lastLi = NA.common.doc.createElement('li'),	
-			lastLi_a =  NA.common.doc.createElement('a');
-			lastLi_a.setAttribute('id','custSearch');
-			lastLi_a.textContent = 'CustomSearch';
-			lastLi.appendChild(lastLi_a);
-			parentC.appendChild(lastLi);
-		}       
+    (function(){   
+        var txtSearchMaster =  NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+            btnSearchMaster = NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');
+        window.onunload = function(){
+            if (typeof txtSearchMaster.onclick == "function") {
+                NA.NAEvent.removeHandler(txtSearchMaster,'keydown',handlerSearchInput)               
+            }
+            if (typeof btnSearchMaster.onclick == "function") {
+                NA.NAEvent.removeHandler(btnSearchMaster,'click',handlerSearchInput);
+            }
+        };
 //=================add Dynamic Styles=============================
         NA.common.loadStyles("../../../static/app/content/jquery-ui.min.css","jqueryUI");
         NA.common.loadStyles("../../../static/app/content/ui.jqgrid.css","UIJqueryGrid");   
@@ -32,14 +39,16 @@
         (function(elm){
             var listElem = elm.children;
             Array.prototype.forEach.call(listElem,function(item){//buat jadi foreach mesti convert dulu ke array
-                NA.NAEvent.addHandler(item,'click',function(event){
-                    event.preventDefault();
-                    if(item.firstChild.id === 'custSearch'){
-                        //=========='show dialog search'==================
-                        NA.common.dialog.createSearchDialog(event)
-                    }
-                    NA.common.getElementID('bySearch').firstChild.nodeValue = item.textContent;
-                });
+                if(item.firstChild.nodeValue != 'CustomSearch'){
+                    NA.NAEvent.addHandler(item,'click',function(event){
+                        event.preventDefault();
+                        if(item.firstChild.id === 'custSearch'){
+                            //=========='show dialog search'==================
+                            NA.common.dialog.createSearchDialog(event)
+                        }
+                        NA.common.getElementID('bySearch').firstChild.nodeValue = item.textContent;
+                    });
+                }
             });
         })(DivSearch);
     })();   
@@ -50,7 +59,7 @@
 <script>window.jQuery || document.write('\<script src="{% static 'app/scripts/jquery-1.11.1.js' %}"\>\<\/script\>')</script>
 
 <!-- This is the Javascript file of jqGrid -->
-<script src="{% static 'app/scripts/jquery.jqGrid.js' %}"></script>
+<script src="{% static 'app/scripts/a/JqGridJS/jquery.jqGrid.min.js' %}"></script>
 
 <!-- This is the localization file of the grid controlling messages, labels, etc. -->
 <!-- We support more than 40 localizations -->
@@ -63,7 +72,13 @@
 <table id="jqGrid_NA_F_Goods"></table>
 <div id="jqGrid_NA_F_Goods_Pager"></div>
 
-{% endblock %}
+
+<script type="text/javascript">
+  
+</script>         
+
+
+{%endblock%}
 
 {% block DialogEntry %}
 
@@ -100,22 +115,11 @@
            
         //===============================END AJAX SetuP===========================-->  
 
-        //var txtSearchMaster =  NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
-		//   btnSearchMaster = NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');       
-
         //========================Variable Object untuk memanggil search data secara default===============================
         var win = win||window;
         var  grid = $("#jqGrid_NA_F_Goods");
         var txtSearchMaster =  txtSearchMaster|| NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
         btnSearchMaster = btnSearchMaster||NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');
-		window.onunload = function(){
-        	if (typeof txtSearchMaster.onclick == "function") {
-        		NA.NAEvent.removeHandler(txtSearchMaster,'keydown',handlerSearchInput)               
-        	}
-        	if (typeof btnSearchMaster.onclick == "function") {
-        		NA.NAEvent.removeHandler(btnSearchMaster,'click',handlerSearchInput);
-        	}
-        };
         //settings btn sesuai user access
         //anggap saja sekarang admin
         var btnSave =  NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(4)'),
@@ -124,107 +128,110 @@
             btnPrint =  NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(7)'),
             btnHelp =  NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(8)'),
             containerMenu = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav');//inistialisasi menu   
-        function LoadData(page){
-        	var url = 'NA_Goods_Search/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
-			  '&' + win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
-			  '&' + win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) +
-			  '&' + win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria());
-        	if(arguments.length > 0){
-        		grid.setGridParam({url:url}).trigger("reloadGrid",[{page:page,}]);
-        	}
-        	else{
-        		try {           
-        			grid.jqGrid({
-        				url:url,
-        				mtype: "GET",
-        				datatype: "json",
-        				colNames: ['IDapp','Item Code','Goods Name','Brand Name','Unit','Price/PerUnit','Placement','Depreciation Method','Economic Life','inactive','Created Date','Created By'],
-        				colModel: [
+        function LoadData(page){          
+            if(arguments.length > 0){
+                var url = 'NA_Goods_Search/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
+                      '&' +  win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
+                      '&' +  win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) + 
+                      '&' +  win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria());
+                grid.setGridParam({url:url}).trigger("reloadGrid",[{page:page,}]);
+            }
+            else{
+                try {           
+                    grid.jqGrid({
+                        url: 'NA_Goods_Search/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
+                            '&' +  win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
+                            '&' +  win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) + 
+                            '&' +  win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria()),
+                        mtype: "GET",
+                        datatype: "json",
+                        colNames: ['IDapp','Item Code','Goods Name','Brand Name','Unit','Price/PerUnit','Placement','Depreciation Method','Economic Life','inactive','Created Date','Created By'],
+                        colModel: [
                             {name: 'idapp', key: true, hidden: true, width:70,align:'left'},
                             {name: 'itemcode', index:'itemcode', width: 80,sortable:true,editable:false,align:'left', filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
-                            {name: 'brandname', index:'brandname',width: 150,sortable:true,editable:false, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
+                            {name: 'brandname', index:'brandcame',width: 150,sortable:true,editable:false, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             //formatter : 'date', formatoptions: { srcformat : 'Y-m-d H:i:s', newformat :'ShortDate'}},
                             {name: 'goodsname',index:'goodsname', width: 150,sortable:true,editable:false, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] } },
                             {name:'unit',index:'unit',width:70,sortable:true,editable:false,align:'left', filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name: 'priceperunit',index:'priceperunit', width: 150,sortable:true,align:'right',formatter:'currency', formatoptions:{decimalSeparator:",", thousandsSeparator: ".",
-                            	decimalPlaces: 2, prefix: "Rp "},filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] } },
+                                decimalPlaces: 2, prefix: "Rp "},filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] } },
                             {name:'placement',index:'placement',width:110,sortable:true,editable:false,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name:'typeofdepreciation',index:'typeofdepreciation',width:120,sortable:true,editable:false,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name:'economiclife',index:'economiclife',sortable:true,width:100,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
                             {name:'inactive',index:'inactive',sortable:true,width:50,align:'center', editable:true,edittype:'checkbox',editoptions:{value: "true:false", defaultValue: "false"},formatter:'checkbox', formatoptions: {disabled : false}},
                             {name:'createddate',index:'createddate',sortable:true,width:120,formatter:'date',formatoptions:{srcformat: 'Y-m-d',newformat: 'd F Y'}},
                             {name:'createdby',index:'createdby',sortable:true,width:110,editable:false,filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }},
-        				],
-        				ondblClickRow: function(rowId) {
-        					var btnOpen = NA.common.doc.querySelector('ul.nav.navbar-nav>li:nth-child(2)>button');
-        					if(btnOpen){
-        						btnOpen.click();
-        					}                   
-        				},
-        				gridComplete: function(){
-        					document.body.style.cursor = 'default';
-        				},
-        				beforeSelectRow: function (rowid, e) {
-        					var $self = $(this),
+                        ],
+                        ondblClickRow: function(rowId) {
+                            var btnOpen = NA.common.doc.querySelector('ul.nav.navbar-nav>li:nth-child(2)>button');
+                            if(btnOpen){
+                                btnOpen.click();
+                            }                   
+                        },
+                        gridComplete: function(){
+                            document.body.style.cursor = 'default';
+                        },
+                        beforeSelectRow: function (rowid, e) {
+                            var $self = $(this),
                                 iCol = $.jgrid.getCellIndex($(e.target).closest("td")[0]),
                             cm = $self.jqGrid("getGridParam", "colModel");
-        					//localData = $self.jqGrid("getLocalRow", rowid);
-        					if (cm[iCol].name === "inactive") {
-        						var checked = $(e.target).is(":checked");
-        						oriChecked = !checked;
-        						var tr = $(e.target).closest('tr');
-        						idapp = tr[0].id;
-        						if(parseInt(idapp) != -1){
-        							//post update data by idapp
-        							var url = 'setInActive/';
-        							url = NA.common.addURLParam(url,'idapp',idapp);
-        							url = NA.common.addURLParam(url,'inactive',checked);
-        							$.post(url, function(data, status,xhr){
-        								if(parseInt(status) != 200){
-        									if(parseInt(status) >= 500){
-        										$(this).attr('checked',oriChecked);
-        										throw new Error(data);
-        									}
-        									else {
-        										$(this).attr('checked',oriChecked);
-        										throw new Error((typeof data != 'undefined' && data != null)?data:'unknown error');
-        									}
-        								}
-        							},'json');
-        						}                           
-        					}                        
-        					return true; // allow selection
-        				},
-        				cellEdit:false,
-        				viewrecords: true,
-        				height: $('div.fltlft').height() - ($('div.fltlft').height() * 0.173),
-        				rowNum: 300,
-        				rowList: [20,50,100,200,300,500],
-        				sortname: "idapp",
-        				sortorder: "desc",
-        				multiSort: true,
-        				shrinkToFit:false,
-        				iconSet: "fontAwesome",
-        				forceFit:true,
-        				toolbar:true,
-        				scrollrows:true,
-        				hidegrid:true,             
-        				caption:"Master data -- Goods",
-        				pager: "#jqGrid_NA_F_Goods_Pager"
-        			});
-        			grid.navGrid("#jqGrid_NA_F_Goods_Pager", {                
-        				search: false, // show search button on the toolbar
-        				add: false,
-        				edit: false,
-        				del: false,
-        				refresh: true
-        			});
+                            //localData = $self.jqGrid("getLocalRow", rowid);
+                            if (cm[iCol].name === "inactive") {
+                                var checked = $(e.target).is(":checked");
+                                oriChecked = !checked;
+                                var tr = $(e.target).closest('tr');
+                                idapp = tr[0].id;
+                                if(parseInt(idapp) != -1){
+                                    //post update data by idapp
+                                    var url = 'setInActive/';
+                                    url = NA.common.addURLParam(url,'idapp',idapp);
+                                    url = NA.common.addURLParam(url,'inactive',checked);
+                                    $.post(url, function(data, status,xhr){
+                                        if(parseInt(status) != 200){
+                                            if(parseInt(status) >= 500){
+                                                $(this).attr('checked',oriChecked);
+                                                throw new Error(data);
+                                            }
+                                            else {
+                                                $(this).attr('checked',oriChecked);
+                                                throw new Error((typeof data != 'undefined' && data != null)?data:'unknown error');
+                                            }
+                                        }
+                                    },'json');
+                                }                           
+                            }                        
+                            return true; // allow selection
+                        },
+                        cellEdit:false,
+                        viewrecords: true,
+                        height: $('div.fltlft').height() - ($('div.fltlft').height() * 0.173),
+                        rowNum: 300,
+                        rowList: [20,50,100,200,300,500],
+                        sortname: "idapp",
+                        sortorder: "desc",
+                        multiSort: true,
+                        shrinkToFit:false,
+                        iconSet: "fontAwesome",
+                        forceFit:true,
+                        toolbar:true,
+                        scrollrows:true,
+                        hidegrid:true,             
+                        caption:"Master data -- Goods",
+                        pager: "#jqGrid_NA_F_Goods_Pager"
+                    });
+                    grid.navGrid("#jqGrid_NA_F_Goods_Pager", {                
+                        search: true, // show search button on the toolbar
+                        add: false,
+                        edit: false,
+                        del: false,
+                        refresh: true
+                    });
                
-        		} catch (e) {
-        			console.log(e);
-        			document.body.style.cursor = 'default';
-        		}
-        	};           
+                } catch (e) {
+                    console.log(e);
+                    document.body.style.cursor = 'default';
+                }
+            };           
         };
 
         var SearchData =  NA.common.SearchData;
@@ -239,7 +246,8 @@
                 var btnDelete =  NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(5)')
                 btnDelete.click();
                 return false;
-            }});                  
+            }});
+                  
         NA.common.doc.title = 'Master data - Goods';
 
         function printToPDF(event){
@@ -341,6 +349,7 @@
                     //$(selector).post(URL,data,function(data,status,xhr),dataType)-->return data type
                     var url = NA.common.addURLParam('Delete/','itemCode',itemCode);
                     $.post(url,{}, function(data, textStatus, jqXHR){
+                        
                         if(textStatus === 'success'){
                             var rowNum = grid.getGridParam('rowNum'),
                          allRecords = grid.getGridParam('records'),
@@ -369,18 +378,19 @@
                             if(mustReload){
                                 window.document.body.style.cursor = 'wait';
                                 grid.trigger("reloadGrid",[{page:curPage}]);
-                            }
+                            };
+                            reload_LogEvent();
                         }                        
                     });
                 } catch (e) {
                     console.log(e);
-                    window.document.body.style.cursor = 'default';
-                    if(JSON.parse(e.message)){
-                        alert(e.name + ': ' + JSON.parse(e.message));
-                    }
-                    else{
-                        alert(e);
-                    }
+                    //window.document.body.style.cursor = 'default';
+                    //if(JSON.parse(e.message)){
+                    //    alert(e.name + ': ' + JSON.parse(e.message));
+                    //}
+                    //else{
+                    //    alert(e);
+                    //}
                 }           
             }
             else{
@@ -394,7 +404,7 @@
 
 
                
-      var  status = status || win.status,  csrftoken = function(){return NA.CookieUtil.get('csrftoken');}, initializeForm = '';
+        status = status || win.status,  csrftoken = function(){return NA.CookieUtil.get('csrftoken');}, initializeForm = '';
         //load Dialog Style css    
         NA.common.loadStyles("../../../static/app/content/Dialog.css", "DialogEntryStyle");//Load Style buat dialog sebelum di pakai
         NA.common.loadStyles("../../../static/app/content/NA_commonEntry.css","CommonEntry");//Load Style buat form sebelum di pakai
@@ -543,7 +553,15 @@
         //});
 
         NA.common.dialog.initDialog(containerMenu,'Nufarm Entry Goods - Master Data');//inistialisasi menu     
-                        
+
+        var elementMenus = [];
+        var menus = NA.common.doc.querySelectorAll('div.sidebar ul.list-sidebar.bg-defoult li ul li a');
+        Array.prototype.forEach.call(menus, function (item) {
+            if (item.textContent.indexOf("Email Data") > -1) {
+                elementMenus.push(item);
+            }
+        });
+        NA.common.dialog.initDialog(null, 'Nufarm Send Email - Master Data', elementMenus);//inistialisasi menu                
         //==============Function untuk mneyimpan value tiap form control======================================== 
         function getValuesForm(){
            return {
@@ -588,7 +606,7 @@
                 if (!csrfSafeMethod(settings.type)) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 }
-            };     
+            }     
         });
             // event handler btnSubmit form to raise validity event
         function submitForm(){         
@@ -615,69 +633,92 @@
         function ExecuteHandler(TextElement){
             if(window.document.body.style.cursor != 'wait'){window.document.body.style.cursor = 'wait';}            
             var dialog = NA.common.dialog.doc.querySelector("div.containerDialog"); 
-            var frmEntry = NA.common.doc.querySelector('#frm-NA-Entry-Goods');               
-            switch(TextElement){
-                case 'OK':{
-                    if(!frmEntry.checkValidity()){
-                        //NA.NAEvent.preventDefault(event);                                          
-                        var inputbtn = NA.common.getElementID('inputButton');
-                        inputbtn.click();
-                        var elements = NA.common.doc.querySelectorAll('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]');
-                        Array.prototype.forEach.call(elements,function(item){
-                            if(!item.validity.valid){
-                                item.focus();                                      
-                                document.body.style.cursor = 'default';
-                                return false;
-                            }
+            var frmEntry = NA.common.doc.querySelector('#frm-NA-Entry-Goods');           
+            if(frmEntry){
+                switch(TextElement){
+                    case 'OK':{
+                        if(!frmEntry.checkValidity()){
+                            //NA.NAEvent.preventDefault(event);                                          
+                            var inputbtn = NA.common.getElementID('inputButton');
+                            inputbtn.click();
+
                             document.body.style.cursor = 'default';
                             return false;
-                        });
-                       document.body.style.cursor = 'default';
-                        return false;
-                    }
-                    else{
-                        submitForm();                     
-                    }
-                    //jangan di close 
-                    //clear kan textbox dan set initilize data, focus ke itemCode
+                        }
+                        else{
+                            submitForm();
+                            reload_LogEvent();
+                        }
+                        //jangan di close 
+                        //clear kan textbox dan set initilize data, focus ke itemCode
 
-                    break;
+                        break;
+                    }
+                    case 'Cancel':
+                    case 'Close':{
+                        //check if data has changed with javascrispt
+                        initializeForm = NA.common.getElementID('id_initializeForm');                    
+                        if(status === 'Open' || initializeForm.Value == ''){  NA.common.dialog.closeDialog(dialog);  EraseElHidden();  return false; }                    
+                        var originalData =  JSON.parse(initializeForm.Value);
+                        var valuesForm = getValuesForm();
+                        if(NA.common.detectInputChanges(originalData,valuesForm)){
+                            if(confirm('Data has changed, \nSave data before closing form ?')){
+                                if(!frmEntry.checkValidity()){
+                                    //NA.NAEvent.preventDefault(event);   
+                                    var inputbtn = NA.common.getElementID('inputButton');
+                                    inputbtn.click();
+
+                                    //$(').each(function () {
+                                    //    if(!this.validity.valid){                    
+                                    //        $(this).focus();
+                                    //        window.document.body.style.cursor = 'default';return false;
+                                    //    }
+                                    //}); 
+
+                                }
+                                else{
+                                    submitForm();
+                                    reload_LogEvent();
+                                }
+                            }                                             
+                        }               
+                        NA.common.dialog.closeDialog(dialog);
+                        EraseElHidden();
+                        document.body.style.cursor = 'default';                    
+                        break;
+                    }                      
+                };
+            }else if (emailForm) {
+                var emailForm = NA.common.doc.querySelector('form#email_data');
+                switch (TextElement) {
+                    case 'Cancel':
+                    case 'Close': {
+                        var initializeEmail = NA.common.getElementID('initializeEmail');
+                        var originalData = initializeEmail.Value;
+                        var valuesForm = getValues_emailForm();
+                    
+                        if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                            if (confirm('Data has changed, \nAre you sure to Send mail ?')) {
+                                if (!emailForm.checkValidity()) {
+                                    //NA.NAEvent.preventDefault(event);   
+                                    var inputbtn = NA.common.getElementID('emailData_submit');
+                                    inputbtn.click();
+                                } else {
+                                    NA.common.doc.querySelector('div.dialogButtonOKCancel>a.button:nth-child(1)').click()
+                                }
+                            } else {
+                                NA.common.dialog.closeDialog(dialog);
+                            }
+                        } else {
+                            NA.common.dialog.closeDialog(dialog);
+                        }
+                    }
+
                 }
-                case 'Cancel':
-                case 'Close':{
-                    //check if data has changed with javascrispt
-                    initializeForm = NA.common.getElementID('id_initializeForm');                    
-                    if(status === 'Open' || initializeForm.Value == ''){  NA.common.dialog.closeDialog(dialog);  EraseElHidden();  return false; }                    
-                    var originalData =  JSON.parse(initializeForm.Value);
-                    var valuesForm = getValuesForm();
-                    if(NA.common.detectInputChanges(originalData,valuesForm)){
-                        if(confirm('Data has changed, \nSave data before closing form ?')){
-                            if(!frmEntry.checkValidity()){
-                                //NA.NAEvent.preventDefault(event);   
-                                var inputbtn = NA.common.getElementID('inputButton');
-                                inputbtn.click();
-                                var elements = NA.common.doc.querySelectorAll('#frm-NA-Entry-Goods :input:visible[required],[patern],[min],[max],[maxlength],[type="text"]');
-                                Array.prototype.forEach.call(elements,function(item){
-                                    if(!item.validity.valid){
-                                        item.focus();                                      
-                                        document.body.style.cursor = 'default';
-                                        return false;
-                                    }
-                                    document.body.style.cursor = 'default';
-                                    return false;
-                                });
-                            }
-                            else{
-                                submitForm();                              
-                            }
-                        }                                             
-                    }               
-                    NA.common.dialog.closeDialog(dialog);
-                    EraseElHidden();
-                    document.body.style.cursor = 'default';                    
-                    break;
-                }                      
-            };          
+            }
+
+
+                      
             document.body.style.cursor = 'default';
             return false;
         };            
@@ -721,10 +762,57 @@
                
             try {
                 var target = NA.NAEvent.getTarget(event);
-                if(target.innerText === ' Add' || target.innerText === ' Edit' || target.innerText === ' Open'){
+                if (target.innerText === 'Email Data') {
+                    var bottomRight = $('div.dialogButtonRightOther');
+                    bottomRight.find('a.btn-link:eq(1)').css({
+                        'cursor': 'pointer',
+                        'pointer-events': 'all',
+                        'width': 'auto',
+                        'margin-right':'5px'
+                    }).text('Export To PDF');
+                    bottomRight.find('a.btn-link:eq(0)').css({
+                        'cursor': 'pointer',
+                        'pointer-events': 'all',
+                        'width': 'auto'
+                    }).text('Preview PDF');
+                    //$('<a class="btn btn-success" style="#8FBC8F">Export To PDF</a>').insertAfter($('div.dialogButtonRightOther').find('a.btn-link'))
+                    var btnToPDF = document.querySelector('div.bottomDialogContent a.btn-link:nth-child(1)');
+                    //====================================== Display Email Data Dialog =========================================
+                    $('div.maindialogContent').load("http://localhost:8000/NA_EmailData/", function (response, status, xhr) {
+                        if (status == "success") {
+                            var jspdf = "http://localhost:8000/static/app/scripts/jspdf.js";
+                            var sfm = "http://localhost:8000/static/app/scripts/standard_fonts_metrics.js";
+                            var stz = "http://localhost:8000/static/app/scripts/split_text_to_size.js";
+                            var js_pdf = "http://localhost:8000/static/app/scripts/jspdf.plugin.autotable.min.js";
+                            var jqUI = "http://localhost:8000/static/app/scripts/jquery-ui.min.js";
+                            var autoComp = "http://localhost:8000/static/app/scripts/autocomplete.js";
+                            var emailDataJS = "http://localhost:8000/static/app/scripts/NA_EmailData.js";
+                            var oneLoad = $('body > script[src="' + jspdf + '"]') && $('head > script[src="' + jspdf + '"]') && $('head > script[src="' + jspdf + '"]');
+                            if (!oneLoad.length) {
+                                var afterJquery = $('script#jq_uery');
+                                $('<script type="text/javascript" src="' + jspdf + '">').insertAfter(afterJquery);
+                                $('<script type="text/javascript" src="' + sfm + '">').insertAfter(afterJquery);
+                                $('<script type="text/javascript" src="' + stz + '">').insertAfter(afterJquery);
+                                $('<script type="text/javascript" src="' + js_pdf + '">').insertAfter(afterJquery);
+                                $('<script type="text/javascript" src="' + jqUI + '">').insertAfter(afterJquery);
+                                $('<script type="text/javascript" src="' + autoComp + '">').insertAfter(afterJquery);
+                                $('<script type="text/javascript" src="' + emailDataJS + '">').insertAfter(afterJquery);
+                            };
+                            var originalData = getValues_emailForm();
+                            var initializeEmail = NA.common.getElementID('initializeEmail');
+                            initializeEmail.Value = originalData;
+
+                            //=========================================== End Display Email Data Dialog ===========================================
+                        }
+                    
+                    });
+                
+                    //if (window.document.body.style.cursor != 'default') { window.document.body.style.cursor = 'default'; }
+                    //return false;
+                }else if(target.innerText === ' Add' || target.innerText === ' Edit' || target.innerText === ' Open'){
                     if(target.innerText.trim() !== 'Add'){
                         var itemCode = getGridCellValue();
-                        if(typeof itemCode == 'undefined' || itemCode === ''){
+                        if(typeof(itemCode) == 'undefined' || itemCode === ''){
                             alert('Please select data to edit');
                             var dialog = dialog || NA.common.dialog.doc.querySelector("div.containerDialog");
                             if(dialog){
@@ -734,23 +822,20 @@
                             return false;
                         }
                     }
-
                     $('div.maindialogContent').load("ShowEntry?" + win.encodeURIComponent('itemcode') + '=' +  win.encodeURIComponent(itemCode) +
                         '&' + win.encodeURIComponent('status') + '=' +  win.encodeURIComponent(target.innerText.trim()),function(responseTxt,statusTxt,xhr){//load /tampilkan form entry data                    
                        
-                            if(statusTxt == "success"){ //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpan semua ke dalam variable jika perluas                            
+                            if(statusTxt == "success"){ //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpang semua ke dalam variable jika perlua
+                            
                                 $(this).html(responseTxt);
                                 //remove attribute disable untuk button OK dan cancel bila statusnya Add
                                 status = status||win.status||target.innerText.trim();
                                 switch(status){
                                     case 'Add':{
-                                    	//if(hasAttribute("value
-                                    	Array.prototype.forEach.call(NA.common.doc.querySelectorAll('div.dialogButtonEntry>a.button'), function (item) {
-                                    		if(item.hasAttribute('disabled')){
-                                    			item.removeAttribute('disabled');
-                                    		}  
-                                    	}); 
-                                        
+                                        //if(hasAttribute("value
+                                        if(target.hasAttribute('disabled')){
+                                            target.removeAttribute('disabled');
+                                        }
                                         break;                                        
                                     }
                                     case 'Edit':{
