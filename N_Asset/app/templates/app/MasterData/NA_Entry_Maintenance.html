@@ -1,0 +1,157 @@
+﻿<form action="ShowEntry/" method="post" style="width:420px;height:365px;" id="maintenance_form" onsubmit="return false">
+        {% csrf_token %}
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_itemcode" class="NA-Entry-label;">Item code</label>
+            {{ form.itemcode }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_typeApp">Type of goods</label>
+            {{form.typeApp}}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_goods" class="NA-Entry-label;">Search goods</label>
+            <div class="input-group" style="display: inline-flex; width: 180px;">
+                {{ form.goods }}
+                <span class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;justify-content:flex-end">
+                    <button class="btn btn-success" type="button" id="M_FK_goods" style="padding:4px 8px;height: 27px"><span class="glyphicon glyphicon-search"></span></button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_minus">Minus</label>
+            {{form.minus}}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_serialNum">Serial Number</label>
+            {{form.serialNum}}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_requestdate" class="NA-Entry-label;">Request Date</label>
+            {{ form.requestdate }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_startdate" class="NA-Entry-label;">Start Date</label>
+            {{ form.startdate }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_expense" class="NA-Entry-label;">Expense</label>
+            {{ form.expense }}
+        </div>
+    </div>
+    
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_maintenanceby">Maintenance By</label>
+            {{ form.maintenanceby }} 
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_personalname">Personal Name</label>
+            {{ form.personalname }}
+        </div>
+        
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_enddate" class="NA-Entry-label;">End Date</label>
+            {{ form.enddate }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_issucced" style="margin-left:10px">Is Succed
+                {{ form.issucced }}</label>
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_isstillguarantee" class="NA-Entry-label;"style="margin-left:50px;">Is Still Guarantee
+                {{ form.isstillguarantee }}
+            </label>
+        </div>
+        
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_descriptions">Descriptions</label>
+            {{form.descriptions}}
+        </div>
+    </div>
+    {{form.fk_goods}}
+    {{form.initializeForm}}
+    <input type="submit" style="display:none" id="maintenance_submit" />
+</form>
+
+<!--<form action="ShowEntry/" method="post" style="width:480px;height:305px;" id="maintenance_form" onsubmit="return false">
+        <input name="csrfmiddlewaretoken" value="PV7JH1g2hnkWiimSWgIO8EAtUDCHQTKLjeLSFjpTcXQZhaIp7I9x04mpa3RCiAMz" type="hidden">
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_itemcode" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:112px;">Search goods</label>
+            <input name="itemcode" style="width:100px;display: inline-block;" required="" placeholder="Item code" class="NA-Form-Control" id="id_itemcode" type="text">
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            
+            <div class="input-group" style="display: inline-flex; width: 200px;">
+                <input name="goods" disabled="disabled" style="width:200px" required="" placeholder="Goods" class="NA-Form-Control" id="id_goods" type="text">
+                <span class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;justify-content:flex-end">
+                    <button class="btn btn-success" type="button" id="M_FK_goods" style="padding:4px 8px;height: 27px"><span class="glyphicon glyphicon-search"></span></button>
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div" style="">
+            <label for="id_maintenanceby" class="NA-Entry-label;" style="display: inline-block;">Maintenance By</label>
+            <input name="maintenanceby" style="width:310px;display: inline-block;" required="" placeholder="Maintenance By" class="NA-Form-Control" id="id_maintenanceby" type="text">
+        </div>
+        
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_personalname" style="display: inline-block;margin-right: 8px;">Personal Name</label>
+            <input name="personalname" style="width:200px;display: inline-block;" required="" placeholder="Personal Name" class="NA-Form-Control" id="id_personalname" type="text">
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_expense" class="NA-Entry-label;" style="display: inline-block;margin-right: 57px;">Expense</label>
+            <input name="expense" style="width:200px;display: inline-block;" required="" placeholder="Expense" class="NA-Form-Control" id="id_expense" type="text">
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <div class="NA-Entry-inlinve-div">
+                <label for="id_issucced">Is Succed
+                    <input name="issucced" style="margin-left:5px;position:absolute" id="id_issucced" type="checkbox">
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_requestdate" class="NA-Entry-label;">Request Date</label>
+            <input name="requestdate" style="width:150px" required="" placeholder="Request Date" class="NA-Form-Control" id="id_requestdate" type="text">
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_startdate" class="NA-Entry-label;">Start Date</label>
+            <input name="startdate" style="width:150px" required="" placeholder="Start Date" class="NA-Form-Control" id="id_startdate" type="text">
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_enddate" class="NA-Entry-label;">End Date</label>
+            <input name="enddate" style="width:150px" required="" placeholder="End Date" class="NA-Form-Control" id="id_enddate" type="text">
+        </div>
+        <!--<div class="NA-Entry-inlinve-div">
+            <label for="id_isstillguarantee" class="NA-Entry-label;">Is Still Guarantee
+                <input type="checkbox" name="isstillguarantee" style="margin-left:5px;position:absolute" id="id_isstillguarantee" />
+            </label>
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_descriptions">Descriptions</label>
+            <textarea name="descriptions" style="width:480px;height:45px;max-width:480px" id="id_descriptions" cols="40" required="" placeholder="Descriptions" class="NA-Form-Control" rows="10"></textarea>
+        </div>
+    </div>
+    <input name="fk_goods" id="id_fk_goods" type="hidden">
+    <input name="initializeForm" id="id_initializeForm" type="hidden">
+    <input style="display:none" id="maintenance_submit" type="submit">
+</form>-->

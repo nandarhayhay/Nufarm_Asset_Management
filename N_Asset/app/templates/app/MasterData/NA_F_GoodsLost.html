@@ -1,0 +1,1280 @@
+﻿{% extends 'app/layout.html' %}
+
+{% block SearchData %}
+<li><a href="#" data-tipe="varchar" data-column="goodsname">Goods name</a></li>
+<li><a href="#" data-tipe="varchar" data-column="itemcode">Item code</a></li>
+<li><a href="#" data-tipe="varchar" data-column="brandname">Brand name</a></li>
+<li><a href="#" data-tipe="varchar" data-column="typeapp">Type of goods</a></li>
+<li><a href="#" data-tipe="varchar" data-column="serialnumber">Serial number</a></li>
+<li><a href="#" data-tipe="varchar" data-column="used_by">Used by</a></li>
+<li><a href="#" data-tipe="varchar" data-column="lost_by">Lost by</a></li>
+<li><a href="#" data-tipe="varchar" data-column="resp_person">Responsible person</a></li>
+<!--<li class="divider"></li>-->
+<li><a id="custSearch" href="#">Custom Search</a></li>
+<!--<li class="divider"></li>-->
+{% endblock %}
+
+{% block javascriptAndUI %}
+{% load static %}
+
+<script type="text/javascript" src="../../../static/app/scripts/NAJS.js"></script>
+<script type="text/javascript">
+    
+    (function(){   
+        var txtSearchMaster =  NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+            btnSearchMaster = NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');
+        window.onunload = function(){
+            if (typeof txtSearchMaster.onclick == "function") {
+                NA.NAEvent.removeHandler(txtSearchMaster,'keydown',handlerSearchInput)               
+            }
+            if (typeof btnSearchMaster.onclick == "function") {
+                NA.NAEvent.removeHandler(btnSearchMaster,'click',handlerSearchInput);
+            }
+        };
+//=================add Dynamic Styles=============================
+        NA.common.loadStyles("../../../static/app/content/jquery-ui.min.css","jqueryUI");
+        NA.common.loadStyles("../../../static/app/content/ui.jqgrid.css","UIJqueryGrid");   
+        var doc = doc||window.document;
+        var DivSearch = doc.querySelector('ul.dropdown-menu.search');//return list Element
+        (function(elm){
+            var listElem = elm.children;
+            Array.prototype.forEach.call(listElem,function(item){//buat jadi foreach mesti convert dulu ke array
+                if(item.firstChild.nodeValue != 'CustomSearch'){
+                    NA.NAEvent.addHandler(item,'click',function(event){
+                        event.preventDefault();
+                        if(item.firstChild.id === 'custSearch'){
+                            //=========='show dialog search'==================
+                            NA.common.dialog.createSearchDialog(event)
+                        }
+                        NA.common.getElementID('bySearch').firstChild.nodeValue = item.textContent;
+                    });
+                }
+            });
+        })(DivSearch);
+    })();   
+</script>
+<script src="{% static 'app/scripts/jquery-1.11.0.min.js' %}" id="jq_uery"></script>
+<script type="text/javascript" src="{% static 'app/scripts/grid.locale-en.js' %}"></script>
+<script src="{% static 'app/scripts/jquery.jqGrid.min.js' %}"></script>
+<script src="{% static 'app/scripts/jquery-ui.js' %}"></script>
+<script type="text/javascript">if (typeof $.fn.modal == 'undefined') { NA.common.doc.write('\<script src\=\"\.\.\/\.\.\/\.\.\/static\/app\/scripts\/bootstrap\.js\"\>\<\/script\>'); }</script>
+<script src="../../../static/app/scripts/bootstrap-dialog.js"></script>
+<style>
+div#content-0 {
+    overflow:hidden;
+}
+div#gbox_NA_Employee_grid,div#gview_NA_Employee_grid,div#NA_GoodsLost_pager,div.ui-jqgrid-titlebar{
+    border-radius: 0px
+}
+</style>
+{% endblock %}
+
+{% block content-0 %}
+<table id="NA_GoodsLost_grid" style="overflow:auto"></table>
+<div id="NA_GoodsLost_pager" class="scroll" style="text-align:center;"></div>
+{% endblock %}
+
+{% block DialogEntry %}
+<script>
+    function get_csrf(){
+        csrf_token = '{{csrf_token}}'
+        return csrf_token
+    }
+</script>
+<script type="text/javascript">
+    var win = win || window;
+    var status = win.status || window.status;
+    var gLost_grid = $("#NA_GoodsLost_grid");
+    var txtSearchMaster = txtSearchMaster || NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+        btnSearchMaster = btnSearchMaster || NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default'),
+        qs = NA.common.qs,
+        qsAll = NA.common.qsAll;
+    $(document).ready(function () {
+        var NA_Ajax = NA.common.AJAX;
+        function LoadData(page) {
+            var url = 'getData/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
+                          '&' + win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
+                          '&' + win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) +
+                          '&' + win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria());
+            if (arguments.length > 0) {
+                gLost_grid.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
+            } else {
+                gLost_grid.jqGrid({
+                    url: url,
+                    datatype: 'json',
+                    mtype: 'GET',
+                    colNames: ['idapp', 'No', 'Goods', 'Item code','Serial Number', 'From goods', 'Used by', 'Lost by', 'Responsible Person', 'Descriptions', 'Createddate', 'Createdby'],
+                    colModel: [
+                        { name: 'idapp', index: 'idapp', width: 65, search: false, editable: false, hidden: true, key: true, editoptions: { dataInit: function (element) { jq(element).attr("readonly", "readonly"); } } },
+                        { name: 'no', index: 'no', width: 45, align: 'center' },
+                        { name: 'goods', index: 'goodsname', width: 150, editable: true, search: false, sortable: true },
+                        //{ name: 'brandname', index: 'brandname', width: 150, editable: true, sortable: true },
+                        { name: 'itemcode', index: 'typeapp', width: 80, align: 'left', editable: false, search: false },
+                        { name: 'serialnumber', index: 'serialnumber', width: 150, align: 'left', editable: false, search: false },
+                        { name: 'fk_fromgoods', index: 'fk_fromgoods', width: 120, align: 'left', editable: false, search: false },
+                        { name: 'usedby', index: 'usedby', width: 120, editable: false },
+                        { name: 'lostby', index: 'lostby', width: 120, editable: false },
+                        { name: 'resp_person', index: 'resp_person', width: 120, editable: false },
+                        { name: 'descriptions', index: 'descriptions', width: 200, editable: true, search: false },
+                        {
+                            name: 'createddate', index: 'createddate', width: 175, align: 'center', editable: false, search: false,
+                            formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd F Y H:i:s' }
+                        },//,formatter: "date",formatoptions: { srcformat: "ISO8601Long", newformat: "Y/m/d H:i" }
+                        { name: 'createdby', index: 'createdby', width: 115, search: false, editable: false, editoptions: { dataInit: function (element) { jq(element).attr("readonly", "readonly"); } } },
+                    ],
+                    jsonreader: {
+                        repeatitems: false,
+                        id: 'idapp',
+                        root: 'rows'
+                    },
+                    pager: $('#NA_GoodsLost_pager'),
+                    rowList: [20, 50, 100, 200, 300, 500],
+                    rowNum: 5,
+                    //loadui: 'disable', // Disable Loading Text
+                    cellEdit: false,
+                    sortname: 'idapp',
+                    sortorder: "desc",
+                    viewrecords: true,
+                    iconSet: "fontAwesome",
+                    hidegrid: true,
+                    shrinkToFit: false,
+                    caption: 'Nufarm -- Goods Lost',
+                    shrinkToFit: false,
+                    height: $('div.fltlft').height() - ($('div.fltlft').height() * 0.173),
+                    width: 'inherit',
+                    ondblClickRow: function (rowId) {
+                        var btnOpen = NA.common.doc.querySelector('ul.nav.navbar-nav>li:nth-child(2)>button');
+                        if (btnOpen) {
+                            btnOpen.click();
+                        }
+                    }
+                });
+            }
+        };
+        var SearchData = NA.common.SearchData;
+        SearchData.setDefaultSearchData('goodsname', 'Varchar', 'like');
+        LoadData();
+
+        function handlerSearchInput(event) {
+            event = NA.NAEvent.getEvent(event);
+            if (event.target == btnSearchMaster) {
+                NA.NAEvent.preventDefault(event);
+                var elSearch = NA.common.doc.querySelector('li.dropdown>a#bySearch'),
+                SearchBy = NA.common.doc.querySelector('li.dropdown>a#bySearch').textContent.trim(),
+                SearchInput = qs('input[name=q]');
+                if (SearchBy.trim() == 'By') {
+                    NA.common.SearchData.setDefaultSearchData('goodsname', 'Varchar', 'like');
+                    var curPage = parseInt(gLost_grid.getGridParam('page'));
+                    window.document.body.style.cursor = 'wait';
+                    NA.common.SearchData.setValue(SearchInput.value);
+                    LoadData(curPage);
+                }
+                else {
+                    //submit search
+                    submitSearch(event);
+                }
+                NA.NAEvent.stopPropagation(event);
+            }
+            window.document.body.style.cursor = '';
+        }
+        //=======================handler txt & button Search master keyboard event and click================================        
+        NA.NAEvent.addHandler(txtSearchMaster, 'keydown', handlerSearchInput);
+        NA.NAEvent.addHandler(btnSearchMaster, 'click', handlerSearchInput);
+
+        gLost_grid.on("keyup", "tr", function (e) {
+            var rowId = gLost_grid.jqGrid('getGridParam', 'selrow');
+            if (e.keyCode == 46) {
+                var btnDelete = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(5)')
+                btnDelete.click();
+                //return false;
+            }
+        });
+        gLost_grid.navGrid('#NA_GoodsLost_pager', {
+            edit: true,
+            add: true,
+            del: true,
+            search: true,
+            refresh: true,
+            view: true,
+            cloneToTop: false
+        });
+        NA.common.doc.title = 'Nufarm - Entry Goods Lost';
+        var elGrid_lost = qsAll("div#gbox_NA_GoodsLost_grid, div#gview_NA_GoodsLost_grid, div.ui-jqgrid-bdiv, div.ui-jqgrid-hdiv");
+        Array.prototype.forEach.call(elGrid_lost, function (elm) {
+            elm.style.width = 'inherit'
+        });
+
+
+//================================ Search by ==============================//
+
+
+        //================================= End Search by ======================================//
+    function submitSearch(event) {
+        window.document.body.style.cursor = 'wait';
+        if (event)
+            NA.NAEvent.preventDefault(event);
+
+        var elementOption = null, columnKey = '', valueKey = '',
+        elCriteria = null,//NA.common.doc.querySelector('td.columns select.selectopts.NA-Form-Control option:checked');
+        valCriteria = '',//elCriteria.nodeValue;
+        elDataType = '';//elementOption.dataset.dataType;
+        if (event.target.getAttribute('id') === 'fbox_jqGrid_search' || event.target.getAttribute('id') === 'jqg1') {//fbox_jqGrid_search == button search,jqg1 = txtSearch nya
+            elementOption = NA.common.doc.querySelector('td.columns select.NA-Form-Control option:checked');
+            columnKey = elementOption.getAttribute('name'), valueKey = NA.common.getElementID('jqg1').value;
+            elCriteria = NA.common.doc.querySelector('td.operators select.selectopts.NA-Form-Control option:checked');
+            criteria = elCriteria.value;
+            switch (criteria) {
+                case "eq": { valCriteria = 'equal'; break; }
+                case "ne": { valCriteria = 'notequal'; break; }
+                case "bw": { valCriteria = 'beginwith'; break; }
+                case "ew": { valCriteria = "endwith"; break; }
+                case "cn": { valCriteria = "like"; break; }
+                case "in": { valCriteria = "in"; break; }
+                case "ni": { valCriteria = "notin"; break; }
+                case "gt": { valCriteria = "greater"; break; }
+                case "le": { valCriteria = "less"; break; }
+                case "leq": { valCriteria = "lessorequal"; break; }
+                case "gtq": { valCriteria = "greaterorequal"; break; }
+                case "bw": { valCriteria = "between"; break; }
+            };
+            elDataType = elementOption.dataset.tipe;
+        }
+        else if (event.target == txtSearchMaster || event.target == btnSearchMaster) {
+            var txtSearchMaster = txtSearchMaster || NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+            elSearch = null;
+            valueKey = txtSearchMaster.value.trim();
+            var listElem = NA.common.doc.querySelector('ul.dropdown-menu.search').children;//return list Element
+            var textToSearch = NA.common.getElementID('bySearch').firstChild.nodeValue;
+            Array.prototype.forEach.call(listElem, function (item) {//buat jadi foreach mesti convert dulu ke array                   
+                if (item.firstChild.textContent === textToSearch) {
+                    elSearch = item.firstChild;
+                }
+            });
+            columnKey = elSearch.dataset.column
+            elDataType = elSearch.dataset.tipe;
+            valCriteria = 'like'
+            if (!elSearch.dataset.column) {
+                switch (elDataType) {
+                    case "bigint":
+                    case "integer":
+                    case "money":
+                    case "float":
+                    case "decimal":
+                    case "boolean":
+                    case "datetime": {
+                        if (valueKey.toString().indexOf(',') > -1) {
+                            criteria = 'in'
+                        }
+                        criteria = 'equal';
+                        break;
+                    }
+                };
+            }
+        }
+
+        NA.common.SearchData.setValue(valueKey);
+        NA.common.SearchData.setColumnName(columnKey);
+        NA.common.SearchData.setDataType(elDataType)
+        NA.common.SearchData.setCriteria(valCriteria);
+        window.document.body.style.cursor = 'wait';
+        LoadData(1);
+        document.body.style.cursor = 'default';
+        gLost_grid.jqGrid('setGridParam').trigger("reloadGrid", [{ page: 1 }]);//karena searching harus di set ke page 1
+    };
+
+        //function untuk Reset
+    function submitReset(event) {
+        //reload jqueryGrid
+        //check apakah target dari btn reset
+        if (event) {
+            var target = NA.NAEvent.getTarget(event);
+        }
+        NA.common.SearchData.setDefaultSearchData('goodsname', 'varchar', 'like');
+        NA.common.SearchData.setValue('');
+        LoadData(1);
+        window.document.body.style.cursor = 'default';
+    };
+        //========================Function Untuk memanggil Custom Search========================
+    window.showDialogCustomSearch = function (event) {
+        $('div.containerDialog').load("customFilter/", function (responseTxt, statusTxt, xhr) {
+            if (statusTxt == "success") {
+                $(this).html(responseTxt);
+                var dialog = NA.common.doc.querySelector('div.containerDialog');
+                NA.common.getElementID('searchmodfbox').style.display = 'block';
+                var btnClose = NA.common.doc.querySelector('div#searchhdfbo a.ui-jqdialog-titlebar-close.ui-corner-all'),
+                txtSearchCustom = NA.common.getElementID('jqg1');
+                NA.NAEvent.addHandler(btnClose, 'click', function (event) {
+                    NA.common.dialog.closeDialog(dialog);
+                });
+                var btnFind = NA.common.getElementID('fbox_jqGrid_search');
+                NA.NAEvent.addHandler(btnFind, 'click', function (event) {
+                    submitSearch(event);
+                    if (event) {
+                        NA.NAEvent.stopPropagation(event);
+                    }
+                });
+                var btnReset = NA.common.getElementID('fbox_jqGrid_reset');
+                NA.NAEvent.addHandler(btnReset, 'click', function (event) {
+                    submitReset(event);
+                    if (event) {
+                        NA.NAEvent.stopPropagation(event);
+                    }
+                });
+                NA.NAEvent.addHandler(txtSearchCustom, 'keydown', function (event) {
+                    event = NA.NAEvent.getEvent(event);
+                    if (event.keyCode === 13) {
+                        submitSearch(event);
+                    }
+                    if (event) {
+                        NA.NAEvent.stopPropagation(event);
+                    }
+                });
+            }
+        });
+    };
+
+    var containerMenu = qs('ul.nav.navbar-nav');
+    NA.common.loadStyles("../../../static/app/content/Dialog.css", "DialogEntryStyle");
+    NA.common.loadStyles("../../../static/app/content/NA_commonEntry.css","CommonEntry");
+
+    NA.common.dialog.initDialog(containerMenu,'Nufarm Entry Goods - Maintenance');
+
+    var elementMenus = [];
+    var menus = NA.common.doc.querySelectorAll('div.sidebar ul.list-sidebar.bg-defoult li ul li a');
+    Array.prototype.forEach.call(menus, function (item) {
+        if (item.textContent.indexOf("Email Data") > -1) {
+            elementMenus.push(item);
+        }
+    });
+    NA.common.dialog.initDialog(null,'Nufarm Send Email - Master Data',elementMenus);
+    
+    function getGridId() {
+        return $(gLost_grid).jqGrid('getGridParam', 'selrow')
+    }
+
+    function getGridValue (grid,jqgId, column) {
+        var col = grid.jqGrid('getCell', jqgId, column);
+        return col
+    }
+    function getValues_Form() {
+        var data = {
+            fk_goods: qs('input#id_fk_goods').value.trim(),
+            itemcode: qs('input#id_itemcode').value.trim(),
+            goods: qs('input#id_goods').value.trim(),
+            typeApp: qs('input#id_typeApp').value.trim(),
+            serialNumber: qs('input#id_serialNumber').value.trim(),
+            fk_lostby: qs('input#id_fk_lostby').value.trim(),
+            fk_fromgoods: qs('input#id_fk_fromgoods').value.trim(),
+            fk_goods_outwards: qs('input#id_fk_goods_outwards').value.trim(),
+            fk_goods_lending: qs('input#id_fk_goods_lending').value.trim(),
+            fk_maintenance: qs('input#id_fk_maintenance').value.trim(),
+            datelost: qs('input#id_datelost').value.trim(),
+            status_goods: qs('select#id_status_goods').value,
+            reason: qs('textarea#id_reason').value.trim(),
+            descriptions: qs('textarea#id_descriptions').value.trim()
+        };
+        return data
+    }
+    
+
+    var btnDelete = qs('ul.nav.navbar-nav li:nth-child(5)');
+    NA.NAEvent.addHandler(btnDelete, 'click', function (event) {
+        var get_idapp = getGridId();
+        if (getGridId()) {
+            NA.NAEvent.preventDefault(event);
+            var rowNum = gLost_grid.getGridParam('rowNum'),
+                allRecords = gLost_grid.getGridParam('records'),
+                totalPages = parseInt((allRecords / rowNum) + 1),
+                curPage = gLost_grid.getGridParam('page'),
+                rowId = gLost_grid.jqGrid('getGridParam', 'selrow'),
+                curRecount = gLost_grid.jqGrid('getGridParam', 'reccount');
+            return dialogConfirm(NA.common.message.confirmDelete, NA.common.message.confirmInfo,
+                function () {
+                    try {
+                        //delete data di server                  
+                        //$(selector).post(URL,data,function(data,status,xhr),dataType)-->return data type
+                        $.ajax({
+                            url: 'delete/',
+                            method: 'POST',
+                            data: {
+                                'csrfmiddlewaretoken': get_csrf(),
+                                'idapp': get_idapp,
+                            },
+                            success: function (data) {
+                                
+                                mustReload = true;
+                                if (parseInt(curRecount) === 1) {
+                                    if (totalPages > 1) {
+                                        curPage--;
+                                    }
+                                    else {
+                                        mustReload = false;
+                                        gLost_grid.delRowData(rowId);
+                                    }
+                                }
+                                else if (parseInt(totalPages) === 1) {
+                                    mustReload = false;
+                                    gLost_grid.delRowData(rowId);
+                                }
+                                else if (parseInt(curRecount) > 1) {
+                                    mustReload = false;
+                                    gLost_grid.delRowData(rowId);
+                                }
+                                if (mustReload) {
+                                    gLost_grid.trigger("reloadGrid", [{ page: curPage }]);
+                                };
+                            },
+                            complete: function (data, status) {
+                                if (data.status === 500 && data.responseText === 'Lost') {
+                                    return dialogAlert(NA.common.message.dataHasLost, NA.common.message.titleInfo, function () {
+                                        return gLost_grid.trigger("reloadGrid", [{ page: curPage }]);
+                                    });
+                                }
+                            }
+                        })
+                    } catch (e) {
+                        console.log(e);
+                        window.document.body.style.cursor = 'default';
+
+                    }
+                },
+                function () {
+                    return false;
+                });
+        }
+        else {
+            document.body.style.cursor = 'default';
+            return dialogAlert('Please select data you want to delete', NA.common.message.titleInfo, function () {
+                return false;
+            });
+        }
+    });
+    status = status || window.status
+    function gLostSubmit() {
+        var dialog = qs("div.containerDialog");
+        function sendData() {
+            var valuesForm = getValues_Form()
+            var idapp;
+            if (win.status.trim() == 'Edit') {
+                idapp = getGridId();
+            } else {
+                idapp = 'none';
+            }
+            var snData = NA.common.AssignObject({
+                'csrfmiddlewaretoken': get_csrf(),
+                'statusForm': win.status,
+            }, valuesForm, { 'idapp': idapp});
+            return snData
+        }
+                $.ajax({
+                    url: 'ShowEntry/',
+                    method: 'POST',
+                    beforeSend: function (jqXHR) {
+                        jqXHR.setRequestHeader('X-CSRF-Token', get_csrf())
+                    },
+                    data: sendData(),
+                    success: function (data) {
+                        $('div.containerDialog, div#dropSheet').remove()
+                        gLost_grid.trigger('reloadGrid');
+                        if (status.trim() == 'Add' || status.trim() == 'Edit') {
+                            setTimeout(function () {
+                                gLost_grid.setSelection(data['message'], true)
+                            }, 1000);
+                        }
+                    },
+                    complete: function (data, status) {
+                        if (data.responseJSON === 'HasExist') {
+                            return dialogAlert(NA.common.message.existsData, NA.common.message.titleInfo, function () {
+                                return false;
+                            });
+                        }
+                    }
+                });
+    };
+    function ExecuteHandler(TextElement) {
+        var dialog = qs("div.containerDialog");
+        var frmEntry = qs('form#gLost_form');
+        var emailForm = qs('form#email_data');
+        if (frmEntry) {
+            switch (TextElement) {
+                case 'OK': {
+                    if (!frmEntry.checkValidity()) {
+                        //NA.NAEvent.preventDefault(event);                                          
+                        var inputbtn = NA.common.getElementID('gLost_submit');
+                        inputbtn.click();
+                    }
+                    else {
+                        gLostSubmit();
+                    }
+                    break;
+                }
+                case 'Cancel':
+                case 'Close': {
+                    //check if data has changed with javascrispt
+                    initializeForm = NA.common.getElementID('id_initializeForm');
+                    if (status === 'Open' || initializeForm.Value == '') { NA.common.dialog.closeDialog(dialog); return false; }
+                    var originalData = JSON.parse(initializeForm.Value);
+                    var valuesForm = getValues_Form();
+                    if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                        return dialogConfirm(NA.common.message.dataHasChanged, NA.common.message.confirmInfo,
+                                function () {
+                                    if (!frmEntry.checkValidity()) {
+                                        //NA.NAEvent.preventDefault(event);   
+                                        var inputbtn = NA.common.getElementID('gLost_submit');
+                                        inputbtn.click();
+                                    } else {
+                                        gLostSubmit();
+                                    }
+                                },
+                                function () {
+                                    NA.common.dialog.closeDialog(dialog);
+                                }
+                            );
+                            
+                    } else {
+                        NA.common.dialog.closeDialog(dialog);
+                    }
+                }
+            };
+        } else if (emailForm) {
+            var emailForm = qs('form#email_data');
+            switch (TextElement) {
+                case 'Cancel':
+                case 'Close': {
+                    var initializeEmail = NA.common.getElementID('initializeEmail');
+                    var originalData = initializeEmail.Value;
+                    var valuesForm = getValues_emailForm();
+                    
+                    if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                        if (confirm('Data has changed, \nAre you sure to Send mail ?')) {
+                            if (!emailForm.checkValidity()) {
+                                //NA.NAEvent.preventDefault(event);   
+                                var inputbtn = NA.common.getElementID('emailData_submit');
+                                inputbtn.click();
+                            } else {
+                                qs('div.dialogButtonOKCancel>a.button:nth-child(1)').click()
+                            }
+                        } else {
+                            NA.common.dialog.closeDialog(dialog);
+                        }
+                    } else {
+                        NA.common.dialog.closeDialog(dialog);
+                    }
+                }
+
+            }
+        }
+        
+    };
+    function restyleBoostrapDialog() {
+        var BSDialogContent = NA.common.doc.querySelector('div.modal-dialog.modal-sm >.modal-content');
+        BSDialogContent.style.cssText = 'width: 500px; height: 420px;';
+        var ContentBody = NA.common.doc.querySelector('div.modal-dialog.modal-sm >.modal-content>.modal-body');
+        ContentBody.style.cssText = 'padding:0px;';
+        var contentFooter = NA.common.doc.querySelector('div.modal-dialog.modal-sm >.modal-content>.modal-footer');
+        contentFooter.style.cssText = 'padding-bottom:0px;padding-top:0px;';
+        var mHeader = NA.common.doc.querySelector('div.bootstrap-dialog .modal-header.bootstrap-dialog-draggable');
+        mHeader.style.cssText = 'height:30px;padding:0px;';
+        var footerButton = NA.common.doc.querySelector('div.bootstrap-dialog-footer-buttons');
+        footerButton.style.cssText = 'padding-top:8px;';
+    };
+    function getGridCellValue(thegrid, CeltoGet) {
+        var reccount = thegrid.jqGrid('getGridParam', 'reccount');
+        var rowId, rowData, colData;
+        if (reccount > 0) {
+            rowId = thegrid.jqGrid('getGridParam', 'selrow');
+            if (rowId) {
+                rowData = thegrid.getRowData(rowId);
+                colData = rowData[CeltoGet];
+            }
+        }
+        return colData;
+    };
+    function dialogConfirm(message, title, callTrue, callFalse) {
+        return BootstrapDialog.confirm({
+            title: title || NA.common.message.titleInfo,
+            message: message,
+            type: BootstrapDialog.TYPE_WARNING,
+            size: BootstrapDialog.SIZE_SMALL,
+            animate: false,
+            cssClass: 'login-dialog',
+            closeByBackdrop: false,
+            closeByKeyboard: false,
+            closable: false,
+            draggable: true,
+            btnCancelLabel: 'NO.',
+            btnOKLabel: 'Yes.',
+            btnOKClass: 'btn-success',
+            callback: function (result) {
+                if (result) {
+                    if (callTrue) {
+                        callTrue();
+                    }
+                }
+                else {
+                    if (callFalse) {
+                        callFalse();
+                    }
+                }
+            },
+            onshown: function (dialogRef) {
+                var divHeader = NA.common.doc.querySelector('div.modal-header:nth-child(1)');
+                divHeader.style.backgroundColor = 'green';
+            }
+        });
+    };
+
+    function dialogAlert(message, title, callback) {
+        return BootstrapDialog.alert({
+            title: title || NA.common.message.titleInfo,
+            message: message,
+            size: BootstrapDialog.SIZE_SMALL,
+            //animate:false,
+            cssClass: 'login-dialog',
+            closeByBackdrop: false,
+            closeByKeyboard: false,
+            type: BootstrapDialog.TYPE_INFO,
+            closable: false,
+            draggable: true,
+            buttonLabel: 'OK',
+            callback: function (result) {
+                if (result) {
+                    if (callback) {
+                        callback();
+                    }
+                    return true;
+                }
+            },
+            onshown: function (dialogRef) {
+                var divHeader = NA.common.doc.querySelector('div.modal-header:nth-child(1)');
+                divHeader.style.backgroundColor = 'green';
+            }
+        });
+    };
+    window.showDialogEntry = function (event) {//function ini akan di panggil oleh NAJS.common.dialog,setiap menu add/edit/delete,etc di clik 
+        //add handler to btnOK untuk mengantisipasi form load gagal
+        var win = window
+        var target = NA.NAEvent.getTarget(event);
+
+        try {
+            
+            if (target.innerText === 'Email Data') {
+                var btn_mailExport = qs('div.dialogButtonRightOther a.btn-link:nth-child(2)'),
+                    btn_mailPreview = qs('div.dialogButtonRightOther a.btn-link:nth-child(1)');
+                NA.common.NA_setAttr(btn_mailExport, {
+                    "style": "cursor: pointer;pointer-events: all;width: auto;margin-right:5px"
+                });
+                btn_mailExport.textContent = 'Export To PDF';
+                NA.common.NA_setAttr(btn_mailPreview, {
+                    "style": "cursor: pointer;pointer-events: all;width: auto;"
+                });
+                btn_mailPreview.textContent = 'Preview PDF';
+                var btnToPDF = qs('div.bottomDialogContent a.btn-link:nth-child(1)');
+                //====================================== Display Email Data Dialog =========================================
+                $('div.maindialogContent').load(url_emailData(), function (response, status, xhr) {
+                    if (status == "success") {
+                        var jspdf = "../../../static/app/scripts/jspdf.js",
+                        sfm = "../../../static/app/scripts/standard_fonts_metrics.js",
+                        stz = "../../../static/app/scripts/split_text_to_size.js",
+                        jspdf_autoTable = "../../../static/app/scripts/jspdf.plugin.autotable.min.js",
+                        jqUI = "../../../static/app/scripts/jquery-ui.min.js",
+                        autoComp = "../../../static/app/scripts/autocomplete.js",
+                        emailDataJS = "../../../static/app/scripts/NA_EmailData.js",
+                        content_0 = qs('div#content-0');
+                        if (qs('script#jspdf') == null) {
+                            NA.common.loadScript(jspdf, content_0, 'jspdf');
+                            NA.common.loadScript(sfm, content_0, 'sfm');
+                            NA.common.loadScript(stz, content_0, 'stz');
+                            NA.common.loadScript(jspdf_autoTable, content_0, 'jspdf_autoTable');
+                            NA.common.loadScript(emailDataJS, content_0, 'emailData_scripts');
+                        };
+                        var originalData = getValues_emailForm();
+                        var initializeEmail = NA.common.getElementID('initializeEmail');
+                        initializeEmail.Value = originalData;
+
+                        //=========================================== End Display Email Data Dialog ===========================================
+                    }
+
+                });
+
+                //if (window.document.body.style.cursor != 'default') { window.document.body.style.cursor = 'default'; }
+                //return false;
+            } else if (target.innerText.trim() === 'Add' || target.innerText.trim() === 'Edit' || target.innerText.trim() == 'Open') {
+                var dialog = NA.common.dialog.doc.querySelector("div.containerDialog");
+                if (target.innerText.trim() == 'Edit' || target.innerText.trim() == 'Open') {
+                    var idapp = getGridId();
+                    if (typeof idapp == 'undefined' || !idapp || idapp == '') {
+                        NA.common.dialog.closeDialog(dialog);
+                        var message = 'Please select data you want to Edit';
+                        if (gLost_grid.getGridParam('records') === 0) {
+                            message = 'No Data Found at here'
+                        };
+                        return dialogAlert(message, NA.common.message.titleInfo, function () {
+                            return gLost_grid.trigger('reloadGrid');
+                        });
+                    }
+                };
+
+                $('div.maindialogContent').load("ShowEntry/?" + win.encodeURIComponent('idapp') + '=' + win.encodeURIComponent(getGridId()) + '&' + win.encodeURIComponent('statusForm')
+                    + '=' + win.encodeURIComponent(target.innerText.trim()), function (responseTxt, statusTxt, xhr) {//load /tampilkan form entry data(ShowEntry hanya contoh nama form)
+                        if (responseTxt == 'Lost' && xhr.status == 500) {
+                            NA.common.dialog.closeDialog(dialog);
+                            return dialogAlert(NA.common.message.dataHasLost, NA.common.message.titleInfo, function () {
+                                return gLost_grid.trigger("reloadGrid");
+                            });
+                        };
+                        if (statusTxt == "success") {  //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpang semua ke dalam variable jika perlua
+                            //remove attribute disable untuk button OK dan cancel bila statusnya Add
+                            switch (status) {
+
+                                case 'Add':
+                                    {
+                                        break;
+                                    }
+                                case 'Edit':
+                                    {
+                                        setTimeout(function () {
+                                            $('div.dialogButtonOKCancel>a.button').removeAttr("disabled");
+                                            var fromgoods = qs('input#id_fk_fromgoods')
+                                            fromgoods.value = getGridCellValue(gLost_grid, 'fk_fromgoods');
+                                        }, 100)
+                                    }
+                                case 'Open': {
+                                    $('div.dialogButtonEntry>a.button').attr("disabled", true);
+                                    break;
+                                }
+                            };
+                            if (status !== 'Open' && status !== '') {//hanya untuk status Add/Edit       
+                                //simpan original data di initializeForm
+                                var originalData = JSON.stringify(getValues_Form());
+                                var fk_goods = qs('input#id_fk_goods'),
+                                    itemcode = qs('input#id_itemcode'),
+                                    goods = qs('input#id_goods'),
+                                    btn_fkGoods = qs('button#fk_goods'),
+                                    typeApp = qs('input#id_typeApp'),
+                                    serialnumber = qs('input#id_serialNumber'),
+                                    fk_goods_outwards = qs('input#id_fk_goods_outwards'),
+                                    fk_goods_lending = qs('input#id_fk_goods_lending'),
+                                    fk_maintenance = qs('input#id_fk_maintenance'),
+                                    nik_used = qs('input#id_nik_used'),
+                                    empl_used = qs('input#id_empl_used'),
+                                    nik_resp = qs('input#id_nik_resp'),
+                                    empl_resp = qs('input#id_empl_resp'),
+                                    nik_lostby = qs('input#id_nik_lostby'),
+                                    empl_lostby = qs('input#id_empl_lostby'),
+                                    btn_fkLostby = qs('button#fk_lostby'),
+                                    fk_lostby = qs('input#id_fk_lostby'),
+                                    fk_fromGoods = qs('input[type="hidden"]#id_fk_fromgoods');
+
+                                //============= Search Goods By Form ==============
+                                $('input#id_datelost').datepicker({
+                                    dateFormat: 'dd/mm/yy',
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri ', 'Sat'],
+                                    showButtonPanel: true,
+                                    closeText: "Close",
+                                    currentText: 'Now'
+                                });
+
+                                function loadData_byForm(tab,valSearch) {
+                                    var gridTbl, gridTbl_pager_id,elGrid,Caption,
+                                    urlFKGoods = 'SearchGoodsByForm/?' + win.encodeURIComponent('goods_filter') + '=' + valSearch;
+                                    if (tab === 'g_outwards') {
+                                        Caption = 'Transaction -- Find goods outwards';
+                                        gridTbl = $('#NA_GoodsLost_FK_Goods_outwards');
+                                        gridTbl_pager_id = '#NA_GoodsLost_FK_Goods_outwards_Pager';
+                                        urlFKGoods += '&' + win.encodeURIComponent('tab_section') + '=' + win.encodeURIComponent('g_outwards');
+                                    } else if (tab === 'g_lending') {
+                                        Caption = 'Transaction -- Find goods lending';
+                                        gridTbl = $('#NA_GoodsLost_FK_Goods_lending');
+                                        gridTbl_pager_id = '#NA_GoodsLost_FK_Goods_lending_Pager';
+                                        urlFKGoods += '&' + win.encodeURIComponent('tab_section') + '=' + win.encodeURIComponent('g_lending');
+                                    } else if (tab === 'g_maintenance') {
+                                        Caption = 'Transaction -- Find goods maintenance';
+                                        gridTbl = $('#NA_GoodsLost_FK_Goods_maintenance');
+                                        gridTbl_pager_id = '#NA_GoodsLost_FK_Goods_maintenance_Pager';
+                                        urlFKGoods += '&' + win.encodeURIComponent('tab_section') + '=' + win.encodeURIComponent('g_maintenance');
+                                    }
+                                    var gridTbl_pager = $(gridTbl_pager_id);
+                                    
+                                    var col_model = [
+                                            { name: 'idapp', hidden: true, align: 'left' },
+                                            { name: 'fk_goods', hidden: true, align: 'left' },
+                                            { name: 'no', width: 40, align: 'right', sortable: false, editable: false, key: true, },
+                                            { name: 'itemcode', width: 80, align: 'left', sortable: true, editable: false, },
+                                            { name: 'goods', index: 'goods', width: 220, sortable: true, editable: false, align: 'left' },
+                                            { name: 'serialnumber', index: 'serialnumber', width: 150, sortable: true, editable: false, align: 'left' },
+                                            { name: 'fromgoods', hidden: true, align: 'left' },
+                                            { name: 'fk_employee', hidden: true, align: 'left' },
+                                            { name: 'fk_resp', hidden: true, align: 'left' },
+                                            { name: 'nik_empl', hidden: true, align: 'left' },
+                                            { name: 'nik_resp', hidden: true, align: 'left' }
+                                    ];
+                                    var col_names = ['idapp', 'fk goods', 'NO', 'itemcode', 'goods Description', 'Serial Number', 'from goods', 'fk employee', 'fk resp', 'nik employee', 'nik resp'];
+                                    gridTbl.jqGrid({
+                                        url: urlFKGoods,
+                                        mtype: "GET",
+                                        datatype: "json",//column IDapp, NO,    goods   datereceived supliername FK_ReceivedBy  receivedby FK_P_R_By pr_by totalpurchase totalreceived 
+                                        colNames: col_names,
+                                        colModel: col_model,
+                                        ondblClickRow: function (rowId) {
+                                            //fire button OK
+                                            var btnOK = qs('button#btnOKFindGoods');
+                                            btnOK.click();
+                                        },
+                                        gridComplete: function () {
+                                            document.body.style.cursor = 'default';
+                                        },
+                                        cellEdit: false,
+                                        viewrecords: true,
+                                        height: '170px',
+                                        rowNum: 500,
+                                        rowList: [20, 50, 100, 200, 300, 500],
+                                        sortname: "itemcode",
+                                        sortorder: "asc",
+                                        multiSort: true,
+                                        shrinkToFit: false,
+                                        iconSet: "fontAwesome",
+                                        //forceFit: true,
+                                        //toolbar: true,
+                                        scrollrows: true,
+                                        //hidegrid: true,
+                                        caption: Caption,
+                                        pager: gridTbl_pager_id
+                                    });
+                                    gridTbl.navGrid(gridTbl_pager_id, {
+                                        search: false, // show search button on the toolbar
+                                        add: false,
+                                        edit: false,
+                                        del: false,
+                                        refresh: true
+                                    });
+                                    elGrid_lending = qsAll('div#gbox_NA_GoodsLost_FK_Goods_lending,div#gview_NA_GoodsLost_FK_Goods_lending,div#gview_NA_GoodsLost_FK_Goods_lending > div.ui-jqgrid-hdiv,div#gview_NA_GoodsLost_FK_Goods_lending > div.ui-jqgrid-bdiv, div#NA_GoodsLost_FK_Goods_lending_Pager')
+                                    if ($('div#gbox_NA_GoodsLost_FK_Goods_lending').attr('style') !== "width: inherit;") {
+                                        Array.prototype.forEach.call(elGrid_lending, function (el) {
+                                            el.style.width = 'inherit';
+                                        });
+                                    };
+                                    elGrid_maintenance = qsAll('div#gbox_NA_GoodsLost_FK_Goods_maintenance,div#gview_NA_GoodsLost_FK_Goods_maintenance,div#gview_NA_GoodsLost_FK_Goods_maintenance > div.ui-jqgrid-hdiv,div#gview_NA_GoodsLost_FK_Goods_maintenance > div.ui-jqgrid-bdiv, div#NA_GoodsLost_FK_Goods_maintenance_Pager')
+                                    if ($('div#gbox_NA_GoodsLost_FK_Goods_maintenance').attr('style') !== "width: inherit;") {
+                                        Array.prototype.forEach.call(elGrid_maintenance, function (el) {
+                                            el.style.width = 'inherit';
+                                        });
+                                    }
+                                };
+                                function searchGoods(event) {
+                                    var gridTbl_outwards = $('#NA_GoodsLost_FK_Goods_outwards'),
+                                        gridTbl_lending = $('#NA_GoodsLost_FK_Goods_lending'),
+                                        gridTbl_maintenance = $('#NA_GoodsLost_FK_Goods_maintenance');
+                                    BootstrapDialog.show({
+                                        draggable: true,
+                                        type: BootstrapDialog.TYPE_SUCCESS,
+                                        size: BootstrapDialog.SIZE_SMALL,
+                                        title: 'Search Goods .. .',
+                                        message: function (dialogRef) {
+                                            var placeHolder = 'Enter goods descriptions to search for .. .';
+                                            containerMessage = NA.common.dialog.createFormContainer('fk_goods', placeHolder,
+                                            function (e) {//event for blur
+                                                if (this.value === '') {
+                                                    if (this.getAttribute('placeholder') === '') {
+                                                        this.setAttribute('placeholder', placeHolder);
+                                                    }
+                                                }
+                                            },
+                                            function (e) {//event for focus
+                                                if (this.value === '') {
+                                                    if (this.getAttribute('placeholder') === placeHolder) {
+                                                        this.setAttribute('placeholder', '');
+                                                    }
+                                                }
+                                            },
+                                            function (e) {//even for keydown txtSearch                                                  
+                                                if (e.keyCode === 13) {
+                                                    NA.NAEvent.preventDefault(e);
+                                                    win.document.body.style.cursor = 'wait';
+                                                    //cari data ke database
+                                                    var url = 'SearchGoodsByForm/?' + win.encodeURIComponent('goods_filter') + '=' + win.encodeURIComponent(e.target.value.trim());
+                                                    if (qs('div#tab_g_outwards').getAttribute('aria-hidden') == 'false') {
+                                                        url += '&' + win.encodeURIComponent('tab_section') + '=' + win.encodeURIComponent('g_outwards');
+                                                        $(gridTbl_outwards).setGridParam({ url: url, search: true }).trigger("reloadGrid", [{ page: 1, }]);
+                                                    };
+                                                    if (qs('div#tab_g_lending').getAttribute('aria-hidden') == 'false') {
+                                                        url += '&' + win.encodeURIComponent('tab_section') + '=' + win.encodeURIComponent('g_lending');
+                                                        $(gridTbl_lending).setGridParam({ url: url, search: true }).trigger("reloadGrid", [{ page: 1, }]);
+                                                    };
+                                                    if (qs('div#tab_g_maintenance').getAttribute('aria-hidden') == 'false') {
+                                                        url += '&' + win.encodeURIComponent('tab_section') + '=' + win.encodeURIComponent('g_maintenance');
+                                                        $(gridTbl_maintenance).setGridParam({ url: url, search: true }).trigger("reloadGrid", [{ page: 1, }]);
+                                                    };
+                                                    win.document.body.style.cursor = 'default';
+                                                    NA.NAEvent.stopPropagation(e);
+                                                }
+                                            }, function (e) {
+                                                txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+                                                NA.common.triggerKeyboardEvent(txtSearch, 13);
+                                            });
+                                            var children = containerMessage.childNodes;
+                                            var mainContainer = null, txtSearch = null;
+                                            for (var i = 0, len = children.length; i < len; i++) {
+                                                if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm fk_goods') {
+                                                    mainContainer = children[i]; break;
+                                                }
+                                            };
+
+                                            //loads Data into JqueryGrid
+                                            var cont_tab = NA.common.doc.createElement('div'),
+                                                ul_tab = NA.common.doc.createElement('ul'),
+                                                li_tab_g_outwards = NA.common.doc.createElement('li'),
+                                                a_tab_g_outwards = NA.common.doc.createElement('a'),
+                                                tab_g_outwards = NA.common.doc.createElement('div'),
+                                                li_tab_g_lending = NA.common.doc.createElement('li'),
+                                                a_tab_g_lending = NA.common.doc.createElement('a'),
+                                                tab_g_lending = NA.common.doc.createElement('div'),
+                                                li_tab_g_maintenance = NA.common.doc.createElement('li'),
+                                                a_tab_g_maintenance = NA.common.doc.createElement('a'),
+                                                tab_g_maintenance = NA.common.doc.createElement('div');
+                                            cont_tab.id = 'cont_tab_goods_lost',
+                                            a_tab_g_outwards.href = '#tab_g_outwards',
+                                            a_tab_g_lending.href = '#tab_g_lending',
+                                            a_tab_g_maintenance.href = '#tab_g_maintenance',
+                                            tab_g_outwards.id = 'tab_g_outwards',
+                                            tab_g_outwards.style.padding = '4px',
+                                            tab_g_lending.id = 'tab_g_lending',
+                                            tab_g_lending.style.padding = '4px',
+                                            tab_g_maintenance.id = 'tab_g_maintenance',
+                                            tab_g_maintenance.style.padding = '4px';
+                                            a_tab_g_outwards.textContent = 'Goods Outwards',
+                                            NA.common.NA_setAttr(a_tab_g_outwards, {
+                                                'style': 'padding: 4px;font-size: 13px;'
+                                            });
+                                            a_tab_g_lending.textContent = 'Goods Lending',
+                                            NA.common.NA_setAttr(a_tab_g_lending, {
+                                                'style': 'padding: 4px;font-size: 13px;'
+                                            });
+                                            a_tab_g_maintenance.textContent = 'Goods Maintenance';
+                                            NA.common.NA_setAttr(a_tab_g_maintenance, {
+                                                'style': 'padding: 4px;font-size: 13px;'
+                                            });
+                                            cont_tab.appendChild(ul_tab);
+                                            ul_tab.appendChild(li_tab_g_outwards);
+                                            ul_tab.appendChild(li_tab_g_lending);
+                                            ul_tab.appendChild(li_tab_g_maintenance);
+                                            li_tab_g_outwards.appendChild(a_tab_g_outwards);
+                                            li_tab_g_lending.appendChild(a_tab_g_lending);
+                                            li_tab_g_maintenance.appendChild(a_tab_g_maintenance);
+                                            cont_tab.appendChild(tab_g_outwards);
+                                            cont_tab.appendChild(tab_g_lending);
+                                            cont_tab.appendChild(tab_g_maintenance);
+
+                                            var gridTbl_outwards = NA.common.doc.createElement('table');
+                                            gridTbl_outwards.id = 'NA_GoodsLost_FK_Goods_outwards';
+                                            var gridPager_outwards = NA.common.doc.createElement('div');
+                                            gridPager_outwards.id = 'NA_GoodsLost_FK_Goods_outwards_Pager';
+                                            tab_g_outwards.appendChild(gridTbl_outwards);
+                                            tab_g_outwards.appendChild(gridPager_outwards);
+
+                                            var gridTbl_lending = NA.common.doc.createElement('table');
+                                            gridTbl_lending.id = 'NA_GoodsLost_FK_Goods_lending';
+                                            var gridPager_lending = NA.common.doc.createElement('div');
+                                            gridPager_lending.id = 'NA_GoodsLost_FK_Goods_lending_Pager';
+                                            tab_g_lending.appendChild(gridTbl_lending);
+                                            tab_g_lending.appendChild(gridPager_lending);
+                                            
+                                            var gridTbl_maintenance = NA.common.doc.createElement('table');
+                                            gridTbl_maintenance.id = 'NA_GoodsLost_FK_Goods_maintenance';
+                                            var gridPager_maintenance = NA.common.doc.createElement('div');
+                                            gridPager_maintenance.id = 'NA_GoodsLost_FK_Goods_maintenance_Pager';
+                                            tab_g_maintenance.appendChild(gridTbl_maintenance);
+                                            tab_g_maintenance.appendChild(gridPager_maintenance);
+                                            mainContainer.appendChild(cont_tab);
+                                            return containerMessage;
+                                        },
+                                        onshown: function (dialogRef) {
+                                            txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+                                            var valSearch = '';
+                                            if (txtSearch != null) {
+                                                valSearch = win.encodeURIComponent(txtSearch.textContent.trim());
+                                            };
+                                            loadData_byForm('g_outwards', valSearch);
+                                            $('div#cont_tab_goods_lost').tabs({
+                                                activate: function (event, ui) {
+                                                    var targetCurrent = event.currentTarget;
+                                                    if (targetCurrent.text == 'Goods Outwards') {
+                                                        loadData_byForm('g_outwards', valSearch);
+                                                    } else if (targetCurrent.text == 'Goods Lending') {
+                                                        loadData_byForm('g_lending', valSearch);
+                                                    } else if (targetCurrent.text == 'Goods Maintenance') {
+                                                        loadData_byForm('g_maintenance', valSearch);
+                                                    }
+                                                }
+                                            }); // tabs
+                                            elGrid_outwards = qsAll('div#gbox_NA_GoodsLost_FK_Goods_outwards,div#gview_NA_GoodsLost_FK_Goods_outwards,div#gview_NA_GoodsLost_FK_Goods_outwards > div.ui-jqgrid-hdiv,div#gview_NA_GoodsLost_FK_Goods_outwards > div.ui-jqgrid-bdiv, div#NA_GoodsLost_FK_Goods_outwards_Pager')
+                                            Array.prototype.forEach.call(elGrid_outwards, function (el) {
+                                                el.style.width = 'inherit';
+                                            });
+                                            restyleBoostrapDialog();
+                                        },
+                                        closable: false,
+                                        animate: false,
+                                        closeByBackdrop: false,
+                                        closeByKeyboard: false,
+                                        buttons: [{
+                                            label: 'Cancel',
+                                            icon: 'glyphicon glyphicon-remove',
+                                            cssClass: 'btn-success',
+                                            action: function (dialogRef) {
+                                                dialogRef.close();
+                                            },
+                                        }, {
+                                            label: 'OK',
+                                            id: 'btnOKFindGoods',
+                                            icon: 'glyphicon glyphicon-ok',
+                                            cssClass: 'btn-success',
+                                            action: function (dialogRef) {
+                                                var gridTbl;
+                                                if (qs('div#tab_g_lending').getAttribute('aria-hidden') == 'false') {
+                                                    gridTbl = $('#NA_GoodsLost_FK_Goods_lending');
+                                                };
+                                                if (qs('div#tab_g_outwards').getAttribute('aria-hidden') == 'false') {
+                                                    gridTbl = $('#NA_GoodsLost_FK_Goods_outwards');
+                                                };
+                                                if (qs('div#tab_g_maintenance').getAttribute('aria-hidden') == 'false') {
+                                                    gridTbl = $('#NA_GoodsLost_FK_Goods_maintenance');
+                                                };
+                                                var rowId = gridTbl.jqGrid('getGridParam', 'selrow'),
+                                                    rowData = gridTbl.getRowData(rowId),
+                                                    target = NA.NAEvent.getTarget(event),
+                                                    from_goods = rowData['fromgoods'];
+                                                fk_goods.value = rowData['fk_goods'],
+                                                fk_fromGoods.value = rowData['fromgoods'],
+                                                itemcode.value = rowData['itemcode'],
+                                                goods.value = rowData['goods'].match(/^\w+\ \w+/),
+                                                typeApp.value = rowData['goods'].match(/\w+$/),
+                                                serialnumber.value = rowData['serialnumber'],
+                                                fk_fromGoods.value = from_goods,
+                                                nik_used.value = rowData['nik_empl'],
+                                                empl_used.value = rowData['fk_employee'],
+                                                nik_resp.value = rowData['nik_resp'],
+                                                empl_resp.value = rowData['fk_resp'];
+                                                if (from_goods == 'GO') {
+                                                    fk_goods_outwards.value = rowData['idapp']
+                                                    // ==== clear other value if data is change by user ====
+                                                    if (fk_goods_lending.value == rowData['idapp']) {
+                                                        fk_goods_lending.value = '';
+                                                    } else if (fk_maintenance.value == rowData['idapp']) {
+                                                        fk_maintenance.value = '';
+                                                    };
+                                                } else if (from_goods == 'GL') {
+                                                    fk_goods_lending.value = rowData['idapp'];
+                                                    // ==== clear other value if data is change by user ====
+                                                    if (fk_goods_outwards.value == rowData['idapp']) {
+                                                        fk_goods_outwards.value = '';
+                                                    } else if (fk_maintenance.value == rowData['idapp']) {
+                                                        fk_maintenance.value = '';
+                                                    };
+                                                } else if (from_goods == 'GM') {
+                                                    fk_maintenance.value = rowData['idapp'];
+                                                    // ==== clear other value if data is change by user ====
+                                                    if (fk_goods_outwards.value == rowData['idapp']) {
+                                                        fk_goods_outwards.value = '';
+                                                    } else if (fk_goods_lending.value == rowData['idapp']) {
+                                                        fk_goods_lending.value = '';
+                                                    };
+                                                }
+                                                dialogRef.close();
+                                            }
+                                        }]
+                                    });
+                                }
+                                function searchEmployee(event) {
+                                    BootstrapDialog.show({
+                                        draggable: true,
+                                        type: BootstrapDialog.TYPE_SUCCESS,
+                                        size: BootstrapDialog.SIZE_SMALL,
+                                        title: 'Search Employee .. .',
+                                        message: function (dialogRef) {
+                                            var placeHolder = 'Enter employee descriptions to search for .. .';
+                                            containerMessage = NA.common.dialog.createFormContainer('fk_employee', placeHolder,
+                                            function (e) {//event for blur
+                                                if (this.value === '') {
+                                                    if (this.getAttribute('placeholder') === '') {
+                                                        this.setAttribute('placeholder', placeHolder);
+                                                    }
+                                                }
+                                            },
+                                            function (e) {//event for focus
+                                                if (this.value === '') {
+                                                    if (this.getAttribute('placeholder') === placeHolder) {
+                                                        this.setAttribute('placeholder', '');
+                                                    }
+                                                }
+                                            },
+                                            function (e) {//even for keydown txtSearch                                                  
+                                                if (e.keyCode === 13) {
+                                                    NA.NAEvent.preventDefault(e);
+                                                    win.document.body.style.cursor = 'wait';
+                                                    //cari data ke database
+                                                    var url = 'SearchEmployeeByForm/?' + win.encodeURIComponent('employee_filter') + '=' + win.encodeURIComponent(e.target.value.trim());
+                                                    if (gridTbl) {
+                                                        $(gridTbl).setGridParam({ url: url, search: true }).trigger("reloadGrid", [{ page: 1, }]);
+                                                    }
+                                                    win.document.body.style.cursor = 'default';
+                                                    NA.NAEvent.stopPropagation(e);
+                                                }
+                                            }, function (e) {
+                                                txtSearch = NA.common.getElementID('txtsearch_fk_employee');
+                                                NA.common.triggerKeyboardEvent(txtSearch, 13);
+                                            });
+                                            var children = containerMessage.childNodes;
+                                            var mainContainer = null, txtSearch = null;
+                                            for (var i = 0, len = children.length; i < len; i++) {
+                                                if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm fk_employee') {
+                                                    mainContainer = children[i]; break;
+                                                }
+                                            };
+
+                                            //loads Data into JqueryGrid
+                                            gridTbl = NA.common.doc.createElement('table');
+                                            gridTbl.id = 'NA_GoodsLost_FK_Employee';
+                                            gridPager = NA.common.doc.createElement('div');
+                                            gridPager.id = 'NA_GoodsLost_FK_Employee_Pager';
+                                            mainContainer.appendChild(gridTbl);
+                                            mainContainer.appendChild(gridPager);
+                                            return containerMessage;
+                                        },
+                                        onshown: function (dialogRef) {
+                                            txtSearch = NA.common.getElementID('txtsearch_fk_employee');
+                                            var valSearch = '';
+                                            if (txtSearch != null) {
+                                                valSearch = win.encodeURIComponent(txtSearch.textContent.trim());
+                                            }
+                                            gridTbl = $('#NA_GoodsLost_FK_Employee');
+                                            var urlFKGoods = 'SearchEmployeeByForm/?' + win.encodeURIComponent('employee_filter') + '=' + valSearch;
+                                            gridTbl.jqGrid({
+                                                url: urlFKGoods,
+                                                mtype: "GET",
+                                                datatype: "json",//column IDapp, NO,    goods   datereceived supliername FK_ReceivedBy  receivedby FK_P_R_By pr_by totalpurchase totalreceived 
+                                                colNames: ['idapp', 'NO', 'Nik', 'Employee Name'],
+                                                colModel: [
+                                                    { name: 'idapp', hidden: true, align: 'left' },
+                                                    { name: 'no', width: 40, align: 'right', sortable: false, editable: false, key: true, },
+                                                    { name: 'nik', index: 'nik', width: 220, sortable: true, editable: false, align: 'left' },
+                                                    { name: 'employee_name', index: 'employee_name', width: 250, align: 'left', sortable: true, editable: false, }
+                                                ],
+                                                ondblClickRow: function (rowId) {
+                                                    //fire button OK
+                                                    var btnOK = dialogRef.getButton('btnOKFindEmployee');
+                                                    btnOK.click();
+                                                },
+                                                gridComplete: function () {
+                                                    document.body.style.cursor = 'default';
+                                                },
+                                                cellEdit: false,
+                                                viewrecords: true,
+                                                height: '170px',
+                                                rowNum: 500,
+                                                rowList: [20, 50, 100, 200, 300, 500],
+                                                sortname: "employee_name",
+                                                sortorder: "asc",
+                                                multiSort: true,
+                                                shrinkToFit: false,
+                                                iconSet: "fontAwesome",
+                                                //forceFit: true,
+                                                //toolbar: true,
+                                                scrollrows: true,
+                                                //hidegrid: true,
+                                                //caption: "Transactions ---Find goods",
+                                                pager: "#NA_GoodsLost_FK_Employee_Pager"
+                                            });
+                                            gridTbl.navGrid('#NA_GoodsLost_FK_Employee_Pager', {
+                                                search: false, // show search button on the toolbar
+                                                add: false,
+                                                edit: false,
+                                                del: false,
+                                                refresh: false
+                                            });
+                                            restyleBoostrapDialog();
+                                            var elGrid = qsAll('div#gbox_NA_GoodsLost_FK_Employee,div#gview_NA_GoodsLost_FK_Employee,div#gview_NA_GoodsLost_FK_Employee > div.ui-jqgrid-hdiv.ui-state-default.ui-corner-top,div#gview_NA_GoodsLost_FK_Employee > div.ui-jqgrid-bdiv, div#NA_GoodsLost_FK_Employee_Pager')
+                                            Array.prototype.forEach.call(elGrid, function (el) {
+                                                el.style.width = 'inherit';
+                                            });
+                                        },
+                                        closable: false,
+                                        animate: false,
+                                        closeByBackdrop: false,
+                                        closeByKeyboard: false,
+                                        buttons: [{
+                                            label: 'Cancel',
+                                            icon: 'glyphicon glyphicon-remove',
+                                            cssClass: 'btn-success',
+                                            action: function (dialogRef) {
+                                                dialogRef.close();
+                                            },
+                                        }, {
+                                            label: 'OK',
+                                            id: 'btnOKFindEmployee',
+                                            icon: 'glyphicon glyphicon-ok',
+                                            cssClass: 'btn-success',
+                                            action: function (dialogRef) {
+                                                var rowId = gridTbl.jqGrid('getGridParam', 'selrow'),
+                                                    rowData = gridTbl.getRowData(rowId),
+                                                    target = NA.NAEvent.getTarget(event);
+                                                    fk_lostby.value = rowId,
+                                                    nik_lostby.value = rowData['nik'],
+                                                    empl_lostby.value = rowData['employee_name'];
+                                                dialogRef.close();
+                                            }
+                                        }]
+                                    });
+                                }
+                                NA.NAEvent.addHandler(itemcode, 'keydown', function (event) {
+                                    var target = NA.NAEvent.getTarget(event);
+                                    if (event.keyCode == 13) {
+                                        searchGoods(event);
+                                    }
+                                });
+                                NA.NAEvent.addHandler(btn_fkGoods, 'click', function (event) {
+                                    searchGoods(event);
+                                });
+                                NA.NAEvent.addHandler(btn_fkLostby, 'click', function (event) {
+                                    searchEmployee(event);
+                                });
+
+                                initializeForm = NA.common.getElementID('id_initializeForm');
+                                initializeForm.Value = originalData;
+                                //setting Custom Validity
+                            }
+
+                        };
+                        NA.NAEvent.preventDefault(event);
+                        if (window.document.body.style.cursor != 'default') { window.document.body.style.cursor = 'default'; }
+                    });
+            };
+            var dialog = qs("div.containerDialog"),
+            btnOkCancel = qsAll('div.dialogButtonOKCancel>a.button'),
+            btnClose = qs('button.ui-button.ui-dialog-titlebar-close');
+            Array.prototype.forEach.call(btnOkCancel, function (elem) {
+                NA.NAEvent.addHandler(elem, 'click', function (event) {
+                    var target = NA.NAEvent.getTarget(event);
+                    ExecuteHandler(target.innerText.trim());
+                    if (event) {
+                        NA.NAEvent.stopPropagation(event);
+                    }
+                });
+            });
+            NA.NAEvent.addHandler(btnClose,'click', function (event) {
+                ExecuteHandler('Close');
+                if (event) {
+                    NA.NAEvent.stopPropagation(event);
+                };
+            });
+        } catch (e) {
+            if (window.document.body.style.cursor != 'default') { window.document.body.style.cursor = 'default'; }
+            alert(e);
+        }
+    };
+});
+</script>
+
+{% endblock %}

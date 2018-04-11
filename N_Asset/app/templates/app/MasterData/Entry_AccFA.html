@@ -1,0 +1,106 @@
+﻿<form action="ShowEntry/" method="post" style="width:480px;height:{{form.height}};padding-top:10px" id="acc_form" onsubmit="return false">
+        {% csrf_token %}
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_itemcode" class="NA-Entry-label;">{{form.itemcode.label}}</label>
+            {{ form.itemcode }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_typeApp">Type</label>
+            {{ form.typeApp }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_goods_name" class="NA-Entry-label;">Goods</label>
+            <div class="input-group" style="display:inline-flex;">
+                {{ form.goods_name }}
+                <div class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;">
+                    <button class="btn btn-success" type="button" id="fk_goodsname"><i class="glyphicon glyphicon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if mode == 'Add' %}
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label>{{form.economiclife.label}}</label>
+            {{ form.economiclife }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_price" class="NA-Entry-label;">Price</label>
+            {{ form.price }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_serialNumber" class="NA-Entry-label;">Serial Number</label>
+            {{ form.serialNumber }}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_startdate" class="NA-Entry-label;">Start Date</label>
+            {{ form.startdate }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_enddate" class="NA-Entry-label;">End Date</label>
+            {{ form.enddate }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_depr_method">Depreciation Method</label>
+            {{form.depr_method}}
+        </div>
+    </div>
+    {% elif mode == 'Open' %}
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="{{form.year.id}}" class="NA-Entry-label;">{{form.year.label}}</label>
+            {{ form.year }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label>{{form.economiclife.label}}</label>
+            {{ form.economiclife }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_serialNumber" class="NA-Entry-label;">Serial Number</label>
+            {{ form.serialNumber }}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_price" class="NA-Entry-label;">Price</label>
+            {{ form.price }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_depr_method">Depreciation Method</label>
+            {{form.depr_method}}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_startdate" class="NA-Entry-label;">Start Date</label>
+            {{ form.startdate }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_enddate" class="NA-Entry-label;">End Date</label>
+            {{ form.enddate }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_depr_expense">Depreciation Expense</label>
+            {{form.depr_expense}}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_depr_accumulation" class="NA-Entry-label;">{{form.depr_accumulation.label}}</label>
+            {{ form.depr_accumulation }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <div class="NA-Entry-inlinve-div">
+                <label for="id_book_value">{{form.bookvalue.label}}</label>
+                {{ form.bookvalue }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {{form.fk_goods}}
+    {{form.initializeForm}}
+    <input type="submit" style="display:none" id="acc_submit" />
+</form>

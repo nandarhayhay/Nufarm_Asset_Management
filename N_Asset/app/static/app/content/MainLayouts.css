@@ -94,7 +94,7 @@ label{
 /*===========Main Wrapper middle===============*/
 body > div:nth-child(2) {
     height: 85.5%;
-    position: relative;
+    /*position: relative;*/
 }
 
 div.fltlft {
@@ -347,8 +347,8 @@ div.col-sm-5.col-md-4 > ul > li.dropdown {
     background-color: transparent;
     display: block;
     position: relative;
-    border: 1.5px solid #4CAF50;
-    overflow: auto;
+    overflow:auto;
+    /*border: 1.5px solid #4CAF50;*/
     height: auto;
     margin: auto;
 }
@@ -400,3 +400,6 @@ ul, menu, dir {
     -webkit-padding-start: 0px;
 }
 
+.btn .caret {
+	margin-left: 10px !important;
+}

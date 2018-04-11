@@ -1,0 +1,1029 @@
+﻿{% extends 'app/layout.html' %}
+
+{% block SearchData %}
+<li><a href="#" data-tipe="varchar" data-column="goodsname">Goods Name</a></li>
+<li><a href="#" data-tipe="varchar" data-column="brandname">Brand Name</a></li>
+<li><a href="#" data-tipe="varchar" data-column="itemcode">Item code</a></li>
+<li><a href="#" data-tipe="varchar" data-column="serialnumber">Serial Number</a></li>
+<li><a href="#" data-tipe="varchar" data-column="year">Year</a></li>
+<li><a href="#" data-tipe="varchar" data-column="startdate">Start Date</a></li>
+<li><a href="#" data-tipe="varchar" data-column="depr_expense">Depreciation Expense</a></li>
+<li><a href="#" data-tipe="varchar" data-column="depr_accumulation">Depreciation Accumulation</a></li>
+<li><a href="#" data-tipe="varchar" data-column="bookvalue">Book Value</a></li>
+<!--<li class="divider"></li>-->
+<li><a id="custSearch" href="#">Custom Search</a></li>
+<!--<li class="divider"></li>-->
+{% endblock %}
+
+{% block javascriptAndUI %}
+{% load static %}
+
+<script type="text/javascript" src="../../../static/app/scripts/NAJS.js"></script>
+<script type="text/javascript">
+
+    (function(){
+        var txtSearchMaster =  NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+            btnSearchMaster = NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default');
+        window.onunload = function(){
+            if (typeof txtSearchMaster.onclick == "function") {
+                NA.NAEvent.removeHandler(txtSearchMaster,'keydown',handlerSearchInput)
+            }
+            if (typeof btnSearchMaster.onclick == "function") {
+                NA.NAEvent.removeHandler(btnSearchMaster,'click',handlerSearchInput);
+            }
+        };
+//=================add Dynamic Styles=============================
+        NA.common.loadStyles("../../../static/app/content/jquery-ui.min.css","jqueryUI");
+        NA.common.loadStyles("../../../static/app/content/ui.jqgrid.css","UIJqueryGrid");
+        var doc = doc||window.document;
+        var DivSearch = doc.querySelector('ul.dropdown-menu.search');//return list Element
+        (function(elm){
+            var listElem = elm.children;
+            Array.prototype.forEach.call(listElem,function(item){//buat jadi foreach mesti convert dulu ke array
+                if(item.firstChild.nodeValue != 'CustomSearch'){
+                    NA.NAEvent.addHandler(item,'click',function(event){
+                        event.preventDefault();
+                        if(item.firstChild.id === 'custSearch'){
+                            //=========='show dialog search'==================
+                            NA.common.dialog.createSearchDialog(event)
+                        }
+                        NA.common.getElementID('bySearch').firstChild.nodeValue = item.textContent;
+                        if (item.textContent.trim() === 'Start Date') {
+                            $('input[name="q"]').datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeMonth: true,
+                                changeYear: true,
+                                dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri ', 'Sat'],
+                            });
+                        } else {
+                            $('input[name="q"]').datepicker('destroy');
+                        }
+                    });
+                }
+            });
+        })(DivSearch);
+    })();
+</script>
+<script src="{% static 'app/scripts/jquery-1.11.0.min.js' %}" id="jq_uery"></script>
+<script type="text/javascript" src="{% static 'app/scripts/grid.locale-en.js' %}"></script>
+
+<script src="{% static 'app/scripts/jquery.jqGrid.min.js' %}"></script>
+<script src="{% static 'app/scripts/jquery-ui.js' %}"></script>
+<script type="text/javascript">if (typeof $.fn.modal == 'undefined') { NA.common.doc.write('\<script src\=\"\.\.\/\.\.\/\.\.\/static\/app\/scripts\/bootstrap\.js\"\>\<\/script\>'); }</script>
+<script src="../../../static/app/scripts/bootstrap-dialog.js"></script>
+<style>
+div#content-0 {
+    overflow:hidden;
+}
+div#gbox_NA_Acc_grid,div#gview_NA_Acc_grid,div#NA_Acc_pager,div.ui-jqgrid-titlebar{
+    border-radius: 0px
+}
+</style>
+{% endblock %}
+
+{% block content-0 %}
+<table id="NA_Acc_grid" style="overflow:auto"></table>
+<div id="NA_Acc_pager" class="scroll" style="text-align:center;"></div>
+{% endblock %}
+
+{% block DialogEntry %}
+<script>
+    function get_csrf(){
+        csrf_token = '{{csrf_token}}'
+        return csrf_token
+    }
+</script>
+<script type="text/javascript">
+    var win = win || window;
+    var status = win.status || window.status;
+    var acc_grid = $("#NA_Acc_grid");
+    var txtSearchMaster = txtSearchMaster || NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+        btnSearchMaster = btnSearchMaster || NA.common.doc.querySelector('form.navbar-form button[type="submit"].btn.btn-default'),
+        qs = NA.common.qs,
+        qsAll = NA.common.qsAll;
+    $(document).ready(function () {
+        function LoadData(page) {
+            if (arguments.length > 0) {
+                var url = 'getData/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
+                          '&' + win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
+                          '&' + win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) +
+                          '&' + win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria());
+                acc_grid.setGridParam({ url: url }).trigger("reloadGrid", [{ page: page, }]);
+            } else {
+                acc_grid.jqGrid({
+                    url: 'getData/?' + win.encodeURIComponent('columnName') + '=' + win.encodeURIComponent(NA.common.SearchData.getColumnKey()) +
+                                    '&' + win.encodeURIComponent('valueKey') + '=' + win.encodeURIComponent(NA.common.SearchData.getValueKey()) +
+                                    '&' + win.encodeURIComponent('dataType') + '=' + win.encodeURIComponent(NA.common.SearchData.getDataType()) +
+                                    '&' + win.encodeURIComponent('criteria') + '=' + win.encodeURIComponent(NA.common.SearchData.getCriteria()),
+                    datatype: 'json',
+                    mtype: 'GET',
+                    colNames: ['idapp', 'No', 'Goods', 'Item code', 'Serial Number','Year', 'Start Date', 'Depreciation Expense', 'Depreciation Accumulation', 'Book Value', 'Createddate', 'Createdby'],
+                    colModel: [
+                        { name: 'idapp', index: 'idapp', width: 65, search: false, editable: false, hidden: true, key: true },//
+                        { name: 'no', index: 'no', width: 50, align: 'right' },
+                        { name: 'goods', index: 'goods', width: 200, align: 'left' },
+                        { name: 'itemcode', index: 'itemcode', width: 80, align: 'left' },
+                        { name: 'serialNumber', index: 'serialNumber', width: 150, align: 'left' },
+                        { name: 'year', index: 'year', width: 80, sortable: true },
+                        { name: 'startdate', index: 'startdate', width: 150, align: 'center', search: false, formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'd F, Y' } },
+                        {
+                            name: 'depr_expense', index: 'depr_expense', width: 140, align: 'right', formatter: 'currency', formatoptions: {
+                                decimalSeparator: ",", thousandsSeparator: ".",
+                                decimalPlaces: 2, prefix: "Rp "
+                            }, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }
+                        },
+                        {
+                            name: 'depr_accumulation', index: 'depr_accumulation', width: 165, align: 'right', formatter: 'currency', formatoptions: {
+                                decimalSeparator: ",", thousandsSeparator: ".",
+                                decimalPlaces: 2, prefix: "Rp "
+                            }, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }
+                        },
+                        {
+                            name: 'bookvalue', index: 'bookvalue', width: 165, align: 'right', formatter: 'currency', formatoptions: {
+                                decimalSeparator: ",", thousandsSeparator: ".",
+                                decimalPlaces: 2, prefix: "Rp "
+                            }, filter: { type: 'textbox', condition: 'contains', listeners: ['keyup'] }
+                        },
+                        { name: 'createddate', index: 'createddate', width: 175, align: 'center', editable: false, search: false, formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd F, Y H:i:s' } },
+                        { name: 'createdby', index: 'createdby', width: 115, search: false, editable: false }
+                    ],
+                    jsonreader: {
+                        repeatitems: false,
+                        id: 'idapp',
+                        root: 'rows'
+                    },
+                    pager: $('#NA_Acc_pager'),
+                    rowList: [20, 50, 100, 200, 300, 500],
+                    rowNum: 300,
+                    loadui: 'disable', // Disable Loading Text
+                    cellEdit: false,
+                    sortname: 'idapp',
+                    sortorder: "desc",
+                    viewrecords: true,
+                    iconSet: "fontAwesome",
+                    hidegrid: true,
+                    shrinkToFit: false,
+                    caption: 'Nufarm -- Asset Depreciation',
+                    height: $('div.fltlft').height() - ($('div.fltlft').height() * 0.173),
+                    width: 'inherit',
+                    prmNames: {
+                        oper: 'oper', addoper: 'add', editoper: 'edit', deloper: 'del', id: 'idapp'
+                    },
+                    ondblClickRow: function (rowId) {
+                        var btnOpen = NA.common.doc.querySelector('ul.nav.navbar-nav>li:nth-child(2)>button');
+                        if (btnOpen) {
+                            btnOpen.click();
+                        }
+                    }
+                });
+            }
+        };
+
+
+
+
+        var SearchData = NA.common.SearchData;
+        SearchData.setDefaultSearchData('goodsname', 'Varchar', 'like');
+        LoadData();
+
+        function handlerSearchInput(event) {
+            event = NA.NAEvent.getEvent(event);
+            var target = NA.NAEvent.getTarget(event);
+            if (target == btnSearchMaster) {
+                NA.NAEvent.preventDefault(event);
+                var elSearch = NA.common.doc.querySelector('li.dropdown>a#bySearch'),
+                SearchBy = NA.common.doc.querySelector('li.dropdown>a#bySearch').textContent.trim(),
+                SearchInput = NA.common.doc.querySelector('input[name=q]');
+                if (SearchBy.trim() == 'By') {
+                    NA.common.SearchData.setDefaultSearchData('goodsname', 'Varchar', 'like');
+                    var curPage = parseInt(acc_grid.getGridParam('page'));
+                    window.document.body.style.cursor = 'wait';
+                    NA.common.SearchData.setValue(SearchInput.value);
+                    LoadData(curPage);
+                }
+                else {
+                    //submit search
+                    submitSearch(event);
+                }
+                NA.NAEvent.stopPropagation(event);
+            }
+            window.document.body.style.cursor = '';
+        }
+        //=======================handler txt & button Search master keyboard event and click================================
+        NA.NAEvent.addHandler(txtSearchMaster, 'keydown', handlerSearchInput);
+        NA.NAEvent.addHandler(btnSearchMaster, 'click', handlerSearchInput);
+
+        acc_grid.on("keyup", "tr", function (e) {
+            var rowId = acc_grid.jqGrid('getGridParam', 'selrow');
+            if (e.keyCode == 46) {
+                var btnDelete = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(5)')
+                btnDelete.click();
+                //return false;
+            }
+        });
+        acc_grid.navGrid('#NA_Employee_pager', {
+            edit: true,
+            add: true,
+            del: true,
+            search: true,
+            refresh: true,
+            view: true,
+            cloneToTop: false
+        });
+
+        $("div#gbox_NA_Acc_grid, div#gview_NA_Acc_grid, div.ui-jqgrid-bdiv, div.ui-jqgrid-hdiv").css({
+            'width':'inherit'
+        });
+
+
+//================================ Search by ==============================//
+
+
+        //================================= End Search by ======================================//
+    function submitSearch(event) {
+        window.document.body.style.cursor = 'wait';
+        if (event)
+            NA.NAEvent.preventDefault(event);
+
+        var elementOption = null, columnKey = '', valueKey = '',
+        elCriteria = null,//NA.common.doc.querySelector('td.columns select.selectopts.NA-Form-Control option:checked');
+        valCriteria = '',//elCriteria.nodeValue;
+        elDataType = '';//elementOption.dataset.dataType;
+        if (event.target.getAttribute('id') === 'fbox_jqGrid_search' || event.target.getAttribute('id') === 'jqg1') {//fbox_jqGrid_search == button search,jqg1 = txtSearch nya
+            elementOption = NA.common.doc.querySelector('td.columns select.NA-Form-Control option:checked');
+            columnKey = elementOption.getAttribute('name'), valueKey = NA.common.getElementID('jqg1').value;
+            elCriteria = NA.common.doc.querySelector('td.operators select.selectopts.NA-Form-Control option:checked');
+            criteria = elCriteria.value;
+            switch (criteria) {
+                case "eq": { valCriteria = 'equal'; break; }
+                case "ne": { valCriteria = 'notequal'; break; }
+                case "bw": { valCriteria = 'beginwith'; break; }
+                case "ew": { valCriteria = "endwith"; break; }
+                case "cn": { valCriteria = "like"; break; }
+                case "in": { valCriteria = "in"; break; }
+                case "ni": { valCriteria = "notin"; break; }
+                case "gt": { valCriteria = "greater"; break; }
+                case "le": { valCriteria = "less"; break; }
+                case "leq": { valCriteria = "lessorequal"; break; }
+                case "gtq": { valCriteria = "greaterorequal"; break; }
+                case "bwe": { valCriteria = "between"; break; }
+            };
+            elDataType = elementOption.dataset.tipe;
+        }
+        else if (event.target == txtSearchMaster || event.target == btnSearchMaster) {
+            var txtSearchMaster = txtSearchMaster || NA.common.doc.querySelector('form.navbar-form div.input-group input[name="q"]'),
+            elSearch = null;
+            valueKey = txtSearchMaster.value.trim();
+            var listElem = NA.common.doc.querySelector('ul.dropdown-menu.search').children;//return list Element
+            var textToSearch = NA.common.getElementID('bySearch').firstChild.nodeValue;
+            Array.prototype.forEach.call(listElem, function (item) {//buat jadi foreach mesti convert dulu ke array
+                if (item.firstChild.textContent === textToSearch) {
+                    elSearch = item.firstChild;
+                }
+            });
+            columnKey = elSearch.dataset.column
+            elDataType = elSearch.dataset.tipe;
+            valCriteria = 'like'
+            if (!elSearch.dataset.column) {
+                switch (elDataType) {
+                    case "bigint":
+                    case "integer":
+                    case "money":
+                    case "float":
+                    case "decimal":
+                    case "boolean":
+                    case "datetime": {
+                        if (valueKey.toString().indexOf(',') > -1) {
+                            criteria = 'in'
+                        }
+                        criteria = 'equal';
+                        break;
+                    }
+                };
+            }
+        }
+
+        NA.common.SearchData.setValue(valueKey);
+        NA.common.SearchData.setColumnName(columnKey);
+        NA.common.SearchData.setDataType(elDataType)
+        NA.common.SearchData.setCriteria(valCriteria);
+        window.document.body.style.cursor = 'wait';
+        LoadData(1);
+        document.body.style.cursor = 'default';
+        acc_grid.jqGrid('setGridParam').trigger("reloadGrid", [{ page: 1 }]);//karena searching harus di set ke page 1
+    };
+
+        //function untuk Reset
+    function submitReset(event) {
+        //reload jqueryGrid
+        //check apakah target dari btn reset
+        if (event) {
+            var target = NA.NAEvent.getTarget(event);
+        }
+        NA.common.SearchData.setDefaultSearchData('goodsname', 'varchar', 'like');
+        NA.common.SearchData.setValue('');
+        LoadData(1);
+        window.document.body.style.cursor = 'default';
+    };
+        //========================Function Untuk memanggil Custom Search========================
+    window.showDialogCustomSearch = function (event) {
+        $('div.containerDialog').load("customFilter/", function (responseTxt, statusTxt, xhr) {
+            if (statusTxt == "success") {
+                var dialog = NA.common.doc.querySelector('div.containerDialog');
+                NA.common.getElementID('searchmodfbox').style.display = 'block';
+                var btnClose = NA.common.doc.querySelector('div#searchhdfbo a.ui-jqdialog-titlebar-close.ui-corner-all'),
+                txtSearchCustom = NA.common.getElementID('jqg1');
+                var selectColumn = NA.common.qs('div#fbox select.NA-Form-Control');
+                NA.NAEvent.addHandler(selectColumn, 'change', function (event) {
+                    if (this.value === 'startdate') {
+                        $('input#jqg1').datepicker({
+                            dateFormat: 'yy-mm-dd',
+                            changeMonth: true,
+                            changeYear: true,
+                            dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri ', 'Sat'],
+                        });
+                    } else {
+                        $('input#jqg1').datepicker('destroy');
+                    }
+                });
+                NA.NAEvent.addHandler(btnClose, 'click', function (event) {
+                    NA.common.dialog.closeDialog(dialog);
+                });
+                var btnFind = NA.common.getElementID('fbox_jqGrid_search');
+                NA.NAEvent.addHandler(btnFind, 'click', function (event) {
+                    submitSearch(event);
+                    if (event) {
+                        NA.NAEvent.stopPropagation(event);
+                    }
+                });
+                var btnReset = NA.common.getElementID('fbox_jqGrid_reset');
+                NA.NAEvent.addHandler(btnReset, 'click', function (event) {
+                    submitReset(event);
+                    if (event) {
+                        NA.NAEvent.stopPropagation(event);
+                    }
+                });
+                NA.NAEvent.addHandler(txtSearchCustom, 'keydown', function (event) {
+                    event = NA.NAEvent.getEvent(event);
+                    if (event.keyCode === 13) {
+                        submitSearch(event);
+                    }
+                    if (event) {
+                        NA.NAEvent.stopPropagation(event);
+                    }
+                });
+            }
+        });
+    };
+
+
+
+
+            //script load dialog style sebelum panggil dialog
+    var containerMenu = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav');//inistialisasi menu
+    //load Dialog Style css
+    NA.common.loadStyles("../../../static/app/content/Dialog.css", "DialogEntryStyle");//Load Style buat dialog sebelum di pakai
+    NA.common.loadStyles("../../../static/app/content/NA_commonEntry.css","CommonEntry");//Load Style buat form sebelum di pakai
+
+    NA.common.dialog.initDialog(containerMenu,'Nufarm Entry Goods - Asset Depreciation');//inistialisasi menu
+
+    var elementMenus = [];
+    var menus = NA.common.doc.querySelectorAll('div.sidebar ul.list-sidebar.bg-defoult li ul li a');
+    Array.prototype.forEach.call(menus, function (item) {
+        if (item.textContent.indexOf("Email Data") > -1) {
+            elementMenus.push(item);
+        }
+    });
+    NA.common.dialog.initDialog(null,'Nufarm Send Email - Master Data',elementMenus);//inistialisasi menu
+
+    function getGridId() {
+        return $(acc_grid).jqGrid('getGridParam', 'selrow')
+    }
+
+    function getGridValue (grid,jqgId, column) {
+        var col = grid.jqGrid('getCell', jqgId, column);
+        return col
+    }
+    function getValues_accForm() {
+        var data = {
+            fk_goods: qs('input#id_fk_goods').value.trim(),
+            itemcode: qs('input#id_itemcode').value.trim(),
+            typeApp:qs('input#id_typeApp').value.trim(),
+            //brandname: qs('input#id_brandname').value.trim(),
+            goods_name: qs('input#id_goods_name').value.trim(),
+            serialNumber:qs('input#id_serialNumber').value.trim(),
+            startdate: qs('input#id_startdate').value.trim(),
+            enddate:qs('input#id_enddate').value.trim(),
+            depr_method:qs('input#id_depr_method').value.trim(),
+            price: typeof qs('input#id_price').Value == 'undefined' ? '' : qs('input#id_price').Value.trim(),
+            economiclife:qs('input#id_economiclife').value.trim()
+        };
+        return data
+    }
+
+
+    var btnDelete = NA.common.dialog.doc.querySelector('ul.nav.navbar-nav li:nth-child(5)')
+    NA.NAEvent.addHandler(btnDelete, 'click', function (event) {
+        var get_idapp = getGridId()
+        console.log(getGridId())
+        if (getGridId()) {
+            NA.NAEvent.preventDefault(event);
+            if (!confirm('are you sure you want to delete data\nOperation can not be undone ?')) {
+                return false;
+            }
+            NA.NAEvent.preventDefault(event);
+            try {
+                //delete data di server
+                //$(selector).post(URL,data,function(data,status,xhr),dataType)-->return data type
+                $.ajax({
+                    url: 'delete/',
+                    method:'POST',
+                    data: {
+                        'csrfmiddlewaretoken':get_csrf(),
+                        'idapp': get_idapp,
+                        'oper':'del'
+                    },
+                    success: function (data) {
+                        var rowNum = acc_grid.getGridParam('rowNum'),
+                         allRecords = acc_grid.getGridParam('records'),
+                         totalPages = parseInt((allRecords / rowNum) + 1),
+                         curPage = acc_grid.getGridParam('page'),
+                         rowId = acc_grid.jqGrid('getGridParam', 'selrow'),
+                         curRecount = acc_grid.jqGrid('getGridParam', 'reccount');
+                         mustReload = true;
+                        if (parseInt(curRecount) === 1) {
+                            if (totalPages > 1) {
+                                curPage--;
+                            }
+                            else {
+                                mustReload = false;
+                                acc_grid.delRowData(rowId);
+                            }
+                        }
+                        else if (parseInt(totalPages) === 1) {
+                            mustReload = false;
+                            acc_grid.delRowData(rowId);
+                        }
+                        else if (parseInt(curRecount) > 1) {
+                            mustReload = false;
+                            acc_grid.delRowData(rowId);
+                        }
+                        if (mustReload) {
+                            acc_grid.trigger("reloadGrid", [{ page: curPage }]);
+                        };
+                        reload_LogEvent();
+                    }
+                })
+            } catch (e) {
+                console.log(e);
+                window.document.body.style.cursor = 'default';
+
+            }
+        }
+        else {
+            document.body.style.cursor = 'default';
+            alert('Please select data you want to delete');
+        }
+        return false;
+    });
+
+    status = status || window.status
+    function AccSubmit() {
+        function sendData() {
+            var valuesForm = getValues_accForm()
+            var idapp;
+            if (window.status.trim() == 'Edit'|| window.status == 'Open') {
+                idapp = getGridId()
+            } else {
+                idapp = ''
+            }
+            var snData = Object.assign({
+                'csrfmiddlewaretoken': get_csrf(),
+                'mode': window.status,
+            }, valuesForm, {'idapp':idapp})
+            return snData
+        }
+                $.ajax({
+                    url: 'ShowEntry/',
+                    method: 'POST',
+                    beforeSend: function (jqXHR) {
+                        jqXHR.setRequestHeader('X-CSRF-Token', get_csrf())
+                    },
+                    data: sendData(),
+                    success: function (data) {
+                        $('div.containerDialog, div#dropSheet').remove()
+                        acc_grid.trigger('reloadGrid');
+                        setTimeout(function () {
+                            acc_grid.setSelection(data['message'], true)
+                        }, 1000);
+                        reload_LogEvent();
+                    }
+                });
+    };
+
+    function ExecuteHandler(TextElement) {
+        var initializeForm = NA.common.getElementID('id_initializeForm');
+        var dialog = NA.common.dialog.doc.querySelector("div.containerDialog"),
+        frmEntry = NA.common.doc.querySelector('form#acc_form'),
+        emailForm = NA.common.doc.querySelector('form#email_data'),
+        originalData = status !== 'Open' ? JSON.parse(initializeForm.Value) : '',
+        valuesForm = getValues_accForm(),
+        typeApp = qs('input#id_typeApp');
+        
+        if (frmEntry) {
+            switch (TextElement) {
+                case 'OK': {
+                    if (typeApp.value === '') {
+                        return typeApp.validity.valid = false;
+                    }
+                    if (!frmEntry.checkValidity()) {
+                        //NA.NAEvent.preventDefault(event);
+                        var inputbtn = NA.common.getElementID('acc_submit');
+                        inputbtn.click();
+                    }
+                    else {
+                        if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                            AccSubmit();
+                        }
+                        else {
+                            NA.common.dialog.closeDialog(dialog);
+                        }
+                    }
+                    break;
+                }
+                case 'Cancel':
+                case 'Close': {
+                    if (status === 'Open' || initializeForm.Value == '') { NA.common.dialog.closeDialog(dialog); return false; }
+                    if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                        return dialogConfirm(NA.common.message.dataHasChanged, NA.common.message.titleInfo, function () {
+                            if (!frmEntry.checkValidity()) {
+                                var inputbtn = NA.common.getElementID('acc_submit');
+                                inputbtn.click();
+                            } else {
+                                if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                                    AccSubmit();
+                                } else {
+                                    NA.common.dialog.closeDialog(dialog);
+                                }
+                            }
+                        },
+                        function () {
+                            NA.common.dialog.closeDialog(dialog);
+                        });
+                    } else {
+                        NA.common.dialog.closeDialog(dialog);
+                    }
+                }
+            };
+        } else if (emailForm) {
+            var emailForm = NA.common.doc.querySelector('form#email_data');
+            switch (TextElement) {
+                case 'Cancel':
+                case 'Close': {
+                    var initializeEmail = NA.common.getElementID('initializeEmail');
+                    var originalData = initializeEmail.Value;
+                    var valuesForm = getValues_emailForm();
+
+                    if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                        if (confirm('Data has changed, \nAre you sure to Send mail ?')) {
+                            if (!emailForm.checkValidity()) {
+                                //NA.NAEvent.preventDefault(event);
+                                var inputbtn = NA.common.getElementID('emailData_submit');
+                                inputbtn.click();
+                            } else {
+                                NA.common.doc.querySelector('div.dialogButtonOKCancel>a.button:nth-child(1)').click()
+                            }
+                        } else {
+                            NA.common.dialog.closeDialog(dialog);
+                        }
+                    } else {
+                        NA.common.dialog.closeDialog(dialog);
+                    }
+                }
+
+            }
+        }
+
+    };
+    function restyleBoostrapDialog() {
+        var BSDialogContent = NA.common.doc.querySelector('div.modal-dialog.modal-sm >.modal-content');
+        BSDialogContent.style.cssText = 'width: 450px; height: 350px;';
+        var ContentBody = NA.common.doc.querySelector('div.modal-dialog.modal-sm >.modal-content>.modal-body');
+        ContentBody.style.cssText = 'padding:0px;';
+        var contentFooter = NA.common.doc.querySelector('div.modal-dialog.modal-sm >.modal-content>.modal-footer');
+        contentFooter.style.cssText = 'padding-bottom:0px;padding-top:0px;';
+        var mHeader = NA.common.doc.querySelector('div.bootstrap-dialog .modal-header.bootstrap-dialog-draggable');
+        mHeader.style.cssText = 'height:30px;padding:5px;font-weight:bold';
+        var footerButton = NA.common.doc.querySelector('div.bootstrap-dialog-footer-buttons');
+        footerButton.style.cssText = 'padding-top:8px;';
+        };
+    function getGridCellValue(thegrid,CeltoGet) {
+            var reccount = thegrid.jqGrid('getGridParam', 'reccount');
+            var rowId, rowData, colData;
+            if (reccount > 0) {
+                rowId = thegrid.jqGrid('getGridParam', 'selrow');
+                if (rowId) {
+                    rowData = thegrid.getRowData(rowId);
+                    colData = rowData[CeltoGet];
+                }
+            }
+            return colData;
+    };
+    function dialogConfirm(message, title, callTrue, callFalse) {
+        return BootstrapDialog.confirm({
+            title: title || NA.common.message.titleInfo,
+            message: message,
+            type: BootstrapDialog.TYPE_WARNING,
+            size: BootstrapDialog.SIZE_SMALL,
+            animate: false,
+            cssClass: 'login-dialog',
+            closeByBackdrop: false,
+            closeByKeyboard: false,
+            closable: false,
+            draggable: true,
+            btnCancelLabel: 'NO.',
+            btnOKLabel: 'Yes.',
+            btnOKClass: 'btn-success',
+            callback: function (result) {
+                if (result) {
+                    if (callTrue) {
+                        callTrue();
+                    }
+                }
+                else {
+                    if (callFalse) {
+                        callFalse();
+                    }
+                }
+            },
+            onshown: function (dialogRef) {
+                var divHeader = NA.common.doc.querySelector('div.modal-header:nth-child(1)');
+                divHeader.style.backgroundColor = 'green';
+            }
+        });
+    };
+
+    function dialogAlert(message, title, callback) {
+        return BootstrapDialog.alert({
+            title: title || NA.common.message.titleInfo,
+            message: message,
+            size: BootstrapDialog.SIZE_SMALL,
+            //animate:false,
+            cssClass: 'login-dialog',
+            closeByBackdrop: false,
+            closeByKeyboard: false,
+            type: BootstrapDialog.TYPE_INFO,
+            closable: false,
+            draggable: true,
+            buttonLabel: 'OK',
+            callback: function (result) {
+                if (result) {
+                    if (callback) {
+                        callback();
+                    }
+                    return true;
+                }
+            },
+            onshown: function (dialogRef) {
+                var divHeader = NA.common.doc.querySelector('div.modal-header:nth-child(1)');
+                divHeader.style.backgroundColor = 'green';
+            }
+        });
+    };
+    window.showDialogEntry = function (event) {//function ini akan di panggil oleh NAJS.common.dialog,setiap menu add/edit/delete,etc di clik
+        //add handler to btnOK untuk mengantisipasi form load gagal
+        var win = window
+        var target = NA.NAEvent.getTarget(event);
+
+        try {
+
+            if (target.innerText === 'Email Data') {
+                var bottomRight = $('div.dialogButtonRightOther');
+                bottomRight.find('a.btn-link:eq(1)').css({
+                    'cursor': 'pointer',
+                    'pointer-events': 'all',
+                    'width': 'auto',
+                    'margin-right':'5px'
+                }).text('Export To PDF');
+                bottomRight.find('a.btn-link:eq(0)').css({
+                    'cursor': 'pointer',
+                    'pointer-events': 'all',
+                    'width': 'auto'
+                }).text('Preview PDF');
+                //$('<a class="btn btn-success" style="#8FBC8F">Export To PDF</a>').insertAfter($('div.dialogButtonRightOther').find('a.btn-link'))
+                var btnToPDF = document.querySelector('div.bottomDialogContent a.btn-link:nth-child(1)');
+                //====================================== Display Email Data Dialog =========================================
+                $('div.maindialogContent').load(url_emailData(), function (response, status, xhr) {
+                    if (status == "success") {
+                        var jspdf = "../../../static/app/scripts/jspdf.js";
+                        var sfm = "../../../static/app/scripts/standard_fonts_metrics.js";
+                        var stz = "../../../static/app/scripts/split_text_to_size.js";
+                        var js_pdf = "../../../static/app/scripts/jspdf.plugin.autotable.min.js";
+                        var jqUI = "../../../static/app/scripts/jquery-ui.min.js";
+                        var autoComp = "../../../static/app/scripts/autocomplete.js";
+                        var emailDataJS = "../../../static/app/scripts/NA_EmailData.js";
+                        var oneLoad = $('body > script[src="' + jspdf + '"]') && $('head > script[src="' + jspdf + '"]') && $('head > script[src="' + jspdf + '"]');
+                        if (!oneLoad.length) {
+                            var afterJquery = $('script#jq_uery');
+                            $('<script type="text/javascript" src="' + jspdf + '">').insertAfter(afterJquery);
+                            $('<script type="text/javascript" src="' + sfm + '">').insertAfter(afterJquery);
+                            $('<script type="text/javascript" src="' + stz + '">').insertAfter(afterJquery);
+                            $('<script type="text/javascript" src="' + js_pdf + '">').insertAfter(afterJquery);
+                            $('<script type="text/javascript" src="' + jqUI + '">').insertAfter(afterJquery);
+                            $('<script type="text/javascript" src="' + autoComp + '">').insertAfter(afterJquery);
+                            $('<script type="text/javascript" src="' + emailDataJS + '">').insertAfter(afterJquery);
+                        };
+                        var originalData = getValues_emailForm();
+                        var initializeEmail = NA.common.getElementID('initializeEmail');
+                        initializeEmail.Value = originalData;
+
+                        //=========================================== End Display Email Data Dialog ===========================================
+                    }
+
+                });
+
+                //if (window.document.body.style.cursor != 'default') { window.document.body.style.cursor = 'default'; }
+                //return false;
+            } else if (target.innerText.trim() === 'Add' || target.innerText.trim() === 'Edit' || target.innerText.trim() == 'Open') {
+                if (target.innerText.trim() == 'Edit'||target.innerText.trim() =='Open') {
+                    var idapp = getGridId();
+                    if (typeof idapp == 'undefined' || !idapp || idapp == '') {
+                        var dialog = NA.common.dialog.doc.querySelector("div.containerDialog");
+                        NA.common.dialog.closeDialog(dialog);
+                        var message = 'No Data Found at Here'
+                        if (acc_grid.getGridParam('records') > 0) {
+                            message = 'Please Select data to Open or Edit !!'
+                        };
+                        return dialogAlert(message, NA.common.message.titleInfo, function () {
+                            return acc_grid.trigger('reloadGrid');
+                        });
+                    }
+                }
+
+                $('div.maindialogContent').load("ShowEntry/?" + win.encodeURIComponent('idapp') + '=' + win.encodeURIComponent(getGridId()) + '&' + win.encodeURIComponent('mode')
+                    + '=' + win.encodeURIComponent(target.innerText.trim()), function (responseTxt, statusTxt, xhr) {//load /tampilkan form entry data(ShowEntry hanya contoh nama form)
+                    if (statusTxt == "success") {  //jika form sudah di load selanjutnya tinggal inisialisasi semua component dan simpang semua ke dalam variable jika perlua
+                        //remove attribute disable untuk button OK dan cancel bila statusnya Add
+                        switch (status) {
+
+                            case 'Add':
+                                {
+                                     break;
+                                }
+                            case 'Edit':
+                                {
+                                    setTimeout(function () {
+                                        $('div.dialogButtonOKCancel>a.button').removeAttr("disabled");
+                                    },10)
+
+
+                                }
+                            case 'Open': {
+                                $('div.dialogButtonEntry>a.button').attr("disabled", true);
+                                break;
+                            }
+                        };
+                        if (status !== 'Open' && status !== '') {//hanya untuk status Add/Edit
+                            //simpan original data di initializeForm
+                            var originalData = JSON.stringify(getValues_accForm());
+                            var itemcode = NA.common.doc.querySelector('input#id_itemcode'),
+                                btn_fkGoods = NA.common.doc.querySelector('button#fk_goodsname');
+                            var fk_goods = NA.common.getElementID('id_fk_goods'),
+                                goods_name = NA.common.getElementID('id_goods_name'),
+                                typeApp = NA.common.getElementID('id_typeApp'),
+                                startdate = NA.common.getElementID('id_startdate'),
+                                enddate = NA.common.getElementID('id_enddate'),
+                                depr_method = NA.common.getElementID('id_depr_method'),
+                                price = NA.common.getElementID('id_price'),
+                                serialNumber = NA.common.getElementID('id_serialNumber'),
+                                orig_depr_expense = NA.common.getElementID('id_orig_depr_expense'),
+                                economiclife = NA.common.getElementID('id_economiclife');
+                            function searchGoods(event) {
+                                BootstrapDialog.show({
+                                    draggable: true,
+                                    type: BootstrapDialog.TYPE_SUCCESS,
+                                    size: BootstrapDialog.SIZE_SMALL,
+                                    title: 'Search Goods .. .',
+                                    message: function (dialogRef) {
+                                        var placeHolder = 'Enter goods descriptions to search for .. .';
+                                        containerMessage = NA.common.dialog.createFormContainer('fk_goods', placeHolder,
+                                        function (e) {//event for blur
+                                            if (this.value === '') {
+                                                if (this.getAttribute('placeholder') === '') {
+                                                    this.setAttribute('placeholder', placeHolder);
+                                                }
+                                            }
+                                        },
+                                        function (e) {//event for focus
+                                            if (this.value === '') {
+                                                if (this.getAttribute('placeholder') === placeHolder) {
+                                                    this.setAttribute('placeholder', '');
+                                                }
+                                            }
+                                        },
+                                        function (e) {//even for keydown txtSearch                                                  
+                                            if (e.keyCode === 13) {
+                                                NA.NAEvent.preventDefault(e);
+                                                win.document.body.style.cursor = 'wait';
+                                                //cari data ke database
+                                                var url = 'SearchGoodsByForm/?' + win.encodeURIComponent('goods_filter') + '=' + win.encodeURIComponent(e.target.value.trim());
+                                                if (gridTbl) {
+                                                    jQuery(gridTbl).setGridParam({ url: url, search: true }).trigger("reloadGrid", [{ page: 1, }]);
+                                                }
+                                                win.document.body.style.cursor = 'default';
+                                                NA.NAEvent.stopPropagation(e);
+                                            }
+                                        }, function (e) {
+                                            txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+                                            NA.common.triggerKeyboardEvent(txtSearch, 13);
+                                        });
+                                        var children = containerMessage.childNodes;
+                                        var mainContainer = null, txtSearch = null;
+                                        for (var i = 0, len = children.length; i < len; i++) {
+                                            if (children[i].nodeType == 1 && children[i].className === 'maincontainerForm fk_goods') {
+                                                mainContainer = children[i]; break;
+                                            }
+                                        };
+
+                                        //loads Data into JqueryGrid
+                                        gridTbl = NA.common.doc.createElement('table');
+                                        gridTbl.id = 'NA_AccFA_FK_Goods';
+                                        gridPager = NA.common.doc.createElement('div');
+                                        gridPager.id = 'NA_AccFA_FK_Goods_Pager';
+                                        mainContainer.appendChild(gridTbl);
+                                        mainContainer.appendChild(gridPager);
+                                        return containerMessage;
+                                    },
+                                    onshown: function (dialogRef) {
+                                        txtSearch = NA.common.getElementID('txtsearch_fk_goods');
+                                        var valSearch = '';
+                                        if (txtSearch != null) {
+                                            valSearch = win.encodeURIComponent(txtSearch.textContent.trim());
+                                        }
+                                        gridTbl = $('#NA_AccFA_FK_Goods');
+                                        var urlFKGoods = 'SearchGoodsByForm/?' + win.encodeURIComponent('goods_filter') + '=' + valSearch;
+                                        gridTbl.jqGrid({
+                                            url: urlFKGoods,
+                                            mtype: "GET",
+                                            datatype: "json",//column IDapp, NO,    goods   datereceived supliername FK_ReceivedBy  receivedby FK_P_R_By pr_by totalpurchase totalreceived 
+                                            colNames: ['idapp', 'NO', 'itemcode', 'goods Description', 'Serial Number' ],
+                                            colModel: [
+                                                { name: 'idapp', hidden: true, align: 'left' },
+                                                { name: 'no', width: 40, align: 'right', sortable: false, editable: false, key: true, },
+                                                { name: 'itemcode', width: 80, align: 'left', sortable: true, editable: false, },
+                                                { name: 'goods', index: 'goods', width: 250, sortable: true, editable: false, align: 'left', },
+                                                { name: 'serialnumber', index: 'serialnumber', width: 150, sortable: true, editable: false, align: 'left', },
+                                            ],
+                                            ondblClickRow: function (rowId) {
+                                                //fire button OK
+                                                var btnOK = dialogRef.getButton('btnOKFindGoods');
+                                                btnOK.click();
+                                            },
+                                            gridComplete: function () {
+                                                document.body.style.cursor = 'default';
+                                            },
+                                            loadComplete: function () {
+                                                //No Data Found at Here .. All goods data has been generate to Fixed Assets
+                                                if (gridTbl.getGridParam("records") == 0 && gridTbl.getGridParam('search') === false) {
+                                                    $('div#gview_NA_AccFA_FK_Goods').find('div.ui-jqgrid-bdiv').append('<div style="height: 100%;font-size: 17px;padding: 30px;text-align:center;color:#ccc">' + 'No Data Found at Here ..<br/> All goods data has been generate to Fixed Assets' + '</div>');
+                                                    $('input#txtsearch_fk_goods').attr('disabled', true);
+                                                    $('input#txtsearch_fk_goods').next().find('button.btn.btn-success').attr('disabled', true);
+                                                    dialogRef.getButton('btnOKFindGoods').attr('disabled', true);
+                                                }
+                                            },
+                                            cellEdit: false,
+                                            viewrecords: true,
+                                            height: '150px',
+                                            rowNum: 500,
+                                            rowList: [20, 50, 100, 200, 300, 500],
+                                            sortname: "itemcode",
+                                            sortorder: "asc",
+                                            multiSort: true,
+                                            shrinkToFit: false,
+                                            iconSet: "fontAwesome",
+                                            width:'inherit',
+                                            //forceFit: true,
+                                            //toolbar: true,
+                                            scrollrows: true,
+                                            //hidegrid: true,
+                                            caption: "Asset Depreciation ---Find goods",
+                                            pager: "#NA_AccFA_FK_Goods_Pager"
+                                        });
+                                        gridTbl.navGrid('#NA_AccFA_FK_Goods_Pager', {
+                                            search: false, // show search button on the toolbar
+                                            add: false,
+                                            edit: false,
+                                            del: false,
+                                            refresh: false
+                                        });
+                                        restyleBoostrapDialog();
+                                        var elGrid = qsAll('div#gbox_NA_AccFA_FK_Goods, div#gview_NA_AccFA_FK_Goods, div#gview_NA_AccFA_FK_Goods div.ui-jqgrid-hdiv.ui-state-default, div#gview_NA_AccFA_FK_Goods div.ui-jqgrid-bdiv, div#NA_AccFA_FK_Goods_Pager')
+                                        Array.prototype.forEach.call(elGrid, function (elem) {
+                                            elem.style.width = 'inherit'
+                                        });
+                                    },
+                                    closable: false,
+                                    animate: false,
+                                    closeByBackdrop: false,
+                                    closeByKeyboard: false,
+                                    buttons: [{
+                                        label: 'Cancel',
+                                        icon: 'glyphicon glyphicon-remove',
+                                        cssClass: 'btn-success',
+                                        action: function (dialogRef) {
+                                            dialogRef.close();
+                                        },
+                                    }, {
+                                        label: 'OK',
+                                        id: 'btnOKFindGoods',
+                                        icon: 'glyphicon glyphicon-ok',
+                                        cssClass: 'btn-success',
+                                        action: function (dialogRef) {
+                                            var idapp = getGridCellValue(gridTbl, 'idapp');
+                                            $.ajax({
+                                                url: 'getGoods/',
+                                                data: {
+                                                    'idapp': idapp
+                                                },
+                                                success: function (data) {
+                                                    fk_goods.value = idapp;
+                                                    itemcode.value = getGridCellValue(gridTbl, 'itemcode');
+                                                    goods_name.value = data['goods']
+                                                    typeApp.value = data['typeapp']
+                                                    startdate.value = data['startdate'];
+                                                    enddate.value = data['enddate']
+                                                    depr_method.value = data['depr_method'];
+                                                    price.value = data['price_label']; // price with currency separate
+                                                    price.Value = data['price_orig']; //original price
+                                                    serialNumber.value = data['serialnumber'];
+                                                    economiclife.value = data['economiclife'];
+                                                    dialogRef.close();
+                                                }
+                                            })
+                                        }
+                                    }]
+                                });
+                            }
+                            NA.NAEvent.addHandler(itemcode, 'keydown', function (event) {
+                                var target = NA.NAEvent.getTarget(event);
+                                if (event.keyCode == 13) {
+                                    searchGoods(event);
+                                }
+                            });
+                            NA.NAEvent.addHandler(btn_fkGoods, 'click', function (event) {
+                                searchGoods(event);
+                            });
+
+                            initializeForm = NA.common.getElementID('id_initializeForm');
+                            initializeForm.Value = originalData;
+                            //setting Custom Validity
+                        }
+
+                    }
+                    NA.NAEvent.preventDefault(event);
+                    if (window.document.body.style.cursor != 'default') { window.document.body.style.cursor = 'default'; }
+                });
+            }
+            var dialog = NA.common.dialog.doc.querySelector("div.containerDialog");
+            $('div.dialogButtonOKCancel>a.button').on('click', function () {
+                var frmEntry = NA.common.doc.querySelector('form#acc_form');
+                var emailForm = NA.common.doc.querySelector('form#email_data')
+                if (frmEntry || emailForm) {
+                    var inrtext = $(this).text()
+                    ExecuteHandler(inrtext);
+                    return false;
+                }
+
+                if (event) {
+                    NA.NAEvent.stopPropagation(event);
+                }
+                return false;
+            });
+            $('button.ui-button.ui-dialog-titlebar-close').on('click', function (event) {
+                NA.NAEvent.preventDefault(event);
+                var frmEntry = NA.common.doc.querySelector('form#acc_form');
+                var emailForm = NA.common.doc.querySelector('form#email_data')
+                if (frmEntry) {
+                    ExecuteHandler('Close');
+                } else if (emailForm) {
+                    ExecuteHandler('Close');
+                }
+                //stop buble event if it fires to child or parent component
+                if (event) {
+                    NA.NAEvent.stopPropagation(event);
+                }
+                document.body.style.cursor = 'default';
+                return false;
+            });
+
+
+        } catch (e) {
+            dialog = NA.common.dialog.doc.querySelector("div.containerDialog");
+            if (window.document.body.style.cursor != 'default') { window.document.body.style.cursor = 'default'; }
+            alert(e);
+        }
+    };
+});
+</script>
+
+{% endblock %}

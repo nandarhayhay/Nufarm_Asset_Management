@@ -1,0 +1,91 @@
+﻿<style>
+    .cust-horizontal {
+        display:inline-block;
+    }
+</style>
+<form action="ShowEntry/" method="post" style="width:450px;max-height:400px;" id="gLost_form" onsubmit="return false">
+        {% csrf_token %}
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_itemcode" class="cust-horizontal" style="margin-right: 35px;">Item code</label>
+            {{ form.itemcode }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <div class="input-group" style="display:inline-flex;">
+                {{ form.goods }}
+                <div class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;">
+                    <button class="btn btn-success" type="button" id="fk_goods"><i class="glyphicon glyphicon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_typeApp" class="cust-horizontal" style="margin-right: 5px;">Type/<br />Serial Number</label>
+            {{ form.typeApp }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            {{ form.serialNumber }}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label class="cust-horizontal" style="margin-right: 47px;">Used By</label>
+            {{ form.nik_used }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            {{ form.empl_used }}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_startdate" class="cust-horizontal" style="margin-right: 17px;">Responsible<br />Person</label>
+            {{ form.nik_resp }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            {{ form.empl_resp }}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_nik_lostby" class="cust-horizontal" style="margin-right: 55px;">Lost by</label>
+            {{ form.nik_lostby }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <div class="input-group" style="display:inline-flex;">
+                {{ form.empl_lostby }}
+                <div class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;">
+                    <button class="btn btn-success" type="button" id="fk_lostby"><i class="glyphicon glyphicon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_datelost" class="cust-horizontal" style="margin-right: 40px;">Date Lost</label>
+            {{ form.datelost }}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_status" class="cust-horizontal" style="margin: 0 14px 0 4px;">Status</label>
+            {{ form.status_goods }}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_descriptions">Descriptions</label>
+            {{form.descriptions}}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_reason">Reason</label>
+            {{form.reason}}
+        </div>
+    </div>
+    {{form.fk_goods}}
+    {{form.fk_lostby}}
+    {{form.fk_fromgoods}}
+    {{form.fk_goods_outwards}}
+    {{form.fk_goods_lending}}
+    {{form.fk_maintenance}}
+    {{form.initializeForm}}
+    <input type="submit" style="display:none" id="gLost_submit" />
+</form>

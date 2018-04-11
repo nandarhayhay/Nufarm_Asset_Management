@@ -1,0 +1,57 @@
+<form action="." method="post" onsubmit="return false" id="email_data">
+    {% csrf_token %}
+    <div class="row" style="margin:0px;display:inline-flex;">
+        <div class="col-md-5">
+            <label for="id_to" class="left">To:</label> 
+            <input class="NA-Form-Control" name="to" required="" id="id_to" type="email" placeholder="example@example.com">
+        </div>
+        <div class="col-md-7">
+            <label for="id_subject" class="left">Subject:</label> 
+            <input class="NA-Form-Control" name="subject" required="" id="id_subject" type="text" placeholder="Your Subject .. .">
+        </div>
+        
+    </div>
+    <div class="row" style="margin:20px 0 0 0;">
+    <div style="padding-left: 15px;" class="col-md-5">
+        <label for="selectData" class="left">Select Report: </label>
+        <select id="selectData" style="display:block;clear:left;width: 182px;">
+            <option value="tabular_data">Tabular Data</option>
+            <option value="current_data">Current Data</option>
+            <option value="biodata">Bio Data</option>
+        </select>
+    </div>
+    <div style="padding: 0;" class="col-md-7">
+    <div style="padding: 0;padding-left: 15px;" class="col-md-5">
+            <label for="selectTable" class="left">Select Data: </label>
+        </div>
+        <div style="padding:0px;clear: left;display: inline-block;position: relative;left: 35px;padding-right: 8px;" class="col-md-11">
+            <div class="checkbox checkbox-success" style="padding:0px;text-align: left;margin-top:0px;display: inline-block;float: left;">
+                <input id="employee_email" value="employee_emailData" type="checkbox"><label for="employee_email">Employee</label>
+            </div>
+            <div class="checkbox checkbox-success" style="padding:0px;text-align: left;margin-top:0px;display: inline-block;float: left;margin-left: 30px;">
+                <input id="suplier_email" value="suplier_emailData" type="checkbox"><label for="suplier_email">Suplier</label>
+            </div>
+            <div class="checkbox checkbox-success" style="padding:0px;text-align:left;margin-top:0px;display: inline-block;float: left;margin-left: 30px;">
+                <input id="goods_email" value="goods_emailData" type="checkbox"><label for="goods_email">Goods</label>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="row" style="margin:12px 0 0 0" id="searchBioContainer">
+        <div class="col-md-6" style="padding-right:0">
+            <label for="searchBiodata" class="left">Search Data: </label>
+            <input class="NA-Form-Control" id="searchBiodata" disabled="disabled" type="text" placeholder="Search biodata .. ." style="width:77%">
+        </div>
+        <div class="col-md-6" id="resultSearch">
+
+        </div>
+    </div>
+    <div class="row" style="margin:12px 0 0 0">
+        <div class="col-md-12">
+            <label for="id_message" class="left">Message:</label>
+            <textarea class="NA-Form-Control" name="message" required="" id="id_message" maxlength="250" style="max-width: 500px; width: 462px; height: 52px; clear: left;" placeholder="Enter your message .. ."></textarea>
+        </div>
+    </div>
+    <input type="hidden" id="initializeEmail" />
+    <input type="submit" style="display:none" id="emailData_submit"/>
+</form>

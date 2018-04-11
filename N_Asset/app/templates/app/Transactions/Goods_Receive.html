@@ -1,32 +1,51 @@
 ﻿<div class="row" style="overflow:auto;">
-	    <div class="col-md-12">
+
             <form action="." method="post" class="form-horizontal" enctype="multipart/form-data" style="background-color:transparent;font-size: 1em;" id="frm-NA-Entry-Goods_Receive" onsubmit="return false;">
                 {% csrf_token %}
+
+
+                <!--
+        <div class="input-group">
+                           <input type="search" class="form-control">
+                           <span class="input-group-btn">
+                               <button class="btn btn-default" type="button">
+                                   <span class="glyphicon glyphicon-ok"></span>
+                               </button>
+                           </span>
+                       </div>
+               -->
+                <div class="NA-Entry-div-row">
+                    <div class="NA-Entry-inlinve-div">
+                        <label for="refno" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:112px;">RefNO</label>
+                        {{ form.refno }}
+                    </div>
+					<div class="NA-Entry-inlinve-div">
+                    <label for="datereceived" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:100px;">date received</label>
+                    {{ form.datereceived }}
+                </div>
+                </div>
                 <div class="NA-Entry-div-row">
                     <label for="fk_goods" class="NA-Entry-label;" style="display:inline-block;margin-right:5px; width:112px;">Goods Desc</label>
                     {{ form.fk_goods }}
-                    <div class="input-group" style="display:inline-flex;">
+                    <div class="input-group" style="display: inline-flex; width: 46%;">
                         {{ form.goods_desc }}
-                        <div class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;">
-                            <button class="btn btn-success" type="button" id="FE_fk_goods"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
+                        <span class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;justify-content:flex-end">
+                            <button class="btn btn-success" type="button" id="FE_fk_goods" style="padding:4px 8px;height: 27px"><span class="glyphicon glyphicon-search"></span></button>
+                        </span>
                     </div>
                 </div>
                 <div class="NA-Entry-div-row">
                     <label for="suplier" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:112px;">Suplier</label>
                     {{ form.fk_suplier }}
-                    <div class="input-group" style="display:inline-flex;">
+                    <div class="input-group" style="display:inline-flex; width:46%;">
                         {{ form.supliername }}
-                        <div class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;">
-                            <button class="btn btn-success" type="button" id="FE_fk_suplier"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
+                        <span class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;justify-content:flex-end">
+                            <button class="btn btn-success" type="button" id="FE_fk_suplier" style="padding:4px 8px;height: 27px;"><i class="glyphicon glyphicon-search"></i></button>
+                        </span>
                     </div>
                     <!-- <a href="#" style="margin-left:5px;padding:3px;" id="FE_fk_suplier"><i class="fa fa-search" aria-hidden="true"></i>Find suplier</a>-->
                 </div>
-                <div class="NA-Entry-div-row">
-                    <label for="datereceived" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:112px;">date received</label>
-                    {{ form.datereceived }}
-                </div>
+                
                 <div class="NA-Entry-div-row">
                     <div class="NA-Entry-inlinve-div">
                         <label for="totalpurchase" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:112px;">Total Purchased</label>
@@ -40,22 +59,22 @@
                 <div class="NA-Entry-div-row">
                     <label for="fk_pr_by" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:112px;;">PR By</label>
                     {{ form.fk_p_r_by }}
-                    <div class="input-group" style="display:inline-flex;">
+                    <div class="input-group" style="display:inline-flex;width:46%;">
                         {{ form.employee_pr }}
-                        <div class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;">
-                            <button class="btn btn-success" type="button" id="FE_fk_pr_by"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
+                        <span class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;justify-content:flex-end">
+                            <button class="btn btn-success" type="button" id="FE_fk_pr_by" style="padding:4px 8px;height: 27px;"><i class="glyphicon glyphicon-search"></i></button>
+                        </span>
                     </div>
                     <!--  <a href="#" style="margin-left:5px;padding:3px;" id="FE_fk_pr_by"><i class="fa fa-search" aria-hidden="true"></i>Find Employee</a>-->
                 </div>
                 <div class="NA-Entry-div-row">
                     <label for="fk_receivedby" class="NA-Entry-label;" style="display:inline-block;margin-right:5px;width:112px;;">Received By</label>
                     {{ form.fk_receivedby }}
-                    <div class="input-group" style="display:inline-flex;">
+                    <div class="input-group" style="display:inline-flex;width:46%;">
                         {{ form.employee_received }}
-                        <div class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;">
-                            <button class="btn btn-success" type="button" id="FE_fk_receivedby"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
+                        <span class="input-group-btn" style="display:inline-flex;height: 27px;padding-bottom:0;justify-content:flex-end">
+                            <button class="btn btn-success" type="button" id="FE_fk_receivedby" style="padding:4px 8px;height: 27px;"><i class="glyphicon glyphicon-search"></i></button>
+                        </span>
                     </div>
                     <!--<a href="#" style="margin-left:5px;padding:3px;" id="FE_fk_receivedby"><i class="fa fa-search" aria-hidden="true"></i>Find Employee</a> -->
                 </div>
@@ -65,16 +84,16 @@
                         {{ form.descriptions }}
                     </div>
                 </div>
-                <hr style="margin-bottom:10px;margin-top:2px;background-color:#0b9910;border-top:1px solid rgb(11, 153, 16)" />
-                <div class="NA-Entry-div-row" style="text-align:right">
+                <hr style="margin-bottom:10px;margin-top:2px;background-color:#0b9910;border-top:1px solid rgb(11, 153, 16); margin-right:20px;" />
+                <div class="NA-Entry-div-row" style="text-align:right;">
                     <button class="btn btn-success" type="button" id="btnAddDetail" style="height:27px;padding-top:2px;"><i class="glyphicon glyphicon-plus">Add Detail</i></button>
                 </div>
-				<div class="NA-Entry-div-row" style="overflow:auto">
-					<table id="jqGrid_NA_F_Goods_Receive_Detail" style="overflow:auto"></table>
-					<div id="jqGrid_NA_F_Goods_Receive_Detail_Pager"></div>
-				</div>                
-                <div class="NA-Entry-div-row" style="text-align:right">
-                    <button class="btn btn-success" type="button" id="btnCancelDetail" style="height:27px;padding-top:2px;"><i class="glyphicon glyphicon-remove">Save Data</i></button>
+                <div id="divTable" class="NA-Entry-div-row" style="overflow:auto">
+                    <table id="jqGrid_NA_F_Goods_Receive_Detail" style="overflow:auto"></table>
+                    <div id="jqGrid_NA_F_Goods_Receive_Detail_Pager" style="overflow:auto"></div>
+                </div>
+                <div class="NA-Entry-div-row" style="text-align:right;">
+                    <button class="btn btn-success" type="button" id="btnCancelDetail" style="height:27px;padding-top:2px;display:none;"><i class="glyphicon glyphicon-remove">Cancell</i></button>
                 </div>
                 <input type="submit" style="display:none" id="inputButton">
                 {{ form.status }}
@@ -83,9 +102,9 @@
                 {{ form.idapp_fk_goods }}
                 {{ form.idapp_fk_p_r_by }}
                 {{ form.idapp_fk_receivedby }}
-                {{ form.idapp }}
                 {{ form.hasRefData }}
                 {{ form.descbysystem }}
+				{{ form.economiclife}}
+				{{ form.dataForGridDetail }}
             </form>
 		</div>
-	</div>

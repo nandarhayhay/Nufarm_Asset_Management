@@ -1,0 +1,70 @@
+﻿<form action="EntryEmployee/" method="post" style="width:520px;height:300px;" id="employee_form" onsubmit="return false">
+        {% csrf_token %}
+    <div class="row" style="margin:0px">
+        <div class="col-md-4" style="padding: 0px 10px 0 0;">
+            <label for="id_nik" class="left">Nik:</label>
+            {{form.nik}}
+        </div>
+        <div class="col-md-5" style="padding: 0px 10px 0 0;">
+            <label class="left" for="id_employee_name">Employee name:</label>
+            {{form.employee_name}}
+        </div>
+        <div class="col-md-3" style="padding: 0 10px 0 0;">
+            <label class="left" for="id_typeapp">Typeapp:</label>
+            {{form.typeapp}}
+        </div>
+    </div>
+
+    <div class="row" style="margin:20px 0px 0px 0px">
+        <div style="padding:0px 10px 0 0;" class="col-md-4">
+            <label for="id_jobtype" class="left">Jobtype:</label>
+            {{form.jobtype}}
+        </div>
+        <div class="col-md-4" style="padding: 0px 5px 0px 5px;">
+            <fieldset>
+                <legend>
+            <div class="col-md-4" style="margin:0 10px 0 0">
+                <label for="id_gender_0">Gender:</label>
+            </div>
+                </legend>
+            <ul id="id_gender" style="list-style:none;padding:0px;clear:left;">
+                {%for i in form.gender%}
+                <li class="col-md-6" style="padding:0px"><label for="{{i.id_for_label}}">{{i.tag}}{{i.choice_label}}</label></li>
+                {%endfor%}
+            </ul>
+            </fieldset>
+        </div>
+        <div class="col-md-4" style="padding: 0px 5px 0px 5px;">
+            <fieldset>
+                <legend>
+                    <label for="id_status_0" class="left">Status:</label>
+                </legend>
+                <ul id="id_status" style="list-style:none;clear:left;">
+                    {%for i in form.status%}
+                    <li class="col-md-6" style="padding:0"><label for="{{i.id_for_label}}">{{i.tag}}{{i.choice_label}}</label></li>
+                    {%endfor%}
+                </ul>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="row" style="margin:20px 0 0 0">
+        <div class="col-md-4" style="padding: 0px 10px 0px 0px;">
+            <label class="left" for="id_telphp">Telphp:</label>
+            {{form.telphp}}
+        </div>
+        <div class="col-md-5" style="padding: 0px">
+            <label class="left" for="id_territory">Territory:</label>
+            {{form.territory}}
+        </div>
+        <div class="col-md-2" style="padding:0px;margin: 25px 0 0 25px;">
+            <label for="id_inactive" style="margin-left: 7px;">{{form.inactive}}In active</label>
+        </div>
+    </div>
+    <div class="row" style="margin:20px 0 0 0">
+        <label for="id_descriptions" class="left">Descriptions:</label>
+        {{form.descriptions}}
+    </div>
+    {{form.initializeForm}}
+    <input type="submit" style="display:none" id="employee_submit" />
+</form>

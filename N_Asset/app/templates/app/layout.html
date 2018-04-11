@@ -5,27 +5,53 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-control" content="no-cache">
-     <meta name="description" content= "{{CompanyName}} Asset Management, {{CompanyName}} Asset internal for management only">
-        <!--[if lt IE 9]>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <meta http-equiv="Cache-control" content="no-cache">
+    <meta name="description" content= "{{CompanyName}} Asset Management, {{CompanyName}} Asset internal for management only" />
+    <!--[if lt IE 9]>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
     <![endif]-->
     <title>{{ title }} - {{CompanyName}} </title>
     {% load staticfiles %}
-    <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/menu.css' %}" />
-    {#<link rel="stylesheet" type="text/css" href="{%static 'app/content/jquery-ui.min.css' %}" />#}
-    <link rel="stylesheet" type="text/css" href="{% static 'app/content/MainLayouts.css' %}">
-    <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'app/content/MainLayouts.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
+    <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
+    <style>
+        div.tree-node span.fa-plus, div.tree-node span.fa-pencil {
+            position:relative;
+            bottom:1px
+        }
+        div.tree-node span.fa-trash, div.tree-node span.fa-envelope {
+            position:relative;
+            bottom:2px
+        }
+        div#EventLogs li, div#EventLogs ul {
+            min-width:100%;
+            width:-moz-fit-content;
+        }
+        .ui-jqgrid .ui-pg-table .ui-pg-input {
+            height: 16px;
+            width: 30px;
+            line-height: inherit;
+            padding: 1px;
+            font-weight: normal;
+            font-size: 11px;
+            margin: 1px;
+            border: 1px solid #0b9910;
+            text-align: center;
+}
+    </style>
 </head>
                        <body>
                            <header>
                                <a href="#"><img src="{% static 'app/images/NufarmLogo.jpg' %}" alt="Insert Logo Here" width="173" height="90" id="Insert_logo" style="background-color:transparent; display:block;" /></a>
                            </header>
-                           <div>
+                           <div style="height: 85.5%;position: relative;">
                                <div class="fltlft">
+                                   {% with request.resolver_match.url_name as url_name %} <!-- for getting url path, if the url path is Employee, only give class active to it .. . :D -->
                                    <div class="sidebar">
                                        <ul class="list-sidebar bg-defoult">
                                            <!--<li class="nav-header "> <span> <img alt="image" class="img-circle" src="http://placehold.it/150x150"> </span>
@@ -43,30 +69,26 @@
                                                    <span class="nav-label"> Master Data </span> <span class="fa fa-angle-down pull-right"></span>
                                                </a>
                                                <ul class="sub-menu collapse" id="dashboard" aria-expanded="false" style="">
-                                                   <li class="active"><a href="#"><i class="fa fa-address-book-o" aria-hidden="true"></i>Suplier</a></li>
-                                                   <li><a href="#"><i class="fa fa-address-card" aria-hidden="true"></i> Employee</a></li>
-                                                   {% if "/NA_Goods/" == request.path %}
-                                                   <li class="active"><a href="{{ request.path }}"><i class="fa fa-dropbox" aria-hidden="true"></i>Goods</a></li>
-                                                   {% else %}
-                                                   <li class="active"><a href="NA_Goods/"><i class="fa fa-dropbox" aria-hidden="true"></i>Goods</a></li>
-                                                   {% endif %}
+
+
+                                                   <li><a href="{% url 'NA_Suplier' %}" {% if url_name == 'NA_Suplier' %} class="active" {% endif %}><i class="fa fa-address-book-o" aria-hidden="true"></i>Suplier</a></li>
+                                                   <li><a href="{% url 'NA_Employee' %}" {% if url_name == 'NA_Employee' %} class="active" {% endif %}><i class="fa fa-address-card" aria-hidden="true"></i> Employee</a></li>
+                                                   <li><a href="{% url 'GoodMaster' %}"><i class="fa fa-dropbox" aria-hidden="true"></i>Goods</a></li>
+                                                   <li id="emailData"><a href="#"><i class="fa fa-envelope"></i>Email Data</a></li>
+                                                   <li><a href="{% url 'NA_GoodsLost' %}" {% if url_name == 'NA_GoodsLost' %} class="active" {% endif %}>Goods Lost</a></li>
                                                    <li><a href="#">Others Menu</a></li>
                                                    <li><a href="#">Others Menu</a></li>
                                                    <li><a href="#">Others Menu</a></li>
                                                    <li><a href="#">Others Menu</a></li>
                                                    <li><a href="#">Others Menu</a></li>
-                                                   <li><a href="#">Others Menu</a></li>
-                                                   <li><a href="#">Others Menu</a></li>
+
+
                                                </ul>
                                            </li>
                                            <li>
                                                <a href="#" data-toggle="collapse" data-target="#products" class="active collapsed" aria-expanded="false"> <span class="nav-label">Transactions</span> <span class="fa fa-angle-down pull-right"></span> </a>
                                                <ul class="sub-menu collapse" id="products" aria-expanded="false" style="">
-                                                   {% if "/NA_Goods_Receive/" == request.path %}
-                                                   <li class="active"><a href="{{ request.path }}">Goods Receiving</a></li>
-                                                   {% else %}
-                                                   <li class="active"><a href="/NA_Goods_Receive/">Goods Receiving</a></li>
-                                                   {% endif %}
+                                                   <li class="active"><a href="{% url 'GoodsReceive' %}">Goods Receiving</a></li>
                                                    <li><a href="#">Goods Outwords</a></li>
                                                    <li><a href="#">Goods Lent</a></li>
                                                    <li><a href="#">Goods Returned</a></li>
@@ -76,47 +98,52 @@
                                                    <li><a href="#">Others Menu</a></li>
                                                </ul>
                                            </li>
-                                           <li> <a href="#"><i class="fa fa-sort-amount-asc" aria-hidden="true"></i> <span class="nav-label">Asset Depreciation</span></a> </li>
-                                           <li> <a href="#"><i class="fa fa-wrench" aria-hidden="true"></i><span class="nav-label">Maintenance</span></a> </li>
+                                           <li> <a href="{% url 'NA_Acc' %}"><i class="fa fa-sort-amount-asc" aria-hidden="true"></i> <span class="nav-label">Asset Depreciation</span></a> </li>
+                                           <li> <a href="{% url 'NA_Maintenance' %}"><i class="fa fa-wrench" aria-hidden="true"></i><span class="nav-label">Maintenance</span></a> </li>
                                            <li> <a href="#"><i class="fa fa-trash" aria-hidden="true"></i> <span class="nav-label">Disposal</span></a> </li>
                                            <li> <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">Other Pages</span></a> </li>
                                        </ul>
                                    </div>
+                                   {% endwith %}
                                    <div class="content">
                                        <div class="nfAction">
                                            <div class="row">
                                                <div class="col-xs-12">
                                                    <nav class="navbar navbar-default" role="navigation">
-                                                       <div id="bs-example-navbar-collapse-1" style="display:flex;flex-flow:nowrap;position:relative">
-                                                           <ul class="nav navbar-nav">
+                                                       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="display:flex;flex-flow:nowrap;position:relative">
+                                                           <ul class="nav navbar-nav" style="flex:0 1 auto ;display: flex;flex-flow: row nowrap">
                                                                {%block ActionMenu %}
-                                                               <li class="active"><button class="btn-sm"><i class="fa fa-plus">  Add</i></button></li>
+                                                               <li class="active"><button class="btn-sm" id="addData"><i class="fa fa-plus">  Add</i></button></li>
                                                                <li><button class="btn-sm"><i class="fa fa-envelope-open">  Open</i></button></li>
-                                                               <li><button class="btn-sm"><i class="fa fa-pencil-square">  Edit</i></button></li>
+                                                               <li><button class="btn-sm" id="editData"><i class="fa fa-pencil-square">  Edit</i></button></li>
                                                                <li><button class="btn-sm"><i class="fa fa-floppy-o">  Save</i></button></li>
-                                                               <li><button class="btn-sm"><i class="fa fa-window-close">  Delete</i></button></li>
+                                                               <li><button class="btn-sm" id="delData"><i class="fa fa-window-close">  Delete</i></button></li>
                                                                <li><button class="btn-sm"><i class="fa fa-file-excel-o">  Export</i></button></li>
                                                                <li><button class="btn-sm"><i class="fa fa-print">  Print</i></button></li>
                                                                <li><button class="btn-sm"><i class="fa fa-question-circle">  Help</i></button></li>
                                                                {% endblock %}
                                                            </ul>
-                                                           <div style="flex:1 1 auto;display:flex;flex-flow:row nowrap;justify-content:flex-start">
-                                                               <ul style="position:relative; margin:auto;align-self:left;flex:0 1 auto;">
-                                                                   <li class="dropdown">
-                                                                       <a id="bySearch" href="#" class="dropdown-toggle" data-toggle="dropdown" style="color:black;">By <b class="caret"></b></a>
-                                                                       <ul class="dropdown-menu search">
-                                                                           {% block SearchData %}
-                                                                           <li><a href="http://www.jquery2dotnet.com">Action</a></li>
-                                                                           <li><a href="http://www.jquery2dotnet.com">Another action</a></li>
-                                                                           <li><a href="http://www.jquery2dotnet.com">Something else here</a></li>
-                                                                           <!--<li class="divider"></li>-->
-                                                                           <li><a href="http://www.jquery2dotnet.com">Separated link</a></li>
-                                                                           <!--<li class="divider"></li>-->
-                                                                           <li><a href="http://www.jquery2dotnet.com">One more separated link</a></li>
+                                                           <div class="col-sm-8 col-md-4" style="display:flex;padding:0px;">
+                                                               <ul>
+                                                                   <li class="dropdown" style="flex:0 1 65px">
+                                                                       <a href="http://www.jquery2dotnet.com" class=" btn dropdown-toggle" data-toggle="dropdown" style="color:black;border-radius:0px;padding:4px 10px;" id="bySearch" value="By">By <b class="caret"></b></a>
+                                                                       <ul class="dropdown-menu search" id="selectValue">
+                                                                           {%block SearchData %}
+
                                                                            {% endblock %}
                                                                        </ul>
                                                                    </li>
                                                                </ul>
+                                                               <!--<form class="navbar-form" role="search" style="flex: 11 1 450px;left:0;position:relative;">
+                                              <div class="input-group" style="display:inline-flex;position:relative">
+                                                  <input class="form-control" style="display:flex;flex-flow:row nowrap;height:30.22px;" placeholder="Enter text to search for" type="text" id="searchData" required="" name="q" />
+                                                  <div class="input-group-btn" style="padding-bottom:0;display:flex;flex-flow:row nowrap;width:auto;">
+                                                      <button style="height:30.22px;" class="btn btn-default" type="submit" id="submitSearch"><i class="fa fa-search-minus" aria-hidden="true"></i></button>
+                                                  </div>
+                                              </div>
+                                         </form>-->
+                                                               <!--input-group-btn{padding-bottom: 2px}
+                                         col-sm-5 col-md-4-->
                                                                <form class="navbar-form" role="search" style="left:0;position:relative;margin:auto;flex:1 1 auto;">
                                                                    <div class="input-group" style="display:inline-flex;position:relative">
                                                                        <input class="NA-Form-Control" style="display:flex;flex-flow:row nowrap;height:30.22px;" placeholder="Enter text to search for" name="q" type="text">
@@ -125,8 +152,6 @@
                                                                        </div>
                                                                    </div>
                                                                </form>
-                                                               <!--input-group-btn{padding-bottom: 2px}
-                                        col-sm-5 col-md-4-->
                                                            </div>
                                                        </div>
                                                    </nav>
@@ -137,12 +162,62 @@
 
                                        </div>
                                        <div id="content-0">
+                                           <script>
+                           function url_logEvent() {
+                               return '{% url 'NA_LogEvent' %}'
+                           };
+                           function url_logDesc(){
+                               return '{% url 'NA_LogEvent_descriptions' %}'
+                           };
+                           function url_register(){
+                               return '{% url 'NA_User_Register' %}'
+                           };
+                           function url_emailData(){
+                               return '{% url 'NA_EmailData' %}'
+                           };
+                           function url_searchBio(){
+                               return '{% url 'NA_EmailData_searchBiodata' %}'
+                           };
+                           function url_emplData(){
+                               return '{% url 'NA_Employee_data' %}'
+                           };
+                           function url_emailUpl(){
+                               return '{% url 'NA_EmailUplData' %}'
+                           };
+                           function url_suplData(){
+                               return '{% url 'NA_Suplier_data' %}'
+                           };
+                           function url_retriveBio(){
+                               return '{% url 'NA_Email_retriveBio' %}'
+                           };
+                                           </script>
+                                           <script>
+                                               function reload_LogEvent() {
+                                                   setTimeout(function () {
+                                                       $.ajax({
+                                                           url: url_logEvent(),
+                                                           success: function (data) {
+                                                               $('#EventLogs').tree('loadData',JSON.parse(data));
+                                                           }
+                                                       })
+
+                                                   },3000)
+                                               };
+                                               function getValues_emailForm() {
+                                                   var data = {
+                                                       to: $.trim($('input#id_to').val()),
+                                                       subject: $.trim($('input#id_subject').val()),
+                                                       message: $.trim($('textarea').val())
+                                                   };
+
+                                                   return data
+                                               }
+                                           </script>
                                            <!---============================Application content resides here======================== -->
                                            {% block javascriptAndUI %}
                                            {% endblock %}
 
                                            {%block content-0 %}
-
                                            {% endblock %}
 
                                        </div>
@@ -159,40 +234,75 @@
                                        <ul class="nav navbar-nav navbar-right" style="display: flex;flex-flow: row nowrap;">
                                            <!--when user log in this must be replaced with user pic and when clicked will go directly to user account management-->
                                            {%block ImgUserLogin %}
-
+                                           {% if request.user.is_authenticated %}
+                                           <li class="dropdown" style="position: absolute;right: 40px;top: 8px;">
+                                               <div class="dropdown-toggle" data-toggle="dropdown" style="top:10px">
+                                                   <div class="profile-circle shadow" style="background-image:url({% if request.user.picture %}{% static 'NA_User_Image/UploadImg/' %}{{ request.user.picture }}{% else %}{% static 'NA_User_Image/Img/default.png' %}{% endif %})"></div>
+                                               </div>
+                                               <ul class="dropdown-menu triangle pull-right shadow" style="min-width: 320px;height:190px;padding:0px;right:8px;border-radius:2px">
+                                                   <div class="row" style="margin:15px;height:110px;">
+                                                       <div class="col-md-4" style="padding:0px;margin-right:17px">
+                                                           <div class="profile-circle medium" style="background-image:url({% if request.user.picture %}{% static 'NA_User_Image/UploadImg/' %}{{ request.user.picture }}{% else %}{% static 'NA_User_Image/Img/default.png' %}{% endif %})">
+                                                           </div>
+                                                       </div>
+                                                       <div class="col-md-7" style="font-size:13px;padding:0px;">
+                                                           <div class="username">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+                                                           <div class="email">{{ request.user.email }}</div>
+                                                           <button id="profile" class="btn btn-primary" style="margin-top:10px;">Profile</button>
+                                                       </div>
+                                                   </div>
+                                                   <li class="divider"></li>
+                                                   <li>
+                                                       <a class="btn btn-default pull-right" href="{% url 'logout' %}" style="margin-right:10px">Sign out</a>
+                                                   </li>
+                                               </ul>
+                                           </li>
+                                           {% else %}
                                            <li style="background-color:transparent;margin-top:7px; display:inline-flex;flex :0 0 auto;top:10px; ">
                                                <i class="fa fa-user"></i>
-                                               <!--<div class="login-picture">
-                        <img aria-hidden="true" src="Image/me.jpg"/>
-                        </div>-->
                                            </li>
+                                           {% endif %}
                                            {% endblock %}
                                            <!--When user has sign in this text must be changed with the name sign out and removed li control-->
-                                           {% block UserLogIn %}
+                                           <!-- ============================ User Login =================================== -->
+                                           {% if not request.user.is_authenticated %}
                                            <li class="dropdown" style="flex: 0 1 65px;">
-                                               <a href="http://www.jquery2dotnet.com" class="dropdown-toggle" data-toggle="dropdown" style="top:10px">Sign in <b class="caret"></b></a>
+                                               <!--<li class="dropdown{% if not request.user.is_authenticated %} open{% endif %}" style="flex: 0 1 65px;">-->
+                                               <a href="http://www.jquery2dotnet.com" class="dropdown-toggle" data-toggle="dropdown" style="top:10px">
+                                                   Sign in
+                                                   <b class="caret"></b>
+                                               </a>
+
+                                               <ul class="dropdown-menu" styl
+
                                                <ul class="dropdown-menu" style="padding: 10px;min-width: 170px;">
                                                    <li>
                                                        <div class="row">
                                                            <div class="col-md-12">
-                                                               <form class="form" role="form" method="post" action="login" accept-charset="UTF-8" id="login-nav">
+                                                               <form class="form" role="form" method="post" action="" accept-charset="UTF-8" id="login-nav">
+                                                                   {% csrf_token %}
                                                                    <div class="form-group">
                                                                        <label class="sr-only" for="exampleInputEmail2">Email address</label>
-                                                                       <input class="NA-Form-Control" id="exampleInputEmail2" placeholder="Email address" required="" type="email">
+                                                                       <input class="form-control" name="email" id="id_email" required="" type="email" placeholder="Email address">
                                                                    </div>
                                                                    <div class="form-group">
                                                                        <label class="sr-only" for="exampleInputPassword2">Password</label>
-                                                                       <input class="NA-Form-Control" id="exampleInputPassword2" placeholder="Password" required="" type="password">
+                                                                       <input class="form-control" name="password" id="id_password" required="" type="password" placeholder="Password">
                                                                    </div>
                                                                    <div class="checkbox">
                                                                        <label>
                                                                            <input type="checkbox"> Remember me
                                                                        </label>
                                                                    </div>
+
                                                                    <div class="form-group">
                                                                        <button type="submit" class="btn btn-success btn-block">Sign in</button>
                                                                    </div>
+
                                                                </form>
+                                                               <div class="form-group">
+                                                                   <button class="btn btn-primary btn-block" id="register">Sign up</button>
+                                                               </div>
                                                            </div>
                                                        </div>
                                                    </li>
@@ -203,17 +313,23 @@
                             </li>-->
                                                </ul>
                                            </li>
-                                           {% endblock %}
+                                           {% endif %}
+                                           <!-- ============================ End User Login =============================== -->
                                        </ul>
                                    </div>
                                    <div class="AsideMainArea">
-                                       {% block EventsLog %}
-                                       <h4>Logs Event Here</h4>
-                                       <p>Any User will log here ordered by date and group by month</p>
-                                       {% endblock %}
+
+                                       <div id="EventLogs" class="LogEvent"></div>
+                                       <div class="input-group" style="display:inline-flex;position:relative">
+                                            <input class="NA-Form-Control" id="searchLogEvent" style="display:flex;flex-flow:row nowrap;height:30.22px;" placeholder="Search Actions" type="text">
+                                            <div class="input-group-btn" style="padding-bottom:0;display:flex;flex-flow:row nowrap;width:auto;">
+                                                <button style="height:30.22px;" class="btn btn-default" type="submit" id="btnSearchLogEvent"><i class="fa fa-search-minus" aria-hidden="true"></i></button>
+                                            </div>
+                                        </div>
                                    </div>
                                </aside>
                                <div class="clearfloat"></div>
+
                                <!--=========DIALOG ENTRY FOR INPUT OPEN AND UPDATE DATA===============-->\
 
                                {% block DialogEntry %}
@@ -221,95 +337,420 @@
                                {% endblock %}
 
                                <!--====================================================================-->
-
                            </div>
+                           <script>window.jQuery || document.write('<script src="../../static/app/scripts/jquery-1.11.1.js"><\/script>')</script>
+                           {% with request.resolver_match.url_name as url_name %}
+                           {% if url_name == 'home' or url_name == 'login' %}
+                           <script>window.NA || document.write('<script src="../../static/app/scripts/NAJS.js"><\/script>')</script>
+                           <!-- ========================== This is Load only in Home, =============================== -->
+                           <script>
+                               NA.common.loadStyles("../../../static/app/content/jquery-ui.min.css","jqueryUI");
+                               NA.common.loadStyles("../../../static/app/content/ui.jqgrid.css","UIJqueryGrid");
+                               NA.common.loadStyles("../../../static/app/content/Dialog.css", "DialogEntryStyle");//Load Style buat dialog sebelum di pakai
+                               //NA.common.loadStyles("../../../static/app/content/NA_commonEntry.css","CommonEntry");//Load Style buat form sebelum di pakai
+                               var btnRegister = NA.common.doc.querySelector('button#register')
+                               NA.common.dialog.initDialog(null,'Nufarm User - Register',[btnRegister]);//inistialisasi menu
+                               window.showDialogEntry = function(event){
+                                   $('div.maindialogContent').load(url_register(), function (response, status, xhr) {
+                                       function getData_User() {
+                                           data = {
+                                               first_name: $('input#id_first_name').val(),
+                                               last_name: $('input#id_last_name').val(),
+                                               username: $('form#form_user').find('input#id_username').val(),
+                                               picture: $('input#id_picture').val(),
+                                               email: $('form#form_user').find('input#id_email').val(),
+                                               password1: $('form#form_user').find('input#id_password1').val(),
+                                               password2: $('form#form_user').find('input#id_password2').val()
+                                           }
+                                           return data
+                                       }
+                                       var initializeForm_user = NA.common.getElementID('id_initializeForm_user');
+                                       initializeForm_user.Value = JSON.stringify(getData_User());
+                                       function NA_UserSubmit() {
+                                           $('form#form_user').submit(function (event) {
+                                               $.ajax({
+                                                   url: $(this).attr('action'),
+                                                   method: 'POST',
+                                                   data: new FormData(this),
+                                                   cache: false,
+                                                   contentType: false,
+                                                   processData: false,
+                                                   success: function (data) {
+                                                       console.log(data)
+                                                   }
+                                               })
+                                           });
+                                       };
+                                       var form_user = NA.common.getElementID('form_user');
+                                       var dialog_user = NA.common.dialog.doc.querySelector("div.containerDialog");
+                                       var btn_input = NA.common.getElementID('user_submit');
+                                       function detectDifference_pass() {
+                                           var container_msg = NA.common.doc.createElement('p');
+                                           var message = NA.common.doc.createTextNode('Password didn\'t match .. . Please check again!!');
+                                           container_msg.appendChild(message);
+                                           return {
+                                               check: function () {
+                                                   return $('form#form_user > #id_password1').val() !== $('form#form_user > #id_password2').val();
+                                               },
+                                               showMessage: function () {
+                                                   return form_user.appendChild(container_msg);
+                                               }
+                                           };
+                                       };
+                                       function closeForm_user() {
+                                           var originalData = JSON.parse(initializeForm_user.Value);
+                                           var valuesForm = getData_User();
+                                           if (NA.common.detectInputChanges(originalData, valuesForm)) {
+                                               if (confirm('Data has changed, \nSave data before closing form ?')) {
+                                                   if (detectDifference_pass().check()) {
+                                                       detectDifference_pass().showMessage();
+                                                       form_user.onsubmit('return false')
+                                                   } else {
+                                                       btn_input.click();
+                                                   }
 
-                           <!-- =================jQuery CDN  ttps://code.jquery.com/jquery-1.11.1.min.js========================================-->
-                           <!--================= jQuery local fallback h========================= -->
-                           <script>window.jQuery || document.write('\<script src\="{% static 'app/scripts/jquery-1.11.1.js' %}"\>\<\/script\>')</script>
+                                               } else {
+                                                   NA.common.dialog.closeDialog(dialog_user);
+                                               }
+                                           } else {
+                                               NA.common.dialog.closeDialog(dialog_user);
+                                           }
+                                       };
+                                       $('div.dialogButtonOKCancel>a.button').click(function (event) {
+                                           var target = NA.NAEvent.getTarget(event);
+                                           if (target.innerText.trim() == 'OK') {
+                                               UserHandler('OK');
+                                           } else if (target.innerText.trim() == 'Cancel') {
+                                               UserHandler('Cancel', closeForm_user);
+                                           }
+                                       });
+                                       $('button.ui-button.ui-dialog-titlebar-close').on('click', function (event) {
 
-                           <!-- ===============Bootstrap JS CDN  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>  =============================== -->
-                           <!-- ===============Bootstrap JS local fallback============== -->
-                           <script type="text/javascript">if(typeof($.fn.modal) == 'undefined') {document.write('<script src="{% static 'app/scripts/bootstrap.js' %}"><\/script>')}</script>
+                                           UserHandler('Close', closeForm_user);
+                                           NA.NAEvent.preventDefault(event);
+                                       });
 
-                           
-                           <!--==================== Matikan dulu bootstrap na ======================================
-    $(function(){
-           //=============Bootstrap CSS local fallback==========
-            var btndefaultbgcolor = $('div.input-group-button>.btn-btn-default').css('background-color');
-                if(btndefaultbgcolor != '#ffffff') {
-                $("head>title").prepend('<link rel="stylesheet" type="text/css" href="{ % static 'app/content/bootstrap.css' %}">');}
-           });
-                              </script>
-			=======================================================================================================================-->
+                                       function UserHandler(text, closeForm) {
+                                           if (text == 'OK') {
+                                               btn_input.click();
+                                           } else if (text == 'Cancel' || text == 'Close') {
+                                               if (form_user) {
+                                                   closeForm();
+                                               }
+                                           }
+                                       }
+                                   });
 
-						<!--====================Jquery untuk menu============================ -->
-                           <script type="text/javascript">
-							                    
-                          
-                         	$(function () {
-
-                         		//================Tambahkan method Form Serialize json pada jquery ======================
-                         		//===============di NA.js serilize hanya berguna untuk query string=====================
-                         		// sending the form with JSON
-                         		// sample pemakaian
-                         		//var frm = $(document.myform);
-                         		//var data = JSON.stringify(frm.serializeObject());
-                         		//$.fn.serializeObject = function() {
-                         		//    var o = {};
-                         		//    //    var a = this.serializeArray();
-                         		//    $(this).find('input[type="hidden"], input[type="text"], input[type="password"], input[type="checkbox"]:checked, input[type="radio"]:checked, select').each(function() {
-                         		//        if ($(this).attr('type') == 'hidden') { //if checkbox is checked do not take the hidden field
-                         		//            var $parent = $(this).parent();
-                         		//            var $chb = $parent.find('input[type="checkbox"][name="' + this.name.replace(/\[/g, '\[').replace(/\]/g, '\]') + '"]');
-                         		//            if ($chb != null) {
-                         		//                if ($chb.prop('checked')) return;
-                         		//            }
-                         		//        }
-                         		//        if (this.name === null || this.name === undefined || this.name === '')
-                         		//            return;
-                         		//        var elemValue = null;
-                         		//        if ($(this).is('select'))
-                         		//            elemValue = $(this).find('option:selected').val();
-                         		//        else elemValue = this.value;
-                         		//        if (o[this.name] !== undefined) {
-                         		//            if (!o[this.name].push) {
-                         		//                o[this.name] = [o[this.name]];
-                         		//            }
-                         		//            o[this.name].push(elemValue || '');
-                         		//        } else {
-                         		//            o[this.name] = elemValue || '';
-                         		//        }
-                         		//    });
-                         		//    return o;
-                         		//}
-
-                         		//============click menu event=======================
-                         		$("div.sidebar ul li a").click(function (event) {
-                         			if ($(this).find($(".fa")).hasClass('fa-angle-down')) {
-                         				$(this).find($(".fa")).removeClass('fa-angle-down');
-                         				$(this).find($(".pull-right")).addClass('fa-angle-up');
-                         			}
-                         			else if ($(this).find($(".fa")).hasClass('fa-angle-up')) {
-                         				$(this).find($(".fa")).removeClass('fa-angle-up');
-                         				$(this).find($(".pull-right")).addClass('fa-angle-down');
-                         			}
-                         			else if ($(this).find($(".fa")).hasClass('fa-angle-left')) {
-                         				$(this).find($(".fa")).removeClass('fa-angle-left');
-                         				$(this).find($(".pull-right")).addClass('fa-angle-right');
-                         				$('div.sidebar').css('flex', '0 1 auto');
-                         				$('div.sidebar').toggleClass('fliph');
-                         			}
-                         			else if ($(this).find($(".fa")).hasClass('fa-angle-right')) {
-                         				$(this).find($(".fa")).removeClass('fa-angle-right');
-                         				$(this).find($(".pull-right")).addClass('fa-angle-left');
-                         				$('.sidebar').css('flex', '0 0 173px');
-                         				$('.sidebar').toggleClass('fliph');
-                         			}
-                         		});
-                         	});
-
+                               }
                            </script>
-                       </body>
+                           {%endif%}
+                           {%endwith%}
+                           <!--======================================== Script Log Event =============================================== -->
+            
+                           <link rel="stylesheet" type="text/css" href="{% static 'app/content/backupss/icon.css' %}">
+                           <script type="text/javascript" src="{% static 'app/scripts/easyloader.js' %}"></script>
+                           <!--<script src="{% static 'app/scripts/NAJS.js' %}"></script>-->
+                           <script type="text/javascript">
+          $(document).ready(function () {
+              var inputLogEvent = NA.common.getElementID('searchLogEvent'),
+                  btn_search_log = NA.common.getElementID('btnSearchLogEvent');
+              function searchLog(event){
+                  NA.NAEvent.preventDefault(event);
+                  var targetValue = inputLogEvent.value;
+                  NA.common.AJAX.GET(url_logEvent() + '?' + win.encodeURIComponent('_Search') + '=' + true + '&' + win.encodeURIComponent('search') + '=' + targetValue, 'application/json', function (e) { window.document.body.style.cursor = 'wait'; },
+                        null,
+                        function (e) {//function executed after data has been returned by server(XHR.onload)
+                            var data = JSON.parse(this.responseText);
+                            if (data) {
+                                $('#EventLogs').tree('loadData',data);
+                            }
+                        }, null, function (e) {
+                            throw new Error(this.responseText + '\nStatus code :' + this.statusText);
+                        }, function (e) { window.document.body.style.cursor = 'default'; },//function ajax complete
+                        null);
+              };
+              NA.NAEvent.addHandler(inputLogEvent,'keydown',function(event){
+                  console.log(event);
+                  if(event.keyCode == 13){
+                      searchLog(event);
+                  }
+              });
+              NA.NAEvent.addHandler(btn_search_log,'click',function(event){
+                  searchLog(event);
+              });
+              var months = [
+                  'January', 'February', 'March', 'April', 'May',
+                  'June', 'July', 'August', 'September',
+                  'October', 'November', 'December'
+              ];
+              function retriveMonth(monthname) {
+                  var month = months.indexOf(monthname);
+                  return month ? month + 1 : 0;
+              };
+            using('tree', function () {
+                $("#EventLogs").tree({
+                    url: url_logEvent(),
+                    method: 'get',
+                    animate: false,
+                    loadFilter: function (data, parent) {
+                                    function forNodes(data, callback) {
+                                        var nodes = [];
+                                        for (var i = 0; i < data.length; i++) {
+                                            nodes.push(data[i]);
+                                        }
+                                        while (nodes.length) {
+                                            var node = nodes.shift();
+                                            if (callback(node) == false) { return; }
+                                            if (node.children) {
+                                                for (var i = node.children.length - 1; i >= 0; i--) {
+                                                    nodes.unshift(node.children[i]);
+                                                }
+                                            }
+                                        }
+                                    };
+                                    forNodes(data, function (node) {
+                                        if (!node.children) {
+                                            if (node.text.match(/Created/)) {
+                                                node.iconCls = 'fa fa-plus';
+                                            };
+                                            if (node.text.match(/Updated/)) {
+                                                node.iconCls = 'fa fa-pencil';
+                                            };
+                                            if (node.text.match(/Deleted/)) {
+                                                node.iconCls = 'fa fa-trash';
+                                            };
+                                            if(node.text.match(/^Send/)){
+                                                node.iconCls = 'fa fa-envelope'
+                                            }
+                                        };
+                                        if (node.children) {
+                                            if (node.text.match(/\d+ \w+ \d+/)) {
+                                                node.state = 'closed'
+                                                node.iconCls = 'fa fa-calendar'
+                                            } else if (node.text.match(/^Log/)) {
+                                                node.iconCls = 'fa fa-indent'
+                                            } else if (node.text.match(/^\d{4}$/) || node.text.match(/\d{4}$/)) {
+                                                node.iconCls = 'fa fa-calendar-o'
+                                            }
+                                        }
+                        
+                                    });
+                                    
+                        return data;
+                    },
+                    onClick: function (node) {
+                        if (!node.children) {
+                            var obj = $(node.target).parent()['context']['id']; //get id of the clicked object/node .. . :D
+                            var get_tanggal = $('#' + obj).parents().eq(1).prev().text(); //get date of the clicked object, by access parent of element .. . :D
+                            var dynamic_field = (get_tanggal + 'T' + get_waktu); //this is the default format time of the django, and can optional if change it .. . :D
+                            var descrModal = $('#mYmodal'); // Modal Log Descriptions
+                            var get_waktu = node.text.match(/\d+:\d+:\d+/);
+                            var get_year = get_tanggal.match(/\d{4}/),
+                                get_month = retriveMonth(get_tanggal.match(/\s\w+\s/).toString().trim()),
+                                get_day = get_tanggal.match(/\d{2}/);
+                            var get_clicked = get_year + '-' + get_month + '-' + get_day + 'T' + get_waktu;
+                            $.ajax({
+                                type: 'GET',
+                                url: url_logDesc() + '?createddate=' + get_clicked,
+                                dataType: 'json',
+                                success: function (data) {
+                                    if (data[0]['created']) {
+                                        var get_created = data[0]['created'];
+                                    } else if (data[0]['before']) {
+                                        var get_before = data[0]['before'];
+                                        var get_after = data[0]['after'];
+                                    } else if (data[0]['deleted']) {
+                                        var get_deleted = data[0]['deleted'];
+                                    } else if (data[0]['emailData']) {
+                                        var get_mailData = data[0]['emailData'];
+                                    };
+                                    // ===== Label for Display Log Event
+                                    function label_inactive(text){
+                                        if (text.indexOf('0') > -1){
+                                            var i_inactive = text.indexOf('0');
+                                            text[i_inactive] = 'No'
+                                        }else if(text.indexOf('1') > -1){
+                                            var i_active = text.indexOf('1');
+                                            text[i_active] = 'Yes'
+                                        };
+                                        return text
+                                    };
 
+                                    function label_empl() {
+                                        var txt_data = get_created;
+                                        if (txt_data.indexOf('M') > -1) {
+                                            var i_Male = txt_data.indexOf('M');
+                                            txt_data[i_Male] = 'Male';
+                                        }else if(txt_data.indexOf('F') > -1){
+                                            var i_Female = txt_data.indexOf('F');
+                                            txt_data[i_Female] = 'Female';
+                                        };
+                                        if (txt_data.indexOf('S') > -1) {
+                                            var i_Single = txt_data.indexOf('S');
+                                            txt_data[i_Single] = 'Single'
+                                        } else if (txt_data.indexOf('M') > -1) {
+                                            var i_Married = txt_data.indexOf('M');
+                                            txt_data[i_Married] = 'Married'
+                                        };
+                                        label_inactive(txt_data);
+                                        return txt_data
+                                    };
+                                    var match_created = node.text.match(/Created/);
+                                    var match_updated = node.text.match(/Updated/);
+                                    var match_deleted = node.text.match(/Deleted/);
+                                    var match_suplier = node.text.match(/Suplier/);
+                                    var match_employee = node.text.match(/Employee/);
+                                    var match_goods = node.text.match(/Goods/);
+                                    var match_mail = node.text.match(/Email/);
+                                    function removeNull(text) {
+                                        if ($('div#contentName').is(':visible')) {
+                                            if(text[text.length - 1] == null || text.length < $('div#contentElem').length){
+                                                $('div#contentElem:contains(Modified), div#contentData:contains(null), div#contentData:contains(undefined)').remove()
+                                            }
+                                        } else {
+                                            setTimeout(removeNull, 50); //wait 50 ms, then try again this is recursive function :D
+                                        }
+                                    };
+                                    var settings_default = {
+                                        title: 'Nufarm Log Event - Descriptions',
+                                        parentClass: 'col-md-12'
+                                    };
+                                    if (match_suplier) {
+                                        var settings_suplier = NA.common.AssignObject({
+                                            textToContent: ['Suplier Code :', 'Suplier Name :', 'Address :', 'Telp :', 'Hp :', 'Contact Person :', 'Inactive :', 'Created Date :', 'Created By :', 'Modified Date :', 'Modified By :'],
+                                            contentElem_Class: 'col-md-4',
+                                            contentData_Class: 'col-md-7'
+                                        },settings_default)
+                                        if (match_created) {
+                                            var settings_suplier_create = NA.common.AssignObject({
+                                                get_text: label_inactive(get_created)
+                                            },settings_suplier)
+                                            NA.common.dialog.showDescriptionsLog(settings_suplier_create)
+                                            removeNull(get_created);
+                                        } else if (match_updated) {
+                                            var settings_suplier_update = NA.common.AssignObject({
+                                                get_text: get_after,
+                                                mode: 'update',
+                                                text_after: get_after,
+                                                text_before: get_before
+                                            },settings_suplier)
+                                            NA.common.dialog.showDescriptionsLog(settings_suplier_update)
+
+                                        } else if (match_deleted) {
+                                            var settings_suplier_delete = NA.common.AssignObject({
+                                                get_text: get_deleted
+                                            },settings_suplier)
+                                            NA.common.dialog.showDescriptionsLog(settings_suplier_delete);
+                                            removeNull(get_deleted);
+                                        }
+                                    } else if (match_employee) {
+                                        var settings_employee = NA.common.AssignObject({
+                                            textToContent: ['Nik:', 'Employee Name :', 'Type App :', 'Jobtype :', 'Gender :', 'Status :', 'Telp/Hp :', 'Territory :', 'Descriptions :', 'Inactive :', 'Created Date :', 'Created By :', 'Modified Date :', 'Modified By :'],
+                                            contentElem_Class: 'col-md-4',
+                                            contentData_Class: 'col-md-7'
+                                        }, settings_default)
+                                        if (match_created) {
+                                            var settings_employee_create = NA.common.AssignObject({
+                                                get_text: label_empl()
+                                            },settings_employee)
+                                            NA.common.dialog.showDescriptionsLog(settings_employee_create)
+                                            removeNull(get_created);
+                                        } else if (match_updated) {
+                                            var settings_employee_update = NA.common.AssignObject({
+                                                get_text: get_after,
+                                                mode: 'update',
+                                                text_after: get_after,
+                                                text_before: get_before
+                                            }, settings_employee);
+                                            NA.common.dialog.showDescriptionsLog(settings_employee_update);
+                                        } else if (match_deleted) {
+                                            var settings_employee_delete = NA.common.AssignObject({
+                                                mode: 'delete',
+                                                get_text: get_deleted
+                                            }, settings_employee);
+                                            NA.common.dialog.showDescriptionsLog(settings_employee_delete);
+                                            removeNull(get_deleted);
+                                        }
+
+                                    } else if (match_goods) {
+                                        var settings_goods = NA.common.AssignObject({
+                                            textToContent: ['Item Code :', 'Goods Name :', 'Brand Name :', 'Type App :', 'Price/Unit :', 'Depreciation :', 'Unit :', 'Economic Life :', 'Placement :', 'Descriptions :', 'Inactive :', 'Created Date :', 'Created By :', 'Modified Date :', 'Modified By :'],
+                                            contentElem_Class: 'col-md-3',
+                                            contentData_Class: 'col-md-7'
+                                        }, settings_default);
+                                        if (match_created) {
+                                            var settings_goods_create = NA.common.AssignObject({
+                                                get_text: get_created
+                                            }, settings_goods);
+                                            NA.common.dialog.showDescriptionsLog(settings_goods_create);
+                                            removeNull(get_created);
+                                        } else if (match_updated) {
+                                            var settings_goods_update = NA.common.AssignObject({
+                                                get_text: get_after,
+                                                mode: 'update',
+                                                text_after: get_after,
+                                                text_before: get_before
+                                            }, settings_goods);
+                                            NA.common.dialog.showDescriptionsLog(settings_goods_update);
+                                        } else if (match_deleted) {
+                                            var settings_goods_delete = NA.common.AssignObject({
+                                                get_text: get_deleted,
+                                                mode: 'delete'
+                                            }, settings_goods);
+                                            NA.common.dialog.showDescriptionsLog(settings_goods_delete);
+                                            removeNull(get_deleted);
+                                        }
+                                    } else if (match_mail) {
+                                        NA.common.dialog.showDescriptionsLog({
+                                            title: 'Nufarm Log Event - Descriptions',
+                                            textToContent: ['To :','From :', 'Subject :', 'Message :', 'Type Report :'],
+                                            parentClass: 'col-md-12',
+                                            contentElem_Class: 'col-md-4',
+                                            contentData_Class:'col-md-7',
+                                            get_text: get_mailData,
+                                            mode: 'emailData'
+                                        });
+                                    }
+
+                                }
+                            })
+                        }
+
+                    }
+
+                });
+            });
+         });
+      </script>
+                           <!--================================================= End Script Log Event =============================================== -->
+                           <!--====================Jquery untuk menu============================ -->
+                           <script>
+                               $(function () {
+                                   $("div.sidebar ul li a").click(function (event) {
+                                       if ($(this).find($(".fa")).hasClass('fa-angle-down')) {
+                                           $(this).find($(".fa")).removeClass('fa-angle-down');
+                                           $(this).find($(".pull-right")).addClass('fa-angle-up');
+                                       }
+                                       else if ($(this).find($(".fa")).hasClass('fa-angle-up')) {
+                                           $(this).find($(".fa")).removeClass('fa-angle-up');
+                                           $(this).find($(".pull-right")).addClass('fa-angle-down');
+                                       }
+                                       else if ($(this).find($(".fa")).hasClass('fa-angle-left')) {
+                                           $(this).find($(".fa")).removeClass('fa-angle-left');
+                                           $(this).find($(".pull-right")).addClass('fa-angle-right');
+                                           $('div.sidebar').css('flex', '0 1 auto');
+                                           $('div.sidebar').toggleClass('fliph');
+                                       }
+                                       else if ($(this).find($(".fa")).hasClass('fa-angle-right')) {
+                                           $(this).find($(".fa")).removeClass('fa-angle-right');
+                                           $(this).find($(".pull-right")).addClass('fa-angle-left');
+                                           $('.sidebar').css('flex', '0 0 173px');
+                                           $('.sidebar').toggleClass('fliph');
+                                       }
+                                   });
+                               });
+                           </script>
+<script type="text/javascript">if (typeof $.fn.modal == 'undefined') { NA.common.doc.write('\<script src\=\"\.\.\/\.\.\/\.\.\/static\/app\/scripts\/bootstrap\.js\"\>\<\/script\>'); }</script>
+                           <link rel="stylesheet" type="text/css" href="{% static 'app/content/font-awesome.min.css' %}" />
+                       </body>
 </html>

@@ -4789,8 +4789,8 @@ textarea.input-group-sm > .input-group-btn > .btn {
   background-color: #eeeeee;
 }
 
-.pager .next > a,
-.pager .next > span {
+.pager . > a,
+.pager . > span {
   float: right;
 }
 
@@ -6029,7 +6029,7 @@ body.modal-open,
 }
 
 .carousel-inner > .active,
-.carousel-inner > .next,
+.carousel-inner > .,
 .carousel-inner > .prev {
   display: block;
 }
@@ -6038,14 +6038,14 @@ body.modal-open,
   left: 0;
 }
 
-.carousel-inner > .next,
+.carousel-inner > .,
 .carousel-inner > .prev {
   position: absolute;
   top: 0;
   width: 100%;
 }
 
-.carousel-inner > .next {
+.carousel-inner > . {
   left: 100%;
 }
 
@@ -6053,7 +6053,7 @@ body.modal-open,
   left: -100%;
 }
 
-.carousel-inner > .next.left,
+.carousel-inner > ..left,
 .carousel-inner > .prev.right {
   left: 0;
 }
@@ -6109,7 +6109,7 @@ body.modal-open,
 }
 
 .carousel-control .icon-prev,
-.carousel-control .icon-next,
+.carousel-control .icon-,
 .carousel-control .glyphicon-chevron-left,
 .carousel-control .glyphicon-chevron-right {
   position: absolute;
@@ -6120,7 +6120,7 @@ body.modal-open,
 }
 
 .carousel-control .icon-prev,
-.carousel-control .icon-next {
+.carousel-control .icon- {
   width: 20px;
   height: 20px;
   margin-top: -10px;
@@ -6132,7 +6132,7 @@ body.modal-open,
   content: '\2039';
 }
 
-.carousel-control .icon-next:before {
+.carousel-control .icon-:before {
   content: '\203a';
 }
 
@@ -6185,7 +6185,7 @@ body.modal-open,
 
 @media screen and (min-width: 768px) {
   .carousel-control .icon-prev,
-  .carousel-control .icon-next {
+  .carousel-control .icon- {
     width: 30px;
     height: 30px;
     margin-top: -15px;

@@ -1,0 +1,53 @@
+﻿<style>
+    div.NA-Entry-inlinve-div {
+        margin-right:5px
+    }
+</style>
+<form action="EntrySuplier/" method="post" style="width:440px;height:260px;" id="suplier_form" onsubmit="return false">
+    {% csrf_token %}
+    <style>
+        form div.row {
+            margin-top:15px
+        }
+    </style>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_supliercode">Supliercode:</label>
+            {{form.supliercode}}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_supliername">Supliername:</label>
+            {{form.supliername}}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_telp">Telp:</label>
+            {{form.telp}}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_hp">Hp:</label>
+            {{form.hp}}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_contactperson">Contactperson:</label>
+            {{form.contactperson}}
+        </div>
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_inactive" style="display:inline">Inactive:</label>
+            {{form.inactive}}
+        </div>
+    </div>
+    <div class="NA-Entry-div-row">
+        <div class="NA-Entry-inlinve-div">
+            <label for="id_address">Address:</label>
+            {{form.address}}
+        </div>
+    </div>
+    
+    {{form.initializeForm}}
+    <input type="submit" style="display:none" id="suplier_submit" />
+    
+</form>
